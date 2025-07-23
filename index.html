@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidewalk 27 Schedule</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- jsPDF and html2canvas for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+    <div class="main-layout-container mx-auto flex flex-col md:flex-row gap-6">
+
+        <!-- Main Schedule Content Area -->
+        <div class="md:w-3/4 flex-grow">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-gray-900 mb-8 sm:mb-10">Sidewalk 27 Schedule</h1>
+
+            <!-- Day Filter Dropdown -->
+            <div class="mb-6 flex justify-center items-center">
+                <label for="day-filter" class="text-lg font-semibold mr-3">Filter by Day:</label>
+                <select id="day-filter" class="p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="all">All Days</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                </select>
+            </div>
+
+            <!-- Original Schedule Sections -->
+            <!-- Monday, August 18 -->
+            <div class="schedule-day-section mb-10 p-6 bg-red-50 rounded-xl shadow-md" data-day-section="Monday">
+                <h2 class="text-3xl font-bold text-red-700 mb-6 border-b-2 border-red-300 pb-3">Monday, August 18</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="monday-events">
+                    <!-- Event 1 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-1" data-day="Monday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 5:00pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Alabama Film Spotlight Night: Happy Hour</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 2 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-2" data-day="Monday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 6:00pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Alabama Spotlight: Shorts</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 3 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-3" data-day="Monday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 6:30pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Alabama Spotlight: Shorts</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 4 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-4" data-day="Monday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 8:30pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Alabama Spotlight Night: Forward, Ever</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 5 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-5" data-day="Monday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 8:45pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Alabama Spotlight Night: Forward, Ever</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tuesday, August 19 -->
+            <div class="schedule-day-section mb-10 p-6 bg-blue-50 rounded-xl shadow-md" data-day-section="Tuesday">
+                <h2 class="text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-3">Tuesday, August 19</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tuesday-events">
+                    <!-- Event 1 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-1" data-day="Tuesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 5:00pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Life + Liberty Spotlight Night: Happy Hour</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 2 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-2" data-day="Tuesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 6:00pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Life & Liberty Spotlight: Shorts</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 3 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-3" data-day="Tuesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 6:30pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Life & Liberty Spotlight: Shorts</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 4 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-4" data-day="Tuesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 8:30pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Life and Liberty Spotlight Night: Baby Doe</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 5 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-5" data-day="Tuesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 8:45pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Life and Liberty Spotlight Night: Baby Doe</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wednesday, August 20 -->
+            <div class="schedule-day-section mb-10 p-6 bg-green-50 rounded-xl shadow-md" data-day-section="Wednesday">
+                <h2 class="text-3xl font-bold text-green-700 mb-6 border-b-2 border-green-300 pb-3">Wednesday, August 20</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="wednesday-events">
+                    <!-- Event 1 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-1" data-day="Wednesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 5:00pm</p>
+                            <h3 class="text-xl font-bold event-card-title">SHOUT LGBTQ+ Spotlight Night: Happy Hour</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 2 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-2" data-day="Wednesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 6:00pm</p>
+                            <h3 class="text-xl font-bold event-card-title">SHOUT: Spotlight Shorts</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 3 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-3" data-day="Wednesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 6:30pm</p>
+                            <h3 class="text-xl font-bold event-card-title">SHOUT: Spotlight Shorts</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 4 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-4" data-day="Wednesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 8:30pm</p>
+                            <h3 class="text-xl font-bold event-card-title">SHOUT Spotlight Night: Love Me Bait Me: The Power of Queer Representation</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 5 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-5" data-day="Wednesday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 8:45pm</p>
+                            <h3 class="text-xl font-bold event-card-title">SHOUT Spotlight Night: Love Me Bait Me: The Power of Queer Representation</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thursday, August 21 -->
+            <div class="schedule-day-section p-6 bg-purple-50 rounded-xl shadow-md" data-day-section="Thursday">
+                <h2 class="text-3xl font-bold text-purple-700 mb-6 border-b-2 border-purple-300 pb-3">Thursday, August 21</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="thursday-events">
+                    <!-- Event 1 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-1" data-day="Thursday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 5:00pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight Night: Happy Hour</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 2 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-2" data-day="Thursday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 6:00pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight: Shorts</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 3 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-3" data-day="Thursday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 6:30pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight: Shorts</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 4 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-4" data-day="Thursday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 8:30pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight Night: Paint Me A Road Out Of Here</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                    <!-- Event 5 -->
+                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-5" data-day="Thursday">
+                        <div class="event-card-content">
+                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 8:45pm</p>
+                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight Night: Paint Me A Road Out Of Here</h3>
+                        </div>
+                        <button class="add-to-schedule-btn">Add to My Schedule</button>
+                        <span class="view-my-schedule-link">View My Schedule</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Schedule Section (Floating Sidebar) -->
+        <div class="md:w-1/4 p-6 bg-gray-100 rounded-xl shadow-md drop-zone sticky-sidebar" id="my-schedule-drop-zone">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-gray-300 pb-3">
+                My Schedule
+            </h2>
+            <div class="my-schedule-header-buttons flex flex-wrap gap-2 mb-4">
+                <button id="view-full-screen-btn" class="px-3 py-1 bg-blue-500 text-white text-sm rounded-full hover:bg-blue-600 transition-colors duration-200 flex-grow">
+                    View Full Screen
+                </button>
+                <button id="download-pdf-btn" class="px-3 py-1 bg-blue-500 text-white text-sm rounded-full hover:bg-blue-600 transition-colors duration-200 flex-grow">
+                    Download as PDF
+                </button>
+            </div>
+            <div id="my-schedule-events" class="grid grid-cols-1 gap-6 min-h-[100px] flex items-center justify-center text-gray-500 text-lg">
+                Drag events here to create your personalized schedule!
+            </div>
+        </div>
+    </div>
+
+    <!-- Full-screen Modal for My Schedule -->
+    <div id="my-schedule-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="modal-close-btn" class="modal-close-btn">X</button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-gray-300 pb-3">My Full Schedule</h2>
+            <div id="modal-my-schedule-events" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Events will be cloned here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
