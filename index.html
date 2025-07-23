@@ -41,6 +41,7 @@
             background-color: transparent;
             padding: 2px; /* Reduced padding */
             font-size: 0.875rem; /* Smaller font size for inputs */
+            min-height: 32px; /* Ensure sufficient height for touch target */
         }
         /* Adjusted signature input field style */
         .signature-input {
@@ -50,7 +51,7 @@
             border-right: none;
             outline: none;
             width: 100%;
-            height: 18px; /* Slightly smaller height */
+            min-height: 32px; /* Ensure sufficient height for touch target */
             background-color: transparent;
             padding: 0; /* Remove padding for a true line look */
             text-align: center; /* Center placeholder text */
@@ -91,6 +92,27 @@
             .mb-2 { margin-bottom: 0.5rem; } /* Reduce margins */
             .mb-4 { margin-bottom: 0.75rem; }
             .mb-6 > div { margin-bottom: 1rem !important; } /* Reduce spacing between game sections */
+
+            /* Mobile-specific adjustments for header layout */
+            .fixed-header-content .flex-col.sm\:flex-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            .fixed-header-content .sm\:w-48 {
+                width: 100%; /* Make team name inputs full width on mobile */
+            }
+            .fixed-header-content .justify-end {
+                justify-content: center; /* Center align home team input on mobile */
+            }
+            .fixed-header-content .flex-shrink-0 {
+                width: 100%; /* Make button container full width */
+                text-align: right; /* Align button to right */
+                margin-top: 0.5rem; /* Add some space above button */
+            }
+            #submitButton {
+                width: auto; /* Allow button to size naturally */
+                display: inline-block; /* Ensure button aligns right */
+            }
         }
     </style>
 </head>
@@ -124,7 +146,6 @@
                     </div>
                     <p class="font-bold text-sm text-green-700 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-green-700">TOTAL PTS: <span id="away-grand-total" class="text-xs">0</span></p>
                 </div>
-                <!-- Removed VS here -->
                 <div class="flex flex-col items-center w-full sm:w-auto justify-end">
                     <div class="flex items-center w-full mb-0.5 justify-end">
                         <input type="text" name="homeTeamName" class="input-field border border-gray-300 rounded-md mr-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48" placeholder="Home Team Name">
@@ -177,7 +198,6 @@
                                     <div class="grid-cell py-1"><span id="singles501-away-total">0</span></div>
                                 </div>
                             </div>
-                            <!-- Removed VS separator for smaller screens -->
                             <!-- Home Team -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Home Team Player</p>
@@ -237,7 +257,6 @@
                                     <div class="grid-cell py-1"><span id="singlescricket-away-total">0</span></div>
                                 </div>
                             </div>
-                            <!-- Removed VS separator for smaller screens -->
                             <!-- Home Team -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Home Team Player</p>
@@ -292,7 +311,6 @@
                                     <div class="grid-cell py-1"><span id="doubles301-away-total">0</span></div>
                                 </div>
                             </div>
-                            <!-- Removed VS separator for smaller screens -->
                             <!-- Home Team -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Home Team Player</p>
@@ -376,7 +394,6 @@
                                     <div class="grid-cell py-1"><span id="doublescricket-away-total">0</span></div>
                                 </div>
                             </div>
-                            <!-- Removed VS separator for smaller screens -->
                             <!-- Home Team -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Home Team Player</p>
@@ -465,7 +482,6 @@
                                     <div class="grid-cell py-1"><span id="teamvulcan-away-total">0</span></div>
                                 </div>
                             </div>
-                            <!-- Removed VS separator for smaller screens -->
                             <!-- Home Team -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Home Team Player</p>
