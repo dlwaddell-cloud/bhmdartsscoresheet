@@ -19,7 +19,7 @@
             padding: 0; /* Remove default body padding */
             overflow-y: auto; /* Allow scrolling if content still overflows, but try to avoid it */
             /* Add padding to the top of the body to prevent content from being hidden by the fixed header */
-            padding-top: 150px; /* Adjusted based on the fixed header's height including message */
+            padding-top: 200px; /* Adjusted to provide more space for the fixed header on all screens, especially mobile */
         }
         /* Main content wrapper to center and limit width */
         .main-wrapper {
@@ -41,7 +41,6 @@
             background-color: transparent;
             padding: 2px; /* Reduced padding */
             font-size: 0.875rem; /* Smaller font size for inputs */
-            min-height: 32px; /* Ensure sufficient height for touch target */
         }
         /* Adjusted signature input field style */
         .signature-input {
@@ -51,7 +50,6 @@
             border-right: none;
             outline: none;
             width: 100%;
-            min-height: 32px; /* Ensure sufficient height for touch target */
             background-color: transparent;
             padding: 0; /* Remove padding for a true line look */
             text-align: center; /* Center placeholder text */
@@ -92,27 +90,6 @@
             .mb-2 { margin-bottom: 0.5rem; } /* Reduce margins */
             .mb-4 { margin-bottom: 0.75rem; }
             .mb-6 > div { margin-bottom: 1rem !important; } /* Reduce spacing between game sections */
-
-            /* Mobile-specific adjustments for header layout */
-            .fixed-header-content .flex-col.sm\:flex-row {
-                flex-direction: column;
-                align-items: center;
-            }
-            .fixed-header-content .sm\:w-48 {
-                width: 100%; /* Make team name inputs full width on mobile */
-            }
-            .fixed-header-content .justify-end {
-                justify-content: center; /* Center align home team input on mobile */
-            }
-            .fixed-header-content .flex-shrink-0 {
-                width: 100%; /* Make button container full width */
-                text-align: right; /* Align button to right */
-                margin-top: 0.5rem; /* Add some space above button */
-            }
-            #submitButton {
-                width: auto; /* Allow button to size naturally */
-                display: inline-block; /* Ensure button aligns right */
-            }
         }
     </style>
 </head>
@@ -748,4 +725,3 @@
     </script>
 </body>
 </html>
-
