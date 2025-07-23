@@ -267,7 +267,7 @@
                     <div class="border border-black p-2 rounded-md">
                         <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">DOUBLES 301 <span class="text-xs font-normal ml-1">2 points per game</span></h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team -->
+                            <!-- Away Team Group -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Away Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
@@ -282,13 +282,26 @@
                                     <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer2" class="input-field" placeholder="Player 2"></div>
                                     <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts2" class="input-field doubles301-away-pts" id="doubles301-away-player2-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
                                 </div>
-                                <!-- Total Row -->
+                                <!-- Total Row for Pair 1 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-away-total">0</span></div>
                                 </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts3" class="input-field doubles301-away-pts" id="doubles301-away-player3-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer4" class="input-field" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts4" class="input-field doubles301-away-pts" id="doubles301-away-player4-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row for Pair 2 -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL (Pair 2)</div>
+                                    <div class="grid-cell py-1"><span id="doubles301-away-total-2">0</span></div>
+                                </div>
                             </div>
-                            <!-- Home Team -->
+                            <!-- Home Team Group -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Home Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
@@ -303,32 +316,11 @@
                                     <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer2" class="input-field" placeholder="Player 2"></div>
                                     <div class="grid-cell py-1"><input type="number" name="doubles301HomePts2" class="input-field doubles301-home-pts" id="doubles301-home-player2-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
                                 </div>
-                                <!-- Total Row -->
+                                <!-- Total Row for Pair 1 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-home-total">0</span></div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team -->
-                            <div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts3" class="input-field doubles301-away-pts" id="doubles301-away-player3-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
-                                </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts4" class="input-field doubles301-away-pts" id="doubles301-away-player4-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
-                                </div>
-                                <!-- Total Row -->
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1">TOTAL</div>
-                                    <div class="grid-cell py-1"><span id="doubles301-away-total-2">0</span></div>
-                                </div>
-                            </div>
-                            <!-- Home Team -->
-                            <div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer3" class="input-field" placeholder="Player 3"></div>
                                     <div class="grid-cell py-1"><input type="number" name="doubles301HomePts3" class="input-field doubles301-home-pts" id="doubles301-home-player3-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
@@ -337,9 +329,9 @@
                                     <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer4" class="input-field" placeholder="Player 4"></div>
                                     <div class="grid-cell py-1"><input type="number" name="doubles301HomePts4" class="input-field doubles301-home-pts" id="doubles301-home-player4-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
                                 </div>
-                                <!-- Total Row -->
+                                <!-- Total Row for Pair 2 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-home-total-2">0</span></div>
                                 </div>
                             </div>
@@ -350,7 +342,7 @@
                     <div class="border border-black p-2 rounded-md">
                         <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">DOUBLES CRICKET <span class="text-xs font-normal ml-1">2 points per game</span></h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team -->
+                            <!-- Away Team Group -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Away Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
@@ -365,13 +357,26 @@
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer2" class="input-field" placeholder="Player 2"></div>
                                     <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts2" class="input-field doublescricket-away-pts" id="doublescricket-away-player2-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
                                 </div>
-                                <!-- Total Row -->
+                                <!-- Total Row for Pair 1 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-away-total">0</span></div>
                                 </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts3" class="input-field doublescricket-away-pts" id="doublescricket-away-player3-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer4" class="input-field" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts4" class="input-field doublescricket-away-pts" id="doublescricket-away-player4-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row for Pair 2 -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL (Pair 2)</div>
+                                    <div class="grid-cell py-1"><span id="doublescricket-away-total-2">0</span></div>
+                                </div>
                             </div>
-                            <!-- Home Team -->
+                            <!-- Home Team Group -->
                             <div>
                                 <p class="font-semibold mb-1 text-sm">Home Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
@@ -386,32 +391,11 @@
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer2" class="input-field" placeholder="Player 2"></div>
                                     <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts2" class="input-field doublescricket-home-pts" id="doublescricket-home-player2-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
                                 </div>
-                                <!-- Total Row -->
+                                <!-- Total Row for Pair 1 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-home-total">0</span></div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team -->
-                            <div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts3" class="input-field doublescricket-away-pts" id="doublescricket-away-player3-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
-                                </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts4" class="input-field doublescricket-away-pts" id="doublescricket-away-player4-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
-                                </div>
-                                <!-- Total Row -->
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1">TOTAL</div>
-                                    <div class="grid-cell py-1"><span id="doublescricket-away-total-2">0</span></div>
-                                </div>
-                            </div>
-                            <!-- Home Team -->
-                            <div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer3" class="input-field" placeholder="Player 3"></div>
                                     <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts3" class="input-field doublescricket-home-pts" id="doublescricket-home-player3-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
@@ -420,9 +404,9 @@
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer4" class="input-field" placeholder="Player 4"></div>
                                     <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts4" class="input-field doublescricket-home-pts" id="doublescricket-home-player4-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
                                 </div>
-                                <!-- Total Row -->
+                                <!-- Total Row for Pair 2 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-home-total-2">0</span></div>
                                 </div>
                             </div>
