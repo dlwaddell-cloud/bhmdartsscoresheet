@@ -119,13 +119,39 @@
                 <div class="flex flex-col items-center w-full sm:w-auto">
                     <div class="flex items-center w-full mb-0.5">
                         <div class="bg-green-700 text-white font-bold py-0.5 px-2 rounded-r-full text-sm shadow-md">AWAY</div>
-                        <input type="text" name="awayTeamName" id="awayTeamNameInput" class="input-field border border-gray-300 rounded-md ml-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48" placeholder="Away Team Name">
+                        <!-- Replaced input with select for Away Team Name -->
+                        <select name="awayTeamName" id="awayTeamNameInput" class="input-field border border-gray-300 rounded-md ml-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
+                            <option value="">Select Away Team</option>
+                            <option value="Beers & Bulls">Beers & Bulls</option>
+                            <option value="Birmingham Bulls">Birmingham Bulls</option>
+                            <option value="Flight Risk">Flight Risk</option>
+                            <option value="Ginger Gingers">Ginger Gingers</option>
+                            <option value="Just the Tip">Just the Tip</option>
+                            <option value="Low Bones">Low Bones</option>
+                            <option value="Projectile Disfunction">Projectile Disfunction</option>
+                            <option value="Taranis">Taranis</option>
+                            <option value="The Crestwood Crushers">The Crestwood Crushers</option>
+                            <option value="Who Darted?">Who Darted?</option>
+                        </select>
                     </div>
                     <p class="font-bold text-sm text-green-700 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-green-700">TOTAL PTS: <span id="away-grand-total" class="text-xs">0</span></p>
                 </div>
                 <div class="flex flex-col items-center w-full sm:w-auto justify-end">
                     <div class="flex items-center w-full mb-0.5 justify-end">
-                        <input type="text" name="homeTeamName" id="homeTeamNameInput" class="input-field border border-gray-300 rounded-md mr-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48" placeholder="Home Team Name">
+                        <!-- Replaced input with select for Home Team Name -->
+                        <select name="homeTeamName" id="homeTeamNameInput" class="input-field border border-gray-300 rounded-md mr-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
+                            <option value="">Select Home Team</option>
+                            <option value="Beers & Bulls">Beers & Bulls</option>
+                            <option value="Birmingham Bulls">Birmingham Bulls</option>
+                            <option value="Flight Risk">Flight Risk</option>
+                            <option value="Ginger Gingers">Ginger Gingers</option>
+                            <option value="Just the Tip">Just the Tip</option>
+                            <option value="Low Bones">Low Bones</option>
+                            <option value="Projectile Disfunction">Projectile Disfunction</option>
+                            <option value="Taranis">Taranis</option>
+                            <option value="The Crestwood Crushers">The Crestwood Crushers</option>
+                            <option value="Who Darted?">Who Darted?</option>
+                        </select>
                         <div class="bg-green-700 text-white font-bold py-0.5 px-2 rounded-l-full text-sm shadow-md">HOME</div>
                     </div>
                     <p class="font-bold text-sm text-green-700 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-green-700">TOTAL PTS: <span id="home-grand-total" class="text-xs">0</span></p>
@@ -738,8 +764,8 @@
             });
 
             // Dynamic Team Name Labels
-            const awayTeamNameInput = document.getElementById('awayTeamNameInput');
-            const homeTeamNameInput = document.getElementById('homeTeamNameInput');
+            const awayTeamNameSelect = document.getElementById('awayTeamNameInput');
+            const homeTeamNameSelect = document.getElementById('homeTeamNameInput');
 
             const singles501AwayLabel = document.getElementById('singles501AwayLabel');
             const singles501HomeLabel = document.getElementById('singles501HomeLabel');
@@ -754,8 +780,8 @@
 
 
             function updateTeamLabels() {
-                const awayName = awayTeamNameInput.value.trim();
-                const homeName = homeTeamNameInput.value.trim();
+                const awayName = awayTeamNameSelect.value.trim();
+                const homeName = homeTeamNameSelect.value.trim();
 
                 singles501AwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
                 singles501HomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
@@ -769,11 +795,11 @@
                 teamVulcanHomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
             }
 
-            // Add event listeners for input changes
-            awayTeamNameInput.addEventListener('input', updateTeamLabels);
-            homeTeamNameInput.addEventListener('input', updateTeamLabels);
+            // Add event listeners for select changes
+            awayTeamNameSelect.addEventListener('change', updateTeamLabels);
+            homeTeamNameSelect.addEventListener('change', updateTeamLabels);
 
-            // Initial update in case there are pre-filled values (though unlikely in this app)
+            // Initial update
             updateTeamLabels();
         });
     </script>
