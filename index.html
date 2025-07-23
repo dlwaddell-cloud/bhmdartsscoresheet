@@ -3,274 +3,753 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sidewalk 27 Schedule</title>
+    <title>Birmingham Dart League Score Sheet</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
-    <!-- jsPDF and html2canvas for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0;
+            /* Use flexbox to make content fit vertically */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            margin: 0; /* Remove default body margin */
+            padding: 0; /* Remove default body padding */
+            overflow-y: auto; /* Allow scrolling if content still overflows, but try to avoid it */
+            /* Add padding to the top of the body to prevent content from being hidden by the fixed header */
+            padding-top: 150px; /* Adjusted based on the fixed header's height including message */
+        }
+        /* Main content wrapper to center and limit width */
+        .main-wrapper {
+            flex-grow: 1; /* Allow it to take available space */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align content to the top */
+            padding: 1rem; /* Overall padding for the wrapper */
+        }
+
+        /* Custom styles to mimic table borders */
+        .grid-cell {
+            border: 1px solid #000;
+        }
+        .input-field {
+            border: none;
+            outline: none;
+            width: 100%;
+            background-color: transparent;
+            padding: 2px; /* Reduced padding */
+            font-size: 0.875rem; /* Smaller font size for inputs */
+        }
+        /* Adjusted signature input field style */
+        .signature-input {
+            border: 1px solid #000; /* Add border to mimic line */
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            outline: none;
+            width: 100%;
+            height: 18px; /* Slightly smaller height */
+            background-color: transparent;
+            padding: 0; /* Remove padding for a true line look */
+            text-align: center; /* Center placeholder text */
+            font-size: 0.875rem; /* Smaller font size */
+        }
+
+        /* Fixed header style */
+        .fixed-header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000; /* Ensure it stays on top */
+            background-color: #f0f0f0; /* Match body background for seamless transition */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Optional: Add shadow for better separation */
+            padding-top: 0.5rem; /* Padding for the fixed container itself */
+            padding-bottom: 0.5rem;
+        }
+        /* Style for the content inside the fixed header to match the main content width */
+        .fixed-header-content {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0; /* Lighter border to match the main content's outer border */
+            padding: 0.5rem 1rem 0.5rem 1rem; /* Adjusted padding for a more compact fixed header */
+        }
+
+        /* Adjust font sizes for smaller screens */
+        @media (max-width: 640px) {
+            .text-2xl { font-size: 1.5rem; } /* H1 title */
+            .text-3xl { font-size: 2rem; } /* VS text */
+            .text-lg { font-size: 1rem; } /* Section titles, total pts */
+            .text-base { font-size: 0.875rem; } /* Subtitle */
+            .text-sm { font-size: 0.75rem; } /* Player names, pts labels */
+            .py-2 { padding-top: 0.25rem; padding-bottom: 0.25rem; } /* Reduce vertical padding */
+            .px-6 { padding-left: 0.75rem; padding-right: 0.75rem; }
+            .py-1 { padding-top: 0.125rem; padding-bottom: 0.125rem; } /* Reduce cell padding */
+            .mb-2 { margin-bottom: 0.5rem; } /* Reduce margins */
+            .mb-4 { margin-bottom: 0.75rem; }
+            .mb-6 > div { margin-bottom: 1rem !important; } /* Reduce spacing between game sections */
+        }
+    </style>
 </head>
-<body class="p-4 sm:p-6 md:p-8">
-    <div class="main-layout-container mx-auto flex flex-col md:flex-row gap-6">
+<body class="bg-gray-100">
 
-        <!-- Main Schedule Content Area -->
-        <div class="md:w-3/4 flex-grow">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-gray-900 mb-8 sm:mb-10">Sidewalk 27 Schedule</h1>
-
-            <!-- Day Filter Dropdown -->
-            <div class="mb-6 flex justify-center items-center">
-                <label for="day-filter" class="text-lg font-semibold mr-3">Filter by Day:</label>
-                <select id="day-filter" class="p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="all">All Days</option>
-                    <option value="Monday">Monday</option>
-                    <option value="Tuesday">Tuesday</option>
-                    <option value="Wednesday">Wednesday</option>
-                    <option value="Thursday">Thursday</option>
-                </select>
-            </div>
-
-            <!-- Original Schedule Sections -->
-            <!-- Monday, August 18 -->
-            <div class="schedule-day-section mb-10 p-6 bg-red-50 rounded-xl shadow-md" data-day-section="Monday">
-                <h2 class="text-3xl font-bold text-red-700 mb-6 border-b-2 border-red-300 pb-3">Monday, August 18</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="monday-events">
-                    <!-- Event 1 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-1" data-day="Monday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 5:00pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Alabama Film Spotlight Night: Happy Hour</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
+    <!-- Fixed Header Container -->
+    <div class="fixed-header-container">
+        <div class="fixed-header-content max-w-5xl w-full mx-auto flex flex-col">
+            <!-- Header Section with Submit Button -->
+            <div class="flex justify-between items-start w-full mb-2 border-b-2 border-gray-400 pb-1">
+                <div class="flex items-center">
+                    <div>
+                        <h1 class="text-xs sm:text-sm font-extrabold text-gray-800">BIRMINGHAM DART LEAGUE</h1>
+                        <p class="text-xs sm:text-xs text-gray-600">WWW.BIRMINGHAMDARTS.COM</p>
                     </div>
-                    <!-- Event 2 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-2" data-day="Monday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 6:00pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Alabama Spotlight: Shorts</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 3 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-3" data-day="Monday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 6:30pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Alabama Spotlight: Shorts</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 4 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-4" data-day="Monday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 8:30pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Alabama Spotlight Night: Forward, Ever</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 5 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="mon-event-5" data-day="Monday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Monday</span>, 8:45pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Alabama Spotlight Night: Forward, Ever</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
+                </div>
+                <!-- Submit Button moved here -->
+                <div class="flex-shrink-0">
+                    <button type="button" id="submitButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm">
+                        Submit Score Sheet
+                    </button>
                 </div>
             </div>
 
-            <!-- Tuesday, August 19 -->
-            <div class="schedule-day-section mb-10 p-6 bg-blue-50 rounded-xl shadow-md" data-day-section="Tuesday">
-                <h2 class="text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-3">Tuesday, August 19</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tuesday-events">
-                    <!-- Event 1 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-1" data-day="Tuesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 5:00pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Life + Liberty Spotlight Night: Happy Hour</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
+            <!-- Away vs Home Labels, Team Name Inputs, and Grand Totals -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-2 space-y-1 sm:space-y-0">
+                <div class="flex flex-col items-center w-full sm:w-auto">
+                    <div class="flex items-center w-full mb-0.5">
+                        <div class="bg-green-700 text-white font-bold py-0.5 px-2 rounded-r-full text-sm shadow-md">AWAY</div>
+                        <input type="text" name="awayTeamName" class="input-field border border-gray-300 rounded-md ml-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48" placeholder="Away Team Name">
                     </div>
-                    <!-- Event 2 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-2" data-day="Tuesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 6:00pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Life & Liberty Spotlight: Shorts</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
+                    <p class="font-bold text-sm text-green-700 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-green-700">TOTAL PTS: <span id="away-grand-total" class="text-xs">0</span></p>
+                </div>
+                <div class="font-extrabold text-xl text-gray-700 flex-shrink-0">VS</div>
+                <div class="flex flex-col items-center w-full sm:w-auto justify-end">
+                    <div class="flex items-center w-full mb-0.5 justify-end">
+                        <input type="text" name="homeTeamName" class="input-field border border-gray-300 rounded-md mr-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48" placeholder="Home Team Name">
+                        <div class="bg-green-700 text-white font-bold py-0.5 px-2 rounded-l-full text-sm shadow-md">HOME</div>
                     </div>
-                    <!-- Event 3 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-3" data-day="Tuesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 6:30pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Life & Liberty Spotlight: Shorts</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 4 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-4" data-day="Tuesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 8:30pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Life and Liberty Spotlight Night: Baby Doe</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 5 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="tue-event-5" data-day="Tuesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Tuesday</span>, 8:45pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Life and Liberty Spotlight Night: Baby Doe</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
+                    <p class="font-bold text-sm text-green-700 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-green-700">TOTAL PTS: <span id="home-grand-total" class="text-xs">0</span></p>
                 </div>
             </div>
-
-            <!-- Wednesday, August 20 -->
-            <div class="schedule-day-section mb-10 p-6 bg-green-50 rounded-xl shadow-md" data-day-section="Wednesday">
-                <h2 class="text-3xl font-bold text-green-700 mb-6 border-b-2 border-green-300 pb-3">Wednesday, August 20</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="wednesday-events">
-                    <!-- Event 1 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-1" data-day="Wednesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 5:00pm</p>
-                            <h3 class="text-xl font-bold event-card-title">SHOUT LGBTQ+ Spotlight Night: Happy Hour</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 2 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-2" data-day="Wednesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 6:00pm</p>
-                            <h3 class="text-xl font-bold event-card-title">SHOUT: Spotlight Shorts</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 3 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-3" data-day="Wednesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 6:30pm</p>
-                            <h3 class="text-xl font-bold event-card-title">SHOUT: Spotlight Shorts</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 4 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-4" data-day="Wednesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 8:30pm</p>
-                            <h3 class="text-xl font-bold event-card-title">SHOUT Spotlight Night: Love Me Bait Me: The Power of Queer Representation</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 5 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="wed-event-5" data-day="Wednesday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Wednesday</span>, 8:45pm</p>
-                            <h3 class="text-xl font-bold event-card-title">SHOUT Spotlight Night: Love Me Bait Me: The Power of Queer Representation</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Thursday, August 21 -->
-            <div class="schedule-day-section p-6 bg-purple-50 rounded-xl shadow-md" data-day-section="Thursday">
-                <h2 class="text-3xl font-bold text-purple-700 mb-6 border-b-2 border-purple-300 pb-3">Thursday, August 21</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="thursday-events">
-                    <!-- Event 1 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-1" data-day="Thursday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 5:00pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight Night: Happy Hour</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 2 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-2" data-day="Thursday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 6:00pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight: Shorts</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 3 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-3" data-day="Thursday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 6:30pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight: Shorts</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 4 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-4" data-day="Thursday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 8:30pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight Night: Paint Me A Road Out Of Here</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                    <!-- Event 5 -->
-                    <div class="event-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" draggable="true" id="thu-event-5" data-day="Thursday">
-                        <div class="event-card-content">
-                            <p class="text-sm font-semibold event-card-time mb-1"><span class="event-day">Thursday</span>, 8:45pm</p>
-                            <h3 class="text-xl font-bold event-card-title">Black Lens Spotlight Night: Paint Me A Road Out Of Here</h3>
-                        </div>
-                        <button class="add-to-schedule-btn">Add to My Schedule</button>
-                        <span class="view-my-schedule-link">View My Schedule</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- My Schedule Section (Floating Sidebar) -->
-        <div class="md:w-1/4 p-6 bg-gray-100 rounded-xl shadow-md drop-zone sticky-sidebar" id="my-schedule-drop-zone">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-gray-300 pb-3">
-                My Schedule
-            </h2>
-            <div class="my-schedule-header-buttons flex flex-wrap gap-2 mb-4">
-                <button id="view-full-screen-btn" class="px-3 py-1 bg-blue-500 text-white text-sm rounded-full hover:bg-blue-600 transition-colors duration-200 flex-grow">
-                    View Full Screen
-                </button>
-                <button id="download-pdf-btn" class="px-3 py-1 bg-blue-500 text-white text-sm rounded-full hover:bg-blue-600 transition-colors duration-200 flex-grow">
-                    Download as PDF
-                </button>
-            </div>
-            <div id="my-schedule-events" class="grid grid-cols-1 gap-6 min-h-[100px] flex items-center justify-center text-gray-500 text-lg">
-                Drag events here to create your personalized schedule!
+            <!-- Message Area moved here -->
+            <div class="w-full text-center mt-2">
+                <p id="submissionMessage" class="text-sm font-semibold"></p>
             </div>
         </div>
     </div>
 
-    <!-- Full-screen Modal for My Schedule -->
-    <div id="my-schedule-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button id="modal-close-btn" class="modal-close-btn">X</button>
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-gray-300 pb-3">My Full Schedule</h2>
-            <div id="modal-my-schedule-events" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Events will be cloned here -->
-            </div>
+    <!-- Main Content Area (Game sections and signatures) -->
+    <div class="main-wrapper">
+        <div class="bg-white rounded-lg shadow-xl p-4 sm:p-6 md:p-8 max-w-5xl w-full border border-gray-300">
+            <!-- Wrap the entire content that needs to be submitted in a form -->
+            <form id="scoreSheetForm">
+                <!-- Game Sections -->
+                <div class="space-y-4">
+                    <!-- Singles 501 -->
+                    <div class="border border-black p-2 rounded-md">
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">SINGLES 501 <span class="text-xs font-normal ml-1">1 point per game</span></h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <!-- Away Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Away Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singles501AwayPts1" class="input-field singles501-away-pts" data-table="singles501-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singles501AwayPts2" class="input-field singles501-away-pts" data-table="singles501-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Added Player 3 row for Singles 501 Away -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singles501AwayPts3" class="input-field singles501-away-pts" data-table="singles501-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="singles501-away-total">0</span></div>
+                                </div>
+                            </div>
+                            <!-- VS separator for smaller screens -->
+                            <div class="md:hidden flex justify-center items-center my-2">
+                                <div class="font-extrabold text-xl text-gray-700">VS</div>
+                            </div>
+                            <!-- Home Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Home Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singles501HomePts1" class="input-field singles501-home-pts" data-table="singles501-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singles501HomePts2" class="input-field singles501-home-pts" data-table="singles501-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Added Player 3 row for Singles 501 Home -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singles501HomePts3" class="input-field singles501-home-pts" data-table="singles501-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="singles501-home-total">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Singles Cricket -->
+                    <div class="border border-black p-2 rounded-md">
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">SINGLES CRICKET <span class="text-xs font-normal ml-1">1 point per game</span></h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <!-- Away Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Away Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketAwayPts1" class="input-field singlescricket-away-pts" data-table="singlescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketAwayPts2" class="input-field singlescricket-away-pts" data-table="singlescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Added Player 3 row for Singles Cricket Away -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketAwayPts3" class="input-field singlescricket-away-pts" data-table="singlescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="singlescricket-away-total">0</span></div>
+                                </div>
+                            </div>
+                            <!-- VS separator for smaller screens -->
+                            <div class="md:hidden flex justify-center items-center my-2">
+                                <div class="font-extrabold text-xl text-gray-700">VS</div>
+                            </div>
+                            <!-- Home Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Home Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketHomePts1" class="input-field singlescricket-home-pts" data-table="singlescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketHomePts2" class="input-field singlescricket-home-pts" data-table="singlescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Added Player 3 row for Singles Cricket Home -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketHomePts3" class="input-field singlescricket-home-pts" data-table="singlescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="singlescricket-home-total">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doubles 301 -->
+                    <div class="border border-black p-2 rounded-md">
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">DOUBLES 301 <span class="text-xs font-normal ml-1">2 points per game</span></h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <!-- Away Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Away Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts1" class="input-field doubles301-away-pts" id="doubles301-away-player1-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts2" class="input-field doubles301-away-pts" id="doubles301-away-player2-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="doubles301-away-total">0</span></div>
+                                </div>
+                            </div>
+                            <!-- VS separator for smaller screens -->
+                            <div class="md:hidden flex justify-center items-center my-2">
+                                <div class="font-extrabold text-xl text-gray-700">VS</div>
+                            </div>
+                            <!-- Home Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Home Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301HomePts1" class="input-field doubles301-home-pts" id="doubles301-home-player1-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301HomePts2" class="input-field doubles301-home-pts" id="doubles301-home-player2-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="doubles301-home-total">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:hidden flex justify-center items-center my-2">
+                            <div class="font-extrabold text-xl text-gray-700">VS</div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <!-- Away Team -->
+                            <div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts3" class="input-field doubles301-away-pts" id="doubles301-away-player3-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer4" class="input-field" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts4" class="input-field doubles301-away-pts" id="doubles301-away-player4-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="doubles301-away-total-2">0</span></div>
+                                </div>
+                            </div>
+                            <!-- Home Team -->
+                            <div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301HomePts3" class="input-field doubles301-home-pts" id="doubles301-home-player3-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer4" class="input-field" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doubles301HomePts4" class="input-field doubles301-home-pts" id="doubles301-home-player4-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="doubles301-home-total-2">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doubles Cricket -->
+                    <div class="border border-black p-2 rounded-md">
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">DOUBLES CRICKET <span class="text-xs font-normal ml-1">2 points per game</span></h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <!-- Away Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Away Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts1" class="input-field doublescricket-away-pts" id="doublescricket-away-player1-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts2" class="input-field doublescricket-away-pts" id="doublescricket-away-player2-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="doublescricket-away-total">0</span></div>
+                                </div>
+                            </div>
+                            <!-- VS separator for smaller screens -->
+                            <div class="md:hidden flex justify-center items-center my-2">
+                                <div class="font-extrabold text-xl text-gray-700">VS</div>
+                            </div>
+                            <!-- Home Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Home Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts1" class="input-field doublescricket-home-pts" id="doublescricket-home-player1-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts2" class="input-field doublescricket-home-pts" id="doublescricket-home-player2-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="doublescricket-home-total">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:hidden flex justify-center items-center my-2">
+                            <div class="font-extrabold text-xl text-gray-700">VS</div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <!-- Away Team -->
+                            <div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts3" class="input-field doublescricket-away-pts" id="doublescricket-away-player3-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer4" class="input-field" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts4" class="input-field doublescricket-away-pts" id="doublescricket-away-player4-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="doublescricket-away-total-2">0</span></div>
+                                </div>
+                            </div>
+                            <!-- Home Team -->
+                            <div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts3" class="input-field doublescricket-home-pts" id="doublescricket-home-player3-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer4" class="input-field" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts4" class="input-field doublescricket-home-pts" id="doublescricket-home-player4-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="doublescricket-home-total-2">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Team Vulcan Cricket / 701 -->
+                    <div class="border border-black p-2 rounded-md">
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">TEAM VULCAN CRICKET / 701 <span class="text-xs font-normal ml-1">3 points per game</span></h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <!-- Away Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Away Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanAwayPts1" class="input-field teamvulcan-away-pts" data-table="teamvulcan-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanAwayPts2" class="input-field teamvulcan-away-pts" data-table="teamvulcan-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Added Player 3 row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanAwayPts3" class="input-field teamvulcan-away-pts" data-table="teamvulcan-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="teamvulcan-away-total">0</span></div>
+                                </div>
+                            </div>
+                            <!-- VS separator for smaller screens -->
+                            <div class="md:hidden flex justify-center items-center my-2">
+                                <div class="font-extrabold text-xl text-gray-700">VS</div>
+                            </div>
+                            <!-- Home Team -->
+                            <div>
+                                <p class="font-semibold mb-1 text-sm">Home Team Player</p>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                    <div class="grid-cell py-1">PLAYER</div>
+                                    <div class="grid-cell py-1">PTS</div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer1" class="input-field" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanHomePts1" class="input-field teamvulcan-home-pts" data-table="teamvulcan-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer2" class="input-field" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanHomePts2" class="input-field teamvulcan-home-pts" data-table="teamvulcan-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Added Player 3 row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer3" class="input-field" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanHomePts3" class="input-field teamvulcan-home-pts" data-table="teamvulcan-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                </div>
+                                <!-- Total Row -->
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                    <div class="grid-cell py-1">TOTAL</div>
+                                    <div class="grid-cell py-1"><span id="teamvulcan-home-total">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Custom JavaScript -->
-    <script src="script.js"></script>
+    <script>
+        // *** IMPORTANT: Replace with your deployed Google Apps Script Web App URL ***
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxo_sByptTzztGUwdQmx9CFAQzVogxgF3WxQkikQ8ATWEhSrqZEZyfwXheKjjBmNfkc/exec'
+
+        // Function to validate points input to be 0 or 1
+        function validatePoints(input) {
+            let value = parseInt(input.value);
+            if (isNaN(value) || (value !== 0 && value !== 1)) {
+                input.value = 0; // Reset to 0 if invalid
+            }
+        }
+
+        // Function to calculate and update totals for a specific table
+        function updateTableTotal(tableClass, totalId) {
+            const ptsInputs = document.querySelectorAll(`input[type="number"].${tableClass}`);
+            let total = 0;
+            ptsInputs.forEach(input => {
+                total += parseInt(input.value) || 0; // Add value, default to 0 if empty or not a number
+            });
+            document.getElementById(totalId).textContent = total;
+            updateGrandTotals(); // Call grand total update after individual table total changes
+        }
+
+        // Function to calculate and update the overall grand totals
+        function updateGrandTotals() {
+            let awayGrandTotal = 0;
+            awayGrandTotal += parseInt(document.getElementById('singles501-away-total').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('singlescricket-away-total').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('doubles301-away-total').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('doubles301-away-total-2').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('doublescricket-away-total').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('doublescricket-away-total-2').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('teamvulcan-away-total').textContent) || 0;
+            document.getElementById('away-grand-total').textContent = awayGrandTotal;
+
+            let homeGrandTotal = 0;
+            homeGrandTotal += parseInt(document.getElementById('singles501-home-total').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('singlescricket-home-total').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('doubles301-home-total').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('doubles301-home-total-2').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('doublescricket-home-total').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('doublescricket-home-total-2').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('teamvulcan-home-total').textContent) || 0;
+            document.getElementById('home-grand-total').textContent = homeGrandTotal;
+        }
+
+        // Functions for Doubles 301 and Doubles Cricket totals
+        function updateDoubles301AwayTotals() {
+            const player1Val = parseInt(document.getElementById('doubles301-away-player1-pts').value) || 0;
+            const player2Val = parseInt(document.getElementById('doubles301-away-player2-pts').value) || 0;
+            const player3Val = parseInt(document.getElementById('doubles301-away-player3-pts').value) || 0;
+            const player4Val = parseInt(document.getElementById('doubles301-away-player4-pts').value) || 0;
+            document.getElementById('doubles301-away-total').textContent = player1Val + player2Val;
+            document.getElementById('doubles301-away-total-2').textContent = player3Val + player4Val;
+            updateGrandTotals();
+        }
+
+        function updateDoubles301HomeTotals() {
+            const player1Val = parseInt(document.getElementById('doubles301-home-player1-pts').value) || 0;
+            const player2Val = parseInt(document.getElementById('doubles301-home-player2-pts').value) || 0;
+            const player3Val = parseInt(document.getElementById('doubles301-home-player3-pts').value) || 0;
+            const player4Val = parseInt(document.getElementById('doubles301-home-player4-pts').value) || 0;
+            document.getElementById('doubles301-home-total').textContent = player1Val + player2Val;
+            document.getElementById('doubles301-home-total-2').textContent = player3Val + player4Val;
+            updateGrandTotals();
+        }
+
+        function updateDoublesCricketAwayTotals() {
+            const player1Val = parseInt(document.getElementById('doublescricket-away-player1-pts').value) || 0;
+            const player2Val = parseInt(document.getElementById('doublescricket-away-player2-pts').value) || 0;
+            const player3Val = parseInt(document.getElementById('doublescricket-away-player3-pts').value) || 0;
+            const player4Val = parseInt(document.getElementById('doublescricket-away-player4-pts').value) || 0;
+            document.getElementById('doublescricket-away-total').textContent = player1Val + player2Val;
+            document.getElementById('doublescricket-away-total-2').textContent = player3Val + player4Val;
+            updateGrandTotals();
+        }
+
+        function updateDoublesCricketHomeTotals() {
+            const player1Val = parseInt(document.getElementById('doublescricket-home-player1-pts').value) || 0;
+            const player2Val = parseInt(document.getElementById('doublescricket-home-player2-pts').value) || 0;
+            const player3Val = parseInt(document.getElementById('doublescricket-home-player3-pts').value) || 0;
+            const player4Val = parseInt(document.getElementById('doublescricket-home-player4-pts').value) || 0;
+            document.getElementById('doublescricket-home-total').textContent = player1Val + player2Val;
+            document.getElementById('doublescricket-home-total-2').textContent = player3Val + player4Val;
+            updateGrandTotals();
+        }
+
+        // Function to initialize event listeners for all tables
+        function initializeTableTotals() {
+            // Singles 501
+            document.querySelectorAll('input[type="number"].singles501-away-pts').forEach(input => {
+                input.addEventListener('input', () => updateTableTotal('singles501-away-pts', 'singles501-away-total'));
+            });
+            document.querySelectorAll('input[type="number"].singles501-home-pts').forEach(input => {
+                input.addEventListener('input', () => updateTableTotal('singles501-home-pts', 'singles501-home-total'));
+            });
+
+            // Singles Cricket
+            document.querySelectorAll('input[type="number"].singlescricket-away-pts').forEach(input => {
+                input.addEventListener('input', () => updateTableTotal('singlescricket-away-pts', 'singlescricket-away-total'));
+            });
+            document.querySelectorAll('input[type="number"].singlescricket-home-pts').forEach(input => {
+                input.addEventListener('input', () => updateTableTotal('singlescricket-home-pts', 'singlescricket-home-total'));
+            });
+
+            // Doubles 301
+            document.getElementById('doubles301-away-player1-pts').addEventListener('input', updateDoubles301AwayTotals);
+            document.getElementById('doubles301-away-player2-pts').addEventListener('input', updateDoubles301AwayTotals);
+            document.getElementById('doubles301-away-player3-pts').addEventListener('input', updateDoubles301AwayTotals);
+            document.getElementById('doubles301-away-player4-pts').addEventListener('input', updateDoubles301AwayTotals);
+
+            document.getElementById('doubles301-home-player1-pts').addEventListener('input', updateDoubles301HomeTotals);
+            document.getElementById('doubles301-home-player2-pts').addEventListener('input', updateDoubles301HomeTotals);
+            document.getElementById('doubles301-home-player3-pts').addEventListener('input', updateDoubles301HomeTotals);
+            document.getElementById('doubles301-home-player4-pts').addEventListener('input', updateDoubles301HomeTotals);
+
+            // Doubles Cricket
+            document.getElementById('doublescricket-away-player1-pts').addEventListener('input', updateDoublesCricketAwayTotals);
+            document.getElementById('doublescricket-away-player2-pts').addEventListener('input', updateDoublesCricketAwayTotals);
+            document.getElementById('doublescricket-away-player3-pts').addEventListener('input', updateDoublesCricketAwayTotals);
+            document.getElementById('doublescricket-away-player4-pts').addEventListener('input', updateDoublesCricketAwayTotals);
+
+            document.getElementById('doublescricket-home-player1-pts').addEventListener('input', updateDoublesCricketHomeTotals);
+            document.getElementById('doublescricket-home-player2-pts').addEventListener('input', updateDoublesCricketHomeTotals);
+            document.getElementById('doublescricket-home-player3-pts').addEventListener('input', updateDoublesCricketHomeTotals);
+            document.getElementById('doublescricket-home-player4-pts').addEventListener('input', updateDoublesCricketHomeTotals);
+
+            // Team Vulcan Cricket / 701
+            document.querySelectorAll('input[type="number"].teamvulcan-away-pts').forEach(input => {
+                input.addEventListener('input', () => updateTableTotal('teamvulcan-away-pts', 'teamvulcan-away-total'));
+            });
+            document.querySelectorAll('input[type="number"].teamvulcan-home-pts').forEach(input => {
+                input.addEventListener('input', () => updateTableTotal('teamvulcan-home-pts', 'teamvulcan-home-total'));
+            });
+
+            // Initial calculation on load
+            updateTableTotal('singles501-away-pts', 'singles501-away-total');
+            updateTableTotal('singles501-home-pts', 'singles501-home-total');
+
+            updateDoubles301AwayTotals();
+            updateDoubles301HomeTotals();
+            updateDoublesCricketAwayTotals();
+            updateDoublesCricketHomeTotals();
+
+            updateTableTotal('teamvulcan-away-pts', 'teamvulcan-away-total');
+            updateTableTotal('teamvulcan-home-pts', 'teamvulcan-home-total');
+
+            // Initial calculation of grand totals on load
+            updateGrandTotals();
+        }
+
+        // Handle form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTableTotals(); // Ensure totals are calculated on load
+
+            const form = document.getElementById('scoreSheetForm');
+            const submitButton = document.getElementById('submitButton'); // Get the new button
+            const submissionMessage = document.getElementById('submissionMessage');
+
+            submitButton.addEventListener('click', async (event) => { // Listen for click on the new button
+                event.preventDefault(); // Prevent default button action (if it were a submit type)
+
+                submissionMessage.textContent = 'Submitting...';
+                submissionMessage.className = 'text-sm font-semibold text-blue-600'; // Removed mt-3 for header placement
+
+                const formData = new FormData(form);
+                const data = {};
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+
+                // Add calculated totals to the data
+                data['awayGrandTotal'] = document.getElementById('away-grand-total').textContent;
+                data['homeGrandTotal'] = document.getElementById('home-grand-total').textContent;
+                data['singles501AwayTotal'] = document.getElementById('singles501-away-total').textContent;
+                data['singles501HomeTotal'] = document.getElementById('singles501-home-total').textContent;
+                data['singlesCricketAwayTotal'] = document.getElementById('singlescricket-away-total').textContent;
+                data['singlesCricketHomeTotal'] = document.getElementById('singlescricket-home-total').textContent;
+                data['doubles301AwayTotal'] = document.getElementById('doubles301-away-total').textContent;
+                data['doubles301AwayTotal2'] = document.getElementById('doubles301-away-total-2').textContent;
+                data['doubles301HomeTotal'] = document.getElementById('doubles301-home-total').textContent;
+                data['doubles301HomeTotal2'] = document.getElementById('doubles301-home-total-2').textContent;
+                data['doublesCricketAwayTotal'] = document.getElementById('doublescricket-away-total').textContent;
+                data['doublesCricketAwayTotal2'] = document.getElementById('doublescricket-away-total-2').textContent;
+                data['doublesCricketHomeTotal'] = document.getElementById('doublescricket-home-total').textContent;
+                data['doublesCricketHomeTotal2'] = document.getElementById('doublescricket-home-total-2').textContent;
+                data['teamVulcanAwayTotal'] = document.getElementById('teamvulcan-away-total').textContent;
+                data['teamVulcanHomeTotal'] = document.getElementById('teamvulcan-home-total').textContent;
+
+                // Add new Singles 501 Player 3 data
+                data['singles501AwayPlayer3'] = form.elements['singles501AwayPlayer3'].value;
+                data['singles501AwayPts3'] = form.elements['singles501AwayPts3'].value;
+                data['singles501HomePlayer3'] = form.elements['singles501HomePlayer3'].value;
+                data['singles501HomePts3'] = form.elements['singles501HomePts3'].value;
+
+                // Add new Singles Cricket Player 3 data
+                data['singlesCricketAwayPlayer3'] = form.elements['singlesCricketAwayPlayer3'].value;
+                data['singlesCricketAwayPts3'] = form.elements['singlesCricketAwayPts3'].value;
+                data['singlesCricketHomePlayer3'] = form.elements['singlesCricketHomePlayer3'].value;
+                data['singlesCricketHomePts3'] = form.elements['singlesCricketHomePts3'].value;
+
+
+                // Add current date and time
+                const now = new Date();
+                data['submissionDate'] = now.toLocaleDateString();
+                data['submissionTime'] = now.toLocaleTimeString();
+
+
+                try {
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // Required for Google Apps Script web apps
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams(data).toString()
+                    });
+
+                    submissionMessage.textContent = 'Score sheet submitted successfully!';
+                    submissionMessage.className = 'text-sm font-semibold text-green-600';
+                    form.reset(); // Optionally reset the form after successful submission
+                    setTimeout(initializeTableTotals, 100);
+
+                } catch (error) {
+                    console.error('Submission error:', error);
+                    submissionMessage.textContent = 'Error submitting score sheet. Please try again.';
+                    submissionMessage.className = 'text-sm font-semibold text-red-600';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
