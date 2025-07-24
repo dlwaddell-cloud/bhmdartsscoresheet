@@ -103,16 +103,16 @@
                 <div class="flex items-center">
                     <div>
                         <h1 class="text-xs sm:text-sm font-extrabold text-gray-800">BIRMINGHAM DART LEAGUE</h1>
-                        <p class="text-xs sm:text-xs text-gray-600">WWW.BIRMINGHAMDARTS.COM</p>
+                        <!-- Removed the WWW.BIRMINGHAMDARTS.COM URL -->
                     </div>
                 </div>
                 <!-- Buttons Group -->
                 <div class="flex-shrink-0 flex space-x-2">
-                    <a href="https://lookerstudio.google.com/reporting/0e1e13b5-c79e-4a66-8eac-0da0236231e7" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm flex items-center justify-center">
-                        View Submissions
+                    <a href="https://lookerstudio.google.com/reporting/48497626-b1da-433c-b37b-b146a6fedf43" target="_blank" class="bg-blue-800 hover:bg-blue-800 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm flex items-center justify-center">
+                        View Scores
                     </a>
-                    <button type="button" id="submitButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm">
-                        Submit Score Sheet
+                    <button type="button" id="submitButton" class="bg-blue-800 hover:bg-blue-800 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm">
+                        Submit Scores
                     </button>
                 </div>
             </div>
@@ -121,14 +121,14 @@
             <div class="flex flex-col sm:flex-row justify-between items-center mb-2 space-y-1 sm:space-y-0">
                 <div class="flex flex-col items-center w-full sm:w-auto">
                     <div class="flex items-center w-full mb-0.5">
-                        <div class="bg-green-700 text-white font-bold py-0.5 px-2 rounded-r-full text-sm shadow-md">AWAY</div>
+                        <div class="bg-blue-800 text-white font-bold py-0.5 px-2 rounded-r-full text-sm shadow-md">AWAY</div>
                         <!-- Replaced input with select for Away Team Name -->
                         <select name="awayTeamName" id="awayTeamNameInput" class="input-field border border-gray-300 rounded-md ml-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
                             <option value="">Select Away Team</option>
                             <option value="Beers & Bulls">Beers & Bulls</option>
                             <option value="Birmingham Bulls">Birmingham Bulls</option>
                             <option value="Flight Risk">Flight Risk</option>
-                            <option value="Ginger Gingers">Ginger Gingers</option>
+                            <option value="Ginger Bingers">Ginger Bingers</option>
                             <option value="Just the Tip">Just the Tip</option>
                             <option value="Low Bones">Low Bones</option>
                             <option value="Projectile Disfunction">Projectile Disfunction</option>
@@ -137,7 +137,7 @@
                             <option value="Who Darted?">Who Darted?</option>
                         </select>
                     </div>
-                    <p class="font-bold text-sm text-green-700 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-green-700">TOTAL PTS: <span id="away-grand-total" class="text-xs">0</span></p>
+                    <p class="font-bold text-sm text-blue-800 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800">Total Points: <span id="away-grand-total" class="text-s">0</span></p>
                 </div>
                 <div class="flex flex-col items-center w-full sm:w-auto justify-end">
                     <div class="flex items-center w-full mb-0.5 justify-end">
@@ -147,7 +147,7 @@
                             <option value="Beers & Bulls">Beers & Bulls</option>
                             <option value="Birmingham Bulls">Birmingham Bulls</option>
                             <option value="Flight Risk">Flight Risk</option>
-                            <option value="Ginger Gingers">Ginger Gingers</option>
+                            <option value="Ginger Bingers">Ginger Bingers</option>
                             <option value="Just the Tip">Just the Tip</option>
                             <option value="Low Bones">Low Bones</option>
                             <option value="Projectile Disfunction">Projectile Disfunction</option>
@@ -155,9 +155,9 @@
                             <option value="The Crestwood Crushers">The Crestwood Crushers</option>
                             <option value="Who Darted?">Who Darted?</option>
                         </select>
-                        <div class="bg-green-700 text-white font-bold py-0.5 px-2 rounded-l-full text-sm shadow-md">HOME</div>
+                        <div class="bg-blue-800 text-white font-bold py-0.5 px-2 rounded-l-full text-sm shadow-md">HOME</div>
                     </div>
-                    <p class="font-bold text-sm text-green-700 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-green-700">TOTAL PTS: <span id="home-grand-total" class="text-xs">0</span></p>
+                    <p class="font-bold text-sm text-blue-800 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800">Total Points: <span id="home-grand-total" class="text-s">0</span></p>
                 </div>
             </div>
             <!-- Message Area moved here -->
@@ -739,7 +739,7 @@
                     });
 
                     submissionMessage.textContent = 'Score sheet submitted successfully!';
-                    submissionMessage.className = 'text-sm font-semibold text-green-600';
+                    submissionMessage.className = 'text-sm font-semibold text-blue-800';
                     form.reset(); // Optionally reset the form after successful submission
                     setTimeout(initializeTableTotals, 100);
 
