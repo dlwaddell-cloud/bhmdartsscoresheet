@@ -671,140 +671,151 @@
             updateGrandTotals();
         }
 
-        // Handle form submission
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeTableTotals(); // Ensure totals are calculated on load
+        // ... (rest of your existing script code) ...
 
-            const form = document.getElementById('scoreSheetForm');
-            const submitButton = document.getElementById('submitButton'); // Get the new button
-            const submissionMessage = document.getElementById('submissionMessage');
+// Handle form submission
+document.addEventListener('DOMContentLoaded', () => {
+    initializeTableTotals(); // Ensure totals are calculated on load
 
-            submitButton.addEventListener('click', async (event) => { // Listen for click on the new button
-                event.preventDefault(); // Prevent default button action (if it were a submit type)
+    const form = document.getElementById('scoreSheetForm');
+    const submitButton = document.getElementById('submitButton'); // Get the new button
+    const submissionMessage = document.getElementById('submissionMessage');
+    
+    // Get the team name select elements
+    const awayTeamNameSelect = document.getElementById('awayTeamNameInput');
+    const homeTeamNameSelect = document.getElementById('homeTeamNameInput');
 
-                submissionMessage.textContent = 'Submitting...';
-                submissionMessage.className = 'text-sm font-semibold text-blue-600'; // Removed mt-3 for header placement
+    submitButton.addEventListener('click', async (event) => { // Listen for click on the new button
+        event.preventDefault(); // Prevent default button action (if it were a submit type)
 
-                const formData = new FormData(form);
-                const data = {};
-                for (let [key, value] of formData.entries()) {
-                    data[key] = value;
-                }
+        submissionMessage.textContent = 'Submitting...';
+        submissionMessage.className = 'text-sm font-semibold text-blue-600'; // Removed mt-3 for header placement
 
-                // Add calculated totals to the data
-                data['awayGrandTotal'] = document.getElementById('away-grand-total').textContent;
-                data['homeGrandTotal'] = document.getElementById('home-grand-total').textContent;
-                data['singles501AwayTotal'] = document.getElementById('singles501-away-total').textContent;
-                data['singles501HomeTotal'] = document.getElementById('singles501-home-total').textContent;
-                data['singlesCricketAwayTotal'] = document.getElementById('singlescricket-away-total').textContent;
-                data['singlesCricketHomeTotal'] = document.getElementById('singlescricket-home-total').textContent;
-                data['doubles301AwayTotal'] = document.getElementById('doubles301-away-total').textContent;
-                data['doubles301AwayTotal2'] = document.getElementById('doubles301-away-total-2').textContent;
-                data['doubles301HomeTotal'] = document.getElementById('doubles301-home-total').textContent;
-                data['doubles301HomeTotal2'] = document.getElementById('doubles301-home-total-2').textContent;
-                data['doublesCricketAwayTotal'] = document.getElementById('doublescricket-away-total').textContent;
-                data['doublesCricketAwayTotal2'] = document.getElementById('doublescricket-away-total-2').textContent;
-                data['doublesCricketHomeTotal'] = document.getElementById('doublescricket-home-total').textContent;
-                data['doublesCricketHomeTotal2'] = document.getElementById('doublescricket-home-total-2').textContent;
-                data['teamVulcanAwayTotal'] = document.getElementById('teamvulcan-away-total').textContent;
-                data['teamVulcanHomeTotal'] = document.getElementById('teamvulcan-home-total').textContent;
+        const formData = new FormData(form);
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+            data[key] = value;
+        }
 
-                // Add new Singles 501 Player 3 data
-                data['singles501AwayPlayer3'] = form.elements['singles501AwayPlayer3'].value;
-                data['singles501AwayPts3'] = form.elements['singles501AwayPts3'].value;
-                data['singles501HomePlayer3'] = form.elements['singles501HomePlayer3'].value;
-                data['singles501HomePts3'] = form.elements['singles501HomePts3'].value;
+        // Explicitly add the team names from the select elements
+        data['awayTeamName'] = awayTeamNameSelect.value;
+        data['homeTeamName'] = homeTeamNameSelect.value;
 
-                // Add new Singles Cricket Player 3 data
-                data['singlesCricketAwayPlayer3'] = form.elements['singlesCricketAwayPlayer3'].value;
-                data['singlesCricketAwayPts3'] = form.elements['singlesCricketAwayPts3'].value;
-                data['singlesCricketHomePlayer3'] = form.elements['singlesCricketHomePlayer3'].value;
-                data['singlesCricketHomePts3'] = form.elements['singlesCricketHomePts3'].value;
+        // Add calculated totals to the data
+        data['awayGrandTotal'] = document.getElementById('away-grand-total').textContent;
+        data['homeGrandTotal'] = document.getElementById('home-grand-total').textContent;
+        data['singles501AwayTotal'] = document.getElementById('singles501-away-total').textContent;
+        data['singles501HomeTotal'] = document.getElementById('singles501-home-total').textContent;
+        data['singlesCricketAwayTotal'] = document.getElementById('singlescricket-away-total').textContent;
+        data['singlesCricketHomeTotal'] = document.getElementById('singlescricket-home-total').textContent;
+        data['doubles301AwayTotal'] = document.getElementById('doubles301-away-total').textContent;
+        data['doubles301AwayTotal2'] = document.getElementById('doubles301-away-total-2').textContent;
+        data['doubles301HomeTotal'] = document.getElementById('doubles301-home-total').textContent;
+        data['doubles301HomeTotal2'] = document.getElementById('doubles301-home-total-2').textContent;
+        data['doublesCricketAwayTotal'] = document.getElementById('doublescricket-away-total').textContent;
+        data['doublesCricketAwayTotal2'] = document.getElementById('doublescricket-away-total-2').textContent;
+        data['doublesCricketHomeTotal'] = document.getElementById('doublescricket-home-total').textContent;
+        data['doublesCricketHomeTotal2'] = document.getElementById('doublescricket-home-total-2').textContent;
+        data['teamVulcanAwayTotal'] = document.getElementById('teamvulcan-away-total').textContent;
+        data['teamVulcanHomeTotal'] = document.getElementById('teamvulcan-home-total').textContent;
+
+        // Add new Singles 501 Player 3 data
+        data['singles501AwayPlayer3'] = form.elements['singles501AwayPlayer3'].value;
+        data['singles501AwayPts3'] = form.elements['singles501AwayPts3'].value;
+        data['singles501HomePlayer3'] = form.elements['singles501HomePlayer3'].value;
+        data['singles501HomePts3'] = form.elements['singles501HomePts3'].value;
+
+        // Add new Singles Cricket Player 3 data
+        data['singlesCricketAwayPlayer3'] = form.elements['singlesCricketAwayPlayer3'].value;
+        data['singlesCricketAwayPts3'] = form.elements['singlesCricketAwayPts3'].value;
+        data['singlesCricketHomePlayer3'] = form.elements['singlesCricketHomePlayer3'].value;
+        data['singlesCricketHomePts3'] = form.elements['singlesCricketHomePts3'].value;
 
 
-                // Add current date and time
-                const now = new Date();
-                data['submissionDate'] = now.toLocaleDateString();
-                data['submissionTime'] = now.toLocaleTimeString();
+        // Add current date and time
+        const now = new Date();
+        data['submissionDate'] = now.toLocaleDateString();
+        data['submissionTime'] = now.toLocaleTimeString();
 
 
-                try {
-                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors', // Required for Google Apps Script web apps
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams(data).toString()
-                    });
-
-                    submissionMessage.textContent = 'Score sheet submitted successfully!';
-                    submissionMessage.className = 'text-sm font-semibold text-blue-800';
-                    form.reset(); // Optionally reset the form after successful submission
-                    setTimeout(initializeTableTotals, 100);
-
-                } catch (error) {
-                    console.error('Submission error:', error);
-                    submissionMessage.textContent = 'Error submitting score sheet. Please try again.';
-                    submissionMessage.className = 'text-sm font-semibold text-red-600';
-                }
+        try {
+            const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Required for Google Apps Script web apps
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(data).toString()
             });
 
-            // Toggle Player Visibility Logic
-            document.querySelectorAll('.toggle-players-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetId = button.dataset.target;
-                    const targetElement = document.getElementById(targetId);
-                    if (targetElement) {
-                        targetElement.classList.toggle('hidden'); // Use Tailwind's hidden class
-                        if (targetElement.classList.contains('hidden')) {
-                            button.textContent = `Show ${button.textContent.includes('Away') ? 'Away' : 'Home'} Players`;
-                        } else {
-                            button.textContent = `Hide ${button.textContent.includes('Away') ? 'Away' : 'Home'} Players`;
-                        }
-                    }
-                });
-            });
+            submissionMessage.textContent = 'Score sheet submitted successfully!';
+            submissionMessage.className = 'text-sm font-semibold text-blue-800';
+            form.reset(); // Optionally reset the form after successful submission
+            setTimeout(initializeTableTotals, 100);
 
-            // Dynamic Team Name Labels
-            const awayTeamNameSelect = document.getElementById('awayTeamNameInput');
-            const homeTeamNameSelect = document.getElementById('homeTeamNameInput');
+        } catch (error) {
+            console.error('Submission error:', error);
+            submissionMessage.textContent = 'Error submitting score sheet. Please try again.';
+            submissionMessage.className = 'text-sm font-semibold text-red-600';
+        }
+    });
 
-            const singles501AwayLabel = document.getElementById('singles501AwayLabel');
-            const singles501HomeLabel = document.getElementById('singles501HomeLabel');
-            const singlesCricketAwayLabel = document.getElementById('singlesCricketAwayLabel');
-            const singlesCricketHomeLabel = document.getElementById('singlesCricketHomeLabel');
-            const doubles301AwayLabel = document.getElementById('doubles301AwayLabel');
-            const doubles301HomeLabel = document.getElementById('doubles301HomeLabel');
-            const doublesCricketAwayLabel = document.getElementById('doublesCricketAwayLabel');
-            const doublesCricketHomeLabel = document.getElementById('doublesCricketHomeLabel');
-            const teamVulcanAwayLabel = document.getElementById('teamVulcanAwayLabel');
-            const teamVulcanHomeLabel = document.getElementById('teamVulcanHomeLabel');
-
-
-            function updateTeamLabels() {
-                const awayName = awayTeamNameSelect.value.trim();
-                const homeName = homeTeamNameSelect.value.trim();
-
-                singles501AwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
-                singles501HomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
-                singlesCricketAwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
-                singlesCricketHomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
-                doubles301AwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
-                doubles301HomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
-                doublesCricketAwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
-                doublesCricketHomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
-                teamVulcanAwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
-                teamVulcanHomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
+    // Toggle Player Visibility Logic
+    document.querySelectorAll('.toggle-players-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.dataset.target;
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.classList.toggle('hidden'); // Use Tailwind's hidden class
+                if (targetElement.classList.contains('hidden')) {
+                    button.textContent = `Show ${button.textContent.includes('Away') ? 'Away' : 'Home'} Players`;
+                } else {
+                    button.textContent = `Hide ${button.textContent.includes('Away') ? 'Away' : 'Home'} Players`;
+                }
             }
-
-            // Add event listeners for select changes
-            awayTeamNameSelect.addEventListener('change', updateTeamLabels);
-            homeTeamNameSelect.addEventListener('change', updateTeamLabels);
-
-            // Initial update
-            updateTeamLabels();
         });
+    });
+
+    // Dynamic Team Name Labels
+    const awayTeamNameSelect = document.getElementById('awayTeamNameInput');
+    const homeTeamNameSelect = document.getElementById('homeTeamNameInput');
+
+    const singles501AwayLabel = document.getElementById('singles501AwayLabel');
+    const singles501HomeLabel = document.getElementById('singles501HomeLabel');
+    const singlesCricketAwayLabel = document.getElementById('singlesCricketAwayLabel');
+    const singlesCricketHomeLabel = document.getElementById('singlesCricketHomeLabel');
+    const doubles301AwayLabel = document.getElementById('doubles301AwayLabel');
+    const doubles301HomeLabel = document.getElementById('doubles301HomeLabel');
+    const doublesCricketAwayLabel = document.getElementById('doublesCricketAwayLabel');
+    const doublesCricketHomeLabel = document.getElementById('doublesCricketHomeLabel');
+    const teamVulcanAwayLabel = document.getElementById('teamVulcanAwayLabel');
+    const teamVulcanHomeLabel = document.getElementById('teamVulcanHomeLabel');
+
+
+    function updateTeamLabels() {
+        const awayName = awayTeamNameSelect.value.trim();
+        const homeName = homeTeamNameSelect.value.trim();
+
+        singles501AwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
+        singles501HomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
+        singlesCricketAwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
+        singlesCricketHomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
+        doubles301AwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
+        doubles301HomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
+        doublesCricketAwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
+        doublesCricketHomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
+        teamVulcanAwayLabel.textContent = awayName ? awayName + ' Players' : 'Away Team Player';
+        teamVulcanHomeLabel.textContent = homeName ? homeName + ' Players' : 'Home Team Player';
+    }
+
+    // Add event listeners for select changes
+    awayTeamNameSelect.addEventListener('change', updateTeamLabels);
+    homeTeamNameSelect.addEventListener('change', updateTeamLabels);
+
+    // Initial update
+    updateTeamLabels();
+});
+
     </script>
 </body>
 </html>
