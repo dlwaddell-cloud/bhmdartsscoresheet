@@ -11,26 +11,22 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f0f0;
-            /* Use flexbox to make content fit vertically */
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Ensure body takes full viewport height */
-            margin: 0; /* Remove default body margin */
-            padding: 0; /* Remove default body padding */
-            overflow-y: auto; /* Allow scrolling if content still overflows, but try to avoid it */
-            /* Add padding to the top of the body to prevent content from being hidden by the fixed header */
-            padding-top: 200px; /* Adjusted to provide more space for the fixed header on all screens, especially mobile */
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            /* Adjusted padding-top to ensure header doesn't overlap content on mobile */
+            padding-top: 220px; /* Increased space for fixed header */
         }
-        /* Main content wrapper to center and limit width */
         .main-wrapper {
-            flex-grow: 1; /* Allow it to take available space */
+            flex-grow: 1;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align content to the top */
-            padding: 1rem; /* Overall padding for the wrapper */
+            align-items: flex-start;
+            padding: 1rem;
         }
-
-        /* Custom styles to mimic table borders */
         .grid-cell {
             border: 1px solid #000;
         }
@@ -39,57 +35,43 @@
             outline: none;
             width: 100%;
             background-color: transparent;
-            padding: 2px; /* Reduced padding */
-            font-size: 0.875rem; /* Smaller font size for inputs */
+            padding: 2px;
+            font-size: 0.875rem;
         }
-        /* Adjusted signature input field style */
-        .signature-input {
-            border: 1px solid #000; /* Add border to mimic line */
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            outline: none;
-            width: 100%;
-            background-color: transparent;
-            padding: 0; /* Remove padding for a true line look */
-            text-align: center; /* Center placeholder text */
-            font-size: 0.875rem; /* Smaller font size */
-        }
-
-        /* Fixed header style */
         .fixed-header-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            z-index: 1000; /* Ensure it stays on top */
-            background-color: #f0f0f0; /* Match body background for seamless transition */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Optional: Add shadow for better separation */
-            padding-top: 0.5rem; /* Padding for the fixed container itself */
+            z-index: 1000;
+            background-color: #f0f0f0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding-top: 0.5rem;
             padding-bottom: 0.5rem;
         }
-        /* Style for the content inside the fixed header to match the main content width */
         .fixed-header-content {
             background-color: #fff;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e2e8f0; /* Lighter border to match the main content's outer border */
-            padding: 0.5rem 1rem 0.5rem 1rem; /* Adjusted padding for a more compact fixed header */
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 1rem;
         }
 
-        /* Adjust font sizes for smaller screens */
         @media (max-width: 640px) {
-            .text-2xl { font-size: 1.5rem; } /* H1 title */
-            .text-3xl { font-size: 2rem; } /* VS text */
-            .text-lg { font-size: 1rem; } /* Section titles, total pts */
-            .text-base { font-size: 0.875rem; } /* Subtitle */
-            .text-sm { font-size: 0.75rem; } /* Player names, pts labels */
-            .py-2 { padding-top: 0.25rem; padding-bottom: 0.25rem; } /* Reduce vertical padding */
+            body {
+                padding-top: 200px; /* Adjust if needed for smaller screens */
+            }
+            .text-2xl { font-size: 1.5rem; }
+            .text-3xl { font-size: 2rem; }
+            .text-lg { font-size: 1rem; }
+            .text-base { font-size: 0.875rem; }
+            .text-sm { font-size: 0.75rem; }
+            .py-2 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
             .px-6 { padding-left: 0.75rem; padding-right: 0.75rem; }
-            .py-1 { padding-top: 0.125rem; padding-bottom: 0.125rem; } /* Reduce cell padding */
-            .mb-2 { margin-bottom: 0.5rem; } /* Reduce margins */
+            .py-1 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+            .mb-2 { margin-bottom: 0.5rem; }
             .mb-4 { margin-bottom: 0.75rem; }
-            .mb-6 > div { margin-bottom: 1rem !important; } /* Reduce spacing between game sections */
+            .mb-6 > div { margin-bottom: 1rem !important; }
         }
     </style>
 </head>
@@ -98,15 +80,13 @@
     <!-- Fixed Header Container -->
     <div class="fixed-header-container">
         <div class="fixed-header-content max-w-5xl w-full mx-auto flex flex-col">
-            <!-- Header Section with Submit Button and View Submissions Button -->
+            <!-- Header Section -->
             <div class="flex justify-between items-start w-full mb-2 border-b-2 border-gray-400 pb-1">
                 <div class="flex items-center">
                     <div>
                         <h1 class="text-xs sm:text-sm font-extrabold text-gray-800">BIRMINGHAM DART LEAGUE</h1>
-                        <!-- Removed the WWW.BIRMINGHAMDARTS.COM URL -->
                     </div>
                 </div>
-                <!-- Buttons Group -->
                 <div class="flex-shrink-0 flex space-x-2">
                     <a href="https://lookerstudio.google.com/reporting/48497626-b1da-433c-b37b-b146a6fedf43" target="_blank" class="bg-blue-800 hover:bg-blue-800 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm flex items-center justify-center">
                         View Scores
@@ -117,12 +97,11 @@
                 </div>
             </div>
 
-            <!-- Away vs Home Labels, Team Name Inputs, and Grand Totals -->
+            <!-- Team Selection and Grand Totals -->
             <div class="flex flex-col sm:flex-row justify-between items-center mb-2 space-y-1 sm:space-y-0">
                 <div class="flex flex-col items-center w-full sm:w-auto">
                     <div class="flex items-center w-full mb-0.5">
                         <div class="bg-blue-800 text-white font-bold py-0.5 px-2 rounded-r-full text-sm shadow-md">AWAY</div>
-                        <!-- Replaced input with select for Away Team Name -->
                         <select name="awayTeamName" id="awayTeamNameInput" class="input-field border border-gray-300 rounded-md ml-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
                             <option value="">Select Away Team</option>
                             <option value="Beers & Bulls">Beers & Bulls</option>
@@ -137,11 +116,10 @@
                             <option value="Who Darted?">Who Darted?</option>
                         </select>
                     </div>
-                    <p class="font-bold text-sm text-blue-800 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800">Total Points: <span id="away-grand-total" class="text-s">0</span></p>
+                    <p class="font-bold text-sm text-blue-800 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800">Total Points: <span id="away-grand-total">0</span></p>
                 </div>
                 <div class="flex flex-col items-center w-full sm:w-auto justify-end">
                     <div class="flex items-center w-full mb-0.5 justify-end">
-                        <!-- Replaced input with select for Home Team Name -->
                         <select name="homeTeamName" id="homeTeamNameInput" class="input-field border border-gray-300 rounded-md mr-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
                             <option value="">Select Home Team</option>
                             <option value="Beers & Bulls">Beers & Bulls</option>
@@ -157,22 +135,19 @@
                         </select>
                         <div class="bg-blue-800 text-white font-bold py-0.5 px-2 rounded-l-full text-sm shadow-md">HOME</div>
                     </div>
-                    <p class="font-bold text-sm text-blue-800 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800">Total Points: <span id="home-grand-total" class="text-s">0</span></p>
+                    <p class="font-bold text-sm text-blue-800 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800">Total Points: <span id="home-grand-total">0</span></p>
                 </div>
             </div>
-            <!-- Message Area moved here -->
             <div class="w-full text-center mt-2">
                 <p id="submissionMessage" class="text-sm font-semibold"></p>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Area (Game sections and signatures) -->
+    <!-- Main Content Area -->
     <div class="main-wrapper">
         <div class="bg-white rounded-lg shadow-xl p-4 sm:p-6 md:p-8 max-w-5xl w-full border border-gray-300">
-            <!-- Wrap the entire content that needs to be submitted in a form -->
             <form id="scoreSheetForm">
-                <!-- Game Sections -->
                 <div class="space-y-4">
                     <!-- Singles 501 -->
                     <div class="border border-black p-2 rounded-md">
@@ -181,53 +156,49 @@
                             <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="singles501-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team Group -->
+                            <!-- Away Team -->
                             <div id="singles501-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="singles501AwayLabel">Away Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singles501AwayPts1" class="input-field singles501-away-pts" data-table="singles501-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-away-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singles501AwayPts2" class="input-field singles501-away-pts" data-table="singles501-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-away-pts" value="1"></div>
                                 </div>
-                                <!-- Added Player 3 row for Singles 501 Away -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singles501AwayPts3" class="input-field singles501-away-pts" data-table="singles501-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-away-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="singles501-away-total">0</span></div>
                                 </div>
                             </div>
-                            <!-- Home Team Group -->
+                            <!-- Home Team -->
                             <div id="singles501-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="singles501HomeLabel">Home Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singles501HomePts1" class="input-field singles501-home-pts" data-table="singles501-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-home-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singles501HomePts2" class="input-field singles501-home-pts" data-table="singles501-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-home-pts" value="1"></div>
                                 </div>
-                                <!-- Added Player 3 row for Singles 501 Home -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singles501HomePts3" class="input-field singles501-home-pts" data-table="singles501-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-home-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="singles501-home-total">0</span></div>
@@ -243,53 +214,49 @@
                             <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="singlescricket-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team Group -->
+                            <!-- Away Team -->
                             <div id="singlescricket-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="singlesCricketAwayLabel">Away Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketAwayPts1" class="input-field singlescricket-away-pts" data-table="singlescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-away-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketAwayPts2" class="input-field singlescricket-away-pts" data-table="singlescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-away-pts" value="1"></div>
                                 </div>
-                                <!-- Added Player 3 row for Singles Cricket Away -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketAwayPts3" class="input-field singlescricket-away-pts" data-table="singlescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-away-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="singlescricket-away-total">0</span></div>
                                 </div>
                             </div>
-                            <!-- Home Team Group -->
+                            <!-- Home Team -->
                             <div id="singlescricket-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="singlesCricketHomeLabel">Home Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketHomePts1" class="input-field singlescricket-home-pts" data-table="singlescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-home-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketHomePts2" class="input-field singlescricket-home-pts" data-table="singlescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-home-pts" value="1"></div>
                                 </div>
-                                <!-- Added Player 3 row for Singles Cricket Home -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="singlesCricketHomePts3" class="input-field singlescricket-home-pts" data-table="singlescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-home-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="singlescricket-home-total">0</span></div>
@@ -305,69 +272,65 @@
                             <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="doubles301-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team Group -->
+                            <!-- Away Team -->
                             <div id="doubles301-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="doubles301AwayLabel">Away Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts1" class="input-field doubles301-away-pts" id="doubles301-away-player1-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts1" id="doubles301-away-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-away-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts2" class="input-field doubles301-away-pts" id="doubles301-away-player2-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts2" id="doubles301-away-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-away-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row for Pair 1 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-away-total">0</span></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts3" class="input-field doubles301-away-pts" id="doubles301-away-player3-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts3" id="doubles301-away-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-away-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301AwayPts4" class="input-field doubles301-away-pts" id="doubles301-away-player4-pts" data-table="doubles301-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts4" id="doubles301-away-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-away-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row for Pair 2 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-away-total-2">0</span></div>
                                 </div>
                             </div>
-                            <!-- Home Team Group -->
+                            <!-- Home Team -->
                             <div id="doubles301-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="doubles301HomeLabel">Home Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301HomePts1" class="input-field doubles301-home-pts" id="doubles301-home-player1-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts1" id="doubles301-home-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-home-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301HomePts2" class="input-field doubles301-home-pts" id="doubles301-home-player2-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts2" id="doubles301-home-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-home-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row for Pair 1 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-home-total">0</span></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301HomePts3" class="input-field doubles301-home-pts" id="doubles301-home-player3-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts3" id="doubles301-home-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-home-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doubles301HomePts4" class="input-field doubles301-home-pts" id="doubles301-home-player4-pts" data-table="doubles301-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts4" id="doubles301-home-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-home-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row for Pair 2 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-home-total-2">0</span></div>
@@ -383,69 +346,65 @@
                             <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="doublescricket-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team Group -->
+                            <!-- Away Team -->
                             <div id="doublescricket-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="doublesCricketAwayLabel">Away Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts1" class="input-field doublescricket-away-pts" id="doublescricket-away-player1-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts1" id="doublescricket-away-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-away-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts2" class="input-field doublescricket-away-pts" id="doublescricket-away-player2-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts2" id="doublescricket-away-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-away-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row for Pair 1 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-away-total">0</span></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts3" class="input-field doublescricket-away-pts" id="doublescricket-away-player3-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts3" id="doublescricket-away-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-away-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketAwayPts4" class="input-field doublescricket-away-pts" id="doublescricket-away-player4-pts" data-table="doublescricket-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts4" id="doublescricket-away-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-away-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row for Pair 2 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-away-total-2">0</span></div>
                                 </div>
                             </div>
-                            <!-- Home Team Group -->
+                            <!-- Home Team -->
                             <div id="doublescricket-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="doublesCricketHomeLabel">Home Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts1" class="input-field doublescricket-home-pts" id="doublescricket-home-player1-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts1" id="doublescricket-home-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-home-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts2" class="input-field doublescricket-home-pts" id="doublescricket-home-player2-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts2" id="doublescricket-home-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-home-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row for Pair 1 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-home-total">0</span></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts3" class="input-field doublescricket-home-pts" id="doublescricket-home-player3-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts3" id="doublescricket-home-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-home-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="doublesCricketHomePts4" class="input-field doublescricket-home-pts" id="doublescricket-home-player4-pts" data-table="doublescricket-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts4" id="doublescricket-home-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-home-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row for Pair 2 -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-home-total-2">0</span></div>
@@ -461,53 +420,49 @@
                             <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="teamvulcan-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <!-- Away Team Group -->
+                            <!-- Away Team -->
                             <div id="teamvulcan-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="teamVulcanAwayLabel">Away Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanAwayPts1" class="input-field teamvulcan-away-pts" data-table="teamvulcan-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-away-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanAwayPts2" class="input-field teamvulcan-away-pts" data-table="teamvulcan-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-away-pts" value="1"></div>
                                 </div>
-                                <!-- Added Player 3 row -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanAwayPts3" class="input-field teamvulcan-away-pts" data-table="teamvulcan-away" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-away-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="teamvulcan-away-total">0</span></div>
                                 </div>
                             </div>
-                            <!-- Home Team Group -->
+                            <!-- Home Team -->
                             <div id="teamvulcan-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="teamVulcanHomeLabel">Home Team Player</p>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
                                     <div class="grid-cell py-1">PLAYER</div>
-                                    <div class="grid-cell py-1">PTS</div>
+                                    <div class="grid-cell py-1">WIN</div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanHomePts1" class="input-field teamvulcan-home-pts" data-table="teamvulcan-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-home-pts" value="1"></div>
                                 </div>
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanHomePts2" class="input-field teamvulcan-home-pts" data-table="teamvulcan-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-home-pts" value="1"></div>
                                 </div>
-                                <!-- Added Player 3 row -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1"><input type="number" name="teamVulcanHomePts3" class="input-field teamvulcan-home-pts" data-table="teamvulcan-home" min="0" max="1" step="1" oninput="validatePoints(this)"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-home-pts" value="1"></div>
                                 </div>
-                                <!-- Total Row -->
                                 <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="teamvulcan-home-total">0</span></div>
@@ -521,160 +476,307 @@
     </div>
 
     <script>
-        // *** IMPORTANT: Replace with your deployed Google Apps Script Web App URL ***
+        // Google Apps Script URL for form submission
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwzOaESQElgpa1g830F2VlrpzTryqwrPxJJsmvGjcYFiNLgr7_QbWUEGh4Z-RFtjYVe/exec'
 
-        // Function to validate points input to be 0 or 1
-        function validatePoints(input) {
-            let value = parseInt(input.value);
-            if (isNaN(value) || (value !== 0 && value !== 1)) {
-                input.value = 0; // Reset to 0 if invalid
-            }
-        }
+        // --- SCORE CALCULATION FUNCTIONS ---
 
-        // Function to calculate and update totals for a specific table
+        /**
+         * Calculates the total wins for a given game section (e.g., Singles 501 Away).
+         * @param {string} tableClass - The CSS class shared by checkboxes in the section.
+         * @param {string} totalId - The ID of the element to display the total.
+         */
         function updateTableTotal(tableClass, totalId) {
-            const ptsInputs = document.querySelectorAll(`input[type="number"].${tableClass}`);
+            const ptsInputs = document.querySelectorAll(`input[type="checkbox"].${tableClass}`);
             let total = 0;
             ptsInputs.forEach(input => {
-                total += parseInt(input.value) || 0; // Add value, default to 0 if empty or not a number
+                if (input.checked) {
+                    total += 1;
+                }
             });
             document.getElementById(totalId).textContent = total;
-            updateGrandTotals(); // Call grand total update after individual table total changes
+            updateGrandTotals();
         }
 
-        // Function to calculate and update the overall grand totals
+        /**
+         * Calculates and updates the grand totals for both Away and Home teams.
+         */
         function updateGrandTotals() {
             let awayGrandTotal = 0;
             awayGrandTotal += parseInt(document.getElementById('singles501-away-total').textContent) || 0;
             awayGrandTotal += parseInt(document.getElementById('singlescricket-away-total').textContent) || 0;
-            awayGrandTotal += (parseInt(document.getElementById('doubles301-away-total').textContent) || 0) * 2;
-            awayGrandTotal += (parseInt(document.getElementById('doubles301-away-total-2').textContent) || 0) * 2;
-            awayGrandTotal += (parseInt(document.getElementById('doublescricket-away-total').textContent) || 0) * 2;
-            awayGrandTotal += (parseInt(document.getElementById('doublescricket-away-total-2').textContent) || 0) * 2;
-            awayGrandTotal += (parseInt(document.getElementById('teamvulcan-away-total').textContent) || 0) * 3;
+            awayGrandTotal += parseInt(document.getElementById('doubles301-away-total').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('doubles301-away-total-2').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('doublescricket-away-total').textContent) || 0;
+            awayGrandTotal += parseInt(document.getElementById('doublescricket-away-total-2').textContent) || 0;
+            awayGrandTotal += (parseInt(document.getElementById('teamvulcan-away-total').textContent) || 0);
             document.getElementById('away-grand-total').textContent = awayGrandTotal;
 
             let homeGrandTotal = 0;
             homeGrandTotal += parseInt(document.getElementById('singles501-home-total').textContent) || 0;
             homeGrandTotal += parseInt(document.getElementById('singlescricket-home-total').textContent) || 0;
-            homeGrandTotal += (parseInt(document.getElementById('doubles301-home-total').textContent) || 0) * 2;
-            homeGrandTotal += (parseInt(document.getElementById('doubles301-home-total-2').textContent) || 0) * 2;
-            homeGrandTotal += (parseInt(document.getElementById('doublescricket-home-total').textContent) || 0) * 2;
-            homeGrandTotal += (parseInt(document.getElementById('doublescricket-home-total-2').textContent) || 0) * 2;
-            homeGrandTotal += (parseInt(document.getElementById('teamvulcan-home-total').textContent) || 0) * 3;
+            homeGrandTotal += parseInt(document.getElementById('doubles301-home-total').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('doubles301-home-total-2').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('doublescricket-home-total').textContent) || 0;
+            homeGrandTotal += parseInt(document.getElementById('doublescricket-home-total-2').textContent) || 0;
+            homeGrandTotal += (parseInt(document.getElementById('teamvulcan-home-total').textContent) || 0);
             document.getElementById('home-grand-total').textContent = homeGrandTotal;
         }
 
-        // Functions for Doubles 301 and Doubles Cricket totals (calculating wins, not points)
+        // --- DOUBLES SPECIFIC CALCULATIONS ---
+        // These functions determine if a pair won, which counts as 2 points for the team.
+
         function updateDoubles301AwayTotals() {
-            const player1Val = parseInt(document.getElementById('doubles301-away-player1-pts').value) || 0;
-            const player2Val = parseInt(document.getElementById('doubles301-away-player2-pts').value) || 0;
-            const player3Val = parseInt(document.getElementById('doubles301-away-player3-pts').value) || 0;
-            const player4Val = parseInt(document.getElementById('doubles301-away-player4-pts').value) || 0;
-            document.getElementById('doubles301-away-total').textContent = (player1Val > 0 || player2Val > 0) ? 1 : 0;
-            document.getElementById('doubles301-away-total-2').textContent = (player3Val > 0 || player4Val > 0) ? 1 : 0;
+            const pair1Win = document.getElementById('doubles301-away-player1-pts').checked || document.getElementById('doubles301-away-player2-pts').checked;
+            const pair2Win = document.getElementById('doubles301-away-player3-pts').checked || document.getElementById('doubles301-away-player4-pts').checked;
+            document.getElementById('doubles301-away-total').textContent = pair1Win ? 2 : 0;
+            document.getElementById('doubles301-away-total-2').textContent = pair2Win ? 2 : 0;
             updateGrandTotals();
         }
 
         function updateDoubles301HomeTotals() {
-            const player1Val = parseInt(document.getElementById('doubles301-home-player1-pts').value) || 0;
-            const player2Val = parseInt(document.getElementById('doubles301-home-player2-pts').value) || 0;
-            const player3Val = parseInt(document.getElementById('doubles301-home-player3-pts').value) || 0;
-            const player4Val = parseInt(document.getElementById('doubles301-home-player4-pts').value) || 0;
-            document.getElementById('doubles301-home-total').textContent = (player1Val > 0 || player2Val > 0) ? 1 : 0;
-            document.getElementById('doubles301-home-total-2').textContent = (player3Val > 0 || player4Val > 0) ? 1 : 0;
+            const pair1Win = document.getElementById('doubles301-home-player1-pts').checked || document.getElementById('doubles301-home-player2-pts').checked;
+            const pair2Win = document.getElementById('doubles301-home-player3-pts').checked || document.getElementById('doubles301-home-player4-pts').checked;
+            document.getElementById('doubles301-home-total').textContent = pair1Win ? 2 : 0;
+            document.getElementById('doubles301-home-total-2').textContent = pair2Win ? 2 : 0;
             updateGrandTotals();
         }
 
         function updateDoublesCricketAwayTotals() {
-            const player1Val = parseInt(document.getElementById('doublescricket-away-player1-pts').value) || 0;
-            const player2Val = parseInt(document.getElementById('doublescricket-away-player2-pts').value) || 0;
-            const player3Val = parseInt(document.getElementById('doublescricket-away-player3-pts').value) || 0;
-            const player4Val = parseInt(document.getElementById('doublescricket-away-player4-pts').value) || 0;
-            document.getElementById('doublescricket-away-total').textContent = (player1Val > 0 || player2Val > 0) ? 1 : 0;
-            document.getElementById('doublescricket-away-total-2').textContent = (player3Val > 0 || player4Val > 0) ? 1 : 0;
+            const pair1Win = document.getElementById('doublescricket-away-player1-pts').checked || document.getElementById('doublescricket-away-player2-pts').checked;
+            const pair2Win = document.getElementById('doublescricket-away-player3-pts').checked || document.getElementById('doublescricket-away-player4-pts').checked;
+            document.getElementById('doublescricket-away-total').textContent = pair1Win ? 2 : 0;
+            document.getElementById('doublescricket-away-total-2').textContent = pair2Win ? 2 : 0;
             updateGrandTotals();
         }
 
         function updateDoublesCricketHomeTotals() {
-            const player1Val = parseInt(document.getElementById('doublescricket-home-player1-pts').value) || 0;
-            const player2Val = parseInt(document.getElementById('doublescricket-home-player2-pts').value) || 0;
-            const player3Val = parseInt(document.getElementById('doublescricket-home-player3-pts').value) || 0;
-            const player4Val = parseInt(document.getElementById('doublescricket-home-player4-pts').value) || 0;
-            document.getElementById('doublescricket-home-total').textContent = (player1Val > 0 || player2Val > 0) ? 1 : 0;
-            document.getElementById('doublescricket-home-total-2').textContent = (player3Val > 0 || player4Val > 0) ? 1 : 0;
+            const pair1Win = document.getElementById('doublescricket-home-player1-pts').checked || document.getElementById('doublescricket-home-player2-pts').checked;
+            const pair2Win = document.getElementById('doublescricket-home-player3-pts').checked || document.getElementById('doublescricket-home-player4-pts').checked;
+            document.getElementById('doublescricket-home-total').textContent = pair1Win ? 2 : 0;
+            document.getElementById('doublescricket-home-total-2').textContent = pair2Win ? 2 : 0;
             updateGrandTotals();
         }
-
-        // Function to initialize event listeners for all tables
-        function initializeTableTotals() {
-            // Singles 501
-            document.querySelectorAll('input[type="number"].singles501-away-pts').forEach(input => {
-                input.addEventListener('input', () => updateTableTotal('singles501-away-pts', 'singles501-away-total'));
-            });
-            document.querySelectorAll('input[type="number"].singles501-home-pts').forEach(input => {
-                input.addEventListener('input', () => updateTableTotal('singles501-home-pts', 'singles501-home-total'));
-            });
-
-            // Singles Cricket
-            document.querySelectorAll('input[type="number"].singlescricket-away-pts').forEach(input => {
-                input.addEventListener('input', () => updateTableTotal('singlescricket-away-pts', 'singlescricket-away-total'));
-            });
-            document.querySelectorAll('input[type="number"].singlescricket-home-pts').forEach(input => {
-                input.addEventListener('input', () => updateTableTotal('singlescricket-home-pts', 'singlescricket-home-total'));
-            });
-
-            // Doubles 301
-            document.querySelectorAll('.doubles301-away-pts').forEach(input => input.addEventListener('input', updateDoubles301AwayTotals));
-            document.querySelectorAll('.doubles301-home-pts').forEach(input => input.addEventListener('input', updateDoubles301HomeTotals));
-
-            // Doubles Cricket
-            document.querySelectorAll('.doublescricket-away-pts').forEach(input => input.addEventListener('input', updateDoublesCricketAwayTotals));
-            document.querySelectorAll('.doublescricket-home-pts').forEach(input => input.addEventListener('input', updateDoublesCricketHomeTotals));
-            
-            // Team Vulcan Cricket / 701
-            document.querySelectorAll('input[type="number"].teamvulcan-away-pts').forEach(input => {
-                input.addEventListener('input', () => updateTableTotal('teamvulcan-away-pts', 'teamvulcan-away-total'));
-            });
-            document.querySelectorAll('input[type="number"].teamvulcan-home-pts').forEach(input => {
-                input.addEventListener('input', () => updateTableTotal('teamvulcan-home-pts', 'teamvulcan-home-total'));
-            });
-
-            // Initial calculation on load for all sections
-            document.querySelectorAll('.singles501-away-pts, .singles501-home-pts, .singlescricket-away-pts, .singlescricket-home-pts, .teamvulcan-away-pts, .teamvulcan-home-pts').forEach(el => {
-                if (el.value) el.dispatchEvent(new Event('input'));
-            });
+        
+        /**
+         * Recalculates all scores on the page. Useful for initialization and form reset.
+         */
+        function recalculateAllScores() {
+            updateTableTotal('singles501-away-pts', 'singles501-away-total');
+            updateTableTotal('singles501-home-pts', 'singles501-home-total');
+            updateTableTotal('singlescricket-away-pts', 'singlescricket-away-total');
+            updateTableTotal('singlescricket-home-pts', 'singlescricket-home-total');
             updateDoubles301AwayTotals();
             updateDoubles301HomeTotals();
             updateDoublesCricketAwayTotals();
             updateDoublesCricketHomeTotals();
-            updateGrandTotals();
+            updateTableTotal('teamvulcan-away-pts', 'teamvulcan-away-total');
+            updateTableTotal('teamvulcan-home-pts', 'teamvulcan-home-total');
         }
 
-        // Handle form submission
+        /**
+         * Sets up all the event listeners for score changes.
+         */
+        function initializeEventListeners() {
+            // Singles 501
+            document.querySelectorAll('.singles501-away-pts').forEach(input => input.addEventListener('change', () => { updateTableTotal('singles501-away-pts', 'singles501-away-total'); saveData(); }));
+            document.querySelectorAll('.singles501-home-pts').forEach(input => input.addEventListener('change', () => { updateTableTotal('singles501-home-pts', 'singles501-home-total'); saveData(); }));
+
+            // Singles Cricket
+            document.querySelectorAll('.singlescricket-away-pts').forEach(input => input.addEventListener('change', () => { updateTableTotal('singlescricket-away-pts', 'singlescricket-away-total'); saveData(); }));
+            document.querySelectorAll('.singlescricket-home-pts').forEach(input => input.addEventListener('change', () => { updateTableTotal('singlescricket-home-pts', 'singlescricket-home-total'); saveData(); }));
+
+            // Doubles 301
+            document.querySelectorAll('.doubles301-away-pts').forEach(input => input.addEventListener('change', () => { updateDoubles301AwayTotals(); saveData(); }));
+            document.querySelectorAll('.doubles301-home-pts').forEach(input => input.addEventListener('change', () => { updateDoubles301HomeTotals(); saveData(); }));
+
+            // Doubles Cricket
+            document.querySelectorAll('.doublescricket-away-pts').forEach(input => input.addEventListener('change', () => { updateDoublesCricketAwayTotals(); saveData(); }));
+            document.querySelectorAll('.doublescricket-home-pts').forEach(input => input.addEventListener('change', () => { updateDoublesCricketHomeTotals(); saveData(); }));
+            
+            // Team Vulcan
+            document.querySelectorAll('.teamvulcan-away-pts').forEach(input => input.addEventListener('change', () => { updateTableTotal('teamvulcan-away-pts', 'teamvulcan-away-total'); saveData(); }));
+            document.querySelectorAll('.teamvulcan-home-pts').forEach(input => input.addEventListener('change', () => { updateTableTotal('teamvulcan-home-pts', 'teamvulcan-home-total'); saveData(); }));
+            
+            // Listen for changes on text and select inputs to save data
+            document.querySelectorAll('input[type="text"], select').forEach(input => input.addEventListener('input', saveData));
+        }
+
+        // --- MUTUAL EXCLUSION LOGIC ---
+
+        /**
+         * Prevents checking both away and home checkboxes for a single game.
+         * @param {string} awaySelector - CSS selector for the away team checkbox.
+         * @param {string} homeSelector - CSS selector for the home team checkbox.
+         */
+        function setupCheckboxExclusion(awaySelector, homeSelector) {
+            const awayCheckbox = document.querySelector(awaySelector);
+            const homeCheckbox = document.querySelector(homeSelector);
+
+            if (awayCheckbox && homeCheckbox) {
+                awayCheckbox.addEventListener('change', (e) => {
+                    homeCheckbox.disabled = e.target.checked;
+                });
+                homeCheckbox.addEventListener('change', (e) => {
+                    awayCheckbox.disabled = e.target.checked;
+                });
+            }
+        }
+        
+        /**
+         * Prevents checking checkboxes for opposing pairs in doubles games.
+         * @param {string[]} pair1Selectors - Array of CSS selectors for the first pair's checkboxes.
+         * @param {string[]} pair2Selectors - Array of CSS selectors for the opposing pair's checkboxes.
+         */
+        function setupPairExclusion(pair1Selectors, pair2Selectors) {
+            const pair1Checkboxes = pair1Selectors.map(sel => document.querySelector(sel)).filter(cb => cb);
+            const pair2Checkboxes = pair2Selectors.map(sel => document.querySelector(sel)).filter(cb => cb);
+
+            const createListener = (thisPair, otherPair) => {
+                thisPair.forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const isAnyInThisPairChecked = thisPair.some(c => c.checked);
+                        otherPair.forEach(otherCb => {
+                            otherCb.disabled = isAnyInThisPairChecked;
+                        });
+                    });
+                });
+            };
+
+            createListener(pair1Checkboxes, pair2Checkboxes);
+            createListener(pair2Checkboxes, pair1Checkboxes);
+        }
+
+        /**
+         * Sets up all the mutual exclusion listeners.
+         */
+        function initializeMutualExclusion() {
+            // Singles 501
+            setupCheckboxExclusion('input[name="singles501AwayPts1"]', 'input[name="singles501HomePts1"]');
+            setupCheckboxExclusion('input[name="singles501AwayPts2"]', 'input[name="singles501HomePts2"]');
+            setupCheckboxExclusion('input[name="singles501AwayPts3"]', 'input[name="singles501HomePts3"]');
+
+            // Singles Cricket
+            setupCheckboxExclusion('input[name="singlesCricketAwayPts1"]', 'input[name="singlesCricketHomePts1"]');
+            setupCheckboxExclusion('input[name="singlesCricketAwayPts2"]', 'input[name="singlesCricketHomePts2"]');
+            setupCheckboxExclusion('input[name="singlesCricketAwayPts3"]', 'input[name="singlesCricketHomePts3"]');
+            
+            // Doubles 301
+            setupPairExclusion(
+                ['input[name="doubles301AwayPts1"]', 'input[name="doubles301AwayPts2"]'],
+                ['input[name="doubles301HomePts1"]', 'input[name="doubles301HomePts2"]']
+            );
+            setupPairExclusion(
+                ['input[name="doubles301AwayPts3"]', 'input[name="doubles301AwayPts4"]'],
+                ['input[name="doubles301HomePts3"]', 'input[name="doubles301HomePts4"]']
+            );
+
+            // Doubles Cricket
+            setupPairExclusion(
+                ['input[name="doublesCricketAwayPts1"]', 'input[name="doublesCricketAwayPts2"]'],
+                ['input[name="doublesCricketHomePts1"]', 'input[name="doublesCricketHomePts2"]']
+            );
+            setupPairExclusion(
+                ['input[name="doublesCricketAwayPts3"]', 'input[name="doublesCricketAwayPts4"]'],
+                ['input[name="doublesCricketHomePts3"]', 'input[name="doublesCricketHomePts4"]']
+            );
+
+            // Team Vulcan
+            setupCheckboxExclusion('input[name="teamVulcanAwayPts1"]', 'input[name="teamVulcanHomePts1"]');
+            setupCheckboxExclusion('input[name="teamVulcanAwayPts2"]', 'input[name="teamVulcanHomePts2"]');
+            setupCheckboxExclusion('input[name="teamVulcanAwayPts3"]', 'input[name="teamVulcanHomePts3"]');
+        }
+        
+        // --- DATA PERSISTENCE FUNCTIONS ---
+        
+        /**
+         * Saves the current state of the form to localStorage.
+         */
+        function saveData() {
+            const formData = {};
+            document.querySelectorAll('#scoreSheetForm input, #scoreSheetForm select, #awayTeamNameInput, #homeTeamNameInput').forEach(input => {
+                if (input.type === 'checkbox') {
+                    formData[input.name] = input.checked;
+                } else {
+                    formData[input.name] = input.value;
+                }
+            });
+            localStorage.setItem('scoreSheetData', JSON.stringify(formData));
+        }
+
+        /**
+         * Loads the form state from localStorage.
+         */
+        function loadData() {
+            const savedData = localStorage.getItem('scoreSheetData');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                document.querySelectorAll('#scoreSheetForm input, #scoreSheetForm select, #awayTeamNameInput, #homeTeamNameInput').forEach(input => {
+                    if (formData[input.name] !== undefined) {
+                        if (input.type === 'checkbox') {
+                            input.checked = formData[input.name];
+                        } else {
+                            input.value = formData[input.name];
+                        }
+                    }
+                });
+            }
+        }
+
+        // --- UI AND FORM SUBMISSION LOGIC ---
+
         document.addEventListener('DOMContentLoaded', () => {
-            initializeTableTotals(); 
+            // Define team name selectors at the top of the scope
+            const awayTeamNameSelect = document.getElementById('awayTeamNameInput');
+            const homeTeamNameSelect = document.getElementById('homeTeamNameInput');
+
+            // Define the function before it's called
+            function updateTeamLabels() {
+                const awayName = awayTeamNameSelect.value.trim();
+                const homeName = homeTeamNameSelect.value.trim();
+                const labels = {
+                    'singles501AwayLabel': awayName, 'singles501HomeLabel': homeName,
+                    'singlesCricketAwayLabel': awayName, 'singlesCricketHomeLabel': homeName,
+                    'doubles301AwayLabel': awayName, 'doubles301HomeLabel': homeName,
+                    'doublesCricketAwayLabel': awayName, 'doublesCricketHomeLabel': homeName,
+                    'teamVulcanAwayLabel': awayName, 'teamVulcanHomeLabel': homeName
+                };
+
+                for (const id in labels) {
+                    const el = document.getElementById(id);
+                    const name = labels[id];
+                    const defaultText = id.includes('Away') ? 'Away Team Player' : 'Home Team Player';
+                    if (el) {
+                        el.textContent = name ? `${name} Players` : defaultText;
+                    }
+                }
+            }
+            
+            loadData();
+            initializeEventListeners(); 
+            initializeMutualExclusion();
+            recalculateAllScores(); // Initial calculation on page load
+            updateTeamLabels(); // Update labels based on loaded data
 
             const submitButton = document.getElementById('submitButton');
             const submissionMessage = document.getElementById('submissionMessage');
 
+            // Handle form submission
             submitButton.addEventListener('click', async (event) => {
                 event.preventDefault(); 
 
-                const awayTeamName = document.getElementById('awayTeamNameInput').value;
-                const homeTeamName = document.getElementById('homeTeamNameInput').value;
+                const awayTeamName = awayTeamNameSelect.value;
+                const homeTeamName = homeTeamNameSelect.value;
 
                 if (!awayTeamName || !homeTeamName) {
                     submissionMessage.textContent = 'Please select both an Away and a Home team.';
                     submissionMessage.className = 'text-sm font-semibold text-red-600';
-                    return; // Stop the submission
+                    return;
                 }
 
                 submissionMessage.textContent = 'Submitting...';
                 submissionMessage.className = 'text-sm font-semibold text-blue-600';
 
-                // Create a simple object with only the required data
                 const data = {
                     awayTeamName: awayTeamName,
                     homeTeamName: homeTeamName,
@@ -683,27 +785,27 @@
                 };
 
                 try {
-                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors', 
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: new URLSearchParams(data).toString()
                     });
 
                     submissionMessage.textContent = 'Score sheet submitted successfully!';
                     submissionMessage.className = 'text-sm font-semibold text-blue-800';
                     
-                    // Reset form and team names
+                    localStorage.removeItem('scoreSheetData'); // Clear saved data on success
                     document.getElementById('scoreSheetForm').reset();
                     document.getElementById('awayTeamNameInput').value = '';
                     document.getElementById('homeTeamNameInput').value = '';
 
-                    // Use a short timeout to ensure the DOM has updated from the reset before recalculating
+                    // Re-enable all checkboxes after reset
+                    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = false);
+
                     setTimeout(() => {
-                        initializeTableTotals();
-                        updateTeamLabels(); // Also reset the labels
+                        recalculateAllScores();
+                        updateTeamLabels();
                     }, 100);
 
                 } catch (error) {
@@ -728,35 +830,9 @@
                     }
                 });
             });
-
-            // Dynamic Team Name Labels
-            const awayTeamNameSelect = document.getElementById('awayTeamNameInput');
-            const homeTeamNameSelect = document.getElementById('homeTeamNameInput');
-
-            function updateTeamLabels() {
-                const awayName = awayTeamNameSelect.value.trim();
-                const homeName = homeTeamNameSelect.value.trim();
-                const labels = {
-                    'singles501AwayLabel': awayName, 'singles501HomeLabel': homeName,
-                    'singlesCricketAwayLabel': awayName, 'singlesCricketHomeLabel': homeName,
-                    'doubles301AwayLabel': awayName, 'doubles301HomeLabel': homeName,
-                    'doublesCricketAwayLabel': awayName, 'doublesCricketHomeLabel': homeName,
-                    'teamVulcanAwayLabel': awayName, 'teamVulcanHomeLabel': homeName
-                };
-
-                for (const id in labels) {
-                    const el = document.getElementById(id);
-                    const name = labels[id];
-                    const defaultText = id.includes('Away') ? 'Away Team Player' : 'Home Team Player';
-                    if (el) {
-                        el.textContent = name ? `${name} Players` : defaultText;
-                    }
-                }
-            }
-
+            
             awayTeamNameSelect.addEventListener('change', updateTeamLabels);
             homeTeamNameSelect.addEventListener('change', updateTeamLabels);
-            updateTeamLabels();
         });
     </script>
 </body>
