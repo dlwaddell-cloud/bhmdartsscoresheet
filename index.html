@@ -15,7 +15,7 @@
     <script>
         // On page load or when changing themes, it's best to add this script inline in the <head>
         // to avoid a "flash of unstyled content" (FOUC)
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('theme') === 'dark') {
           document.documentElement.classList.add('dark')
         } else {
           document.documentElement.classList.remove('dark')
@@ -770,7 +770,7 @@
             };
 
             // Set initial icon state based on current theme
-            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            if (localStorage.getItem('theme') === 'dark') {
                 sunIcon.classList.remove('hidden');
                 moonIcon.classList.add('hidden');
             }
