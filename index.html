@@ -6,11 +6,25 @@
     <title>Birmingham Dart League Score Sheet</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind to use class-based dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script>
+        // On page load or when changing themes, it's best to add this script inline in the <head>
+        // to avoid a "flash of unstyled content" (FOUC)
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f0f0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -30,6 +44,9 @@
         .grid-cell {
             border: 1px solid #000;
         }
+        .dark .grid-cell {
+            border-color: #4a5568; /* Corresponds to gray-600 */
+        }
         .input-field {
             border: none;
             outline: none;
@@ -44,17 +61,9 @@
             left: 0;
             width: 100%;
             z-index: 1000;
-            background-color: #f0f0f0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding-top: 0.5rem;
             padding-bottom: 0.5rem;
-        }
-        .fixed-header-content {
-            background-color: #fff;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e2e8f0;
-            padding: 0.5rem 1rem;
         }
 
         @media (max-width: 640px) {
@@ -75,23 +84,32 @@
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
 
     <!-- Fixed Header Container -->
-    <div class="fixed-header-container">
-        <div class="fixed-header-content max-w-5xl w-full mx-auto flex flex-col">
+    <div class="fixed-header-container bg-gray-100 dark:bg-slate-900">
+        <div class="bg-white dark:bg-slate-800 dark:border-slate-700 rounded-lg shadow-md border border-gray-200 max-w-5xl w-full mx-auto flex flex-col p-2 sm:p-4">
             <!-- Header Section -->
-            <div class="flex justify-between items-start w-full mb-2 border-b-2 border-gray-400 pb-1">
+            <div class="flex justify-between items-center w-full mb-2 border-b-2 border-gray-400 dark:border-gray-600 pb-2">
                 <div class="flex items-center">
                     <div>
-                        <h1 class="text-xs sm:text-sm font-extrabold text-gray-800">BIRMINGHAM DART LEAGUE</h1>
+                        <h1 class="text-xs sm:text-sm font-extrabold text-gray-800 dark:text-gray-200">BIRMINGHAM DART LEAGUE</h1>
                     </div>
                 </div>
-                <div class="flex-shrink-0 flex space-x-2">
-                    <a href="https://lookerstudio.google.com/reporting/48497626-b1da-433c-b37b-b146a6fedf43" target="_blank" class="bg-blue-800 hover:bg-blue-800 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm flex items-center justify-center">
+                <div class="flex-shrink-0 flex items-center space-x-2">
+                    <!-- Dark Mode Toggle Button -->
+                    <button type="button" id="theme-toggle" class="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-800 dark:focus:ring-offset-slate-800">
+                        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </button>
+                    <a href="https://lookerstudio.google.com/reporting/48497626-b1da-433c-b37b-b146a6fedf43" target="_blank" class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm flex items-center justify-center">
                         View Scores
                     </a>
-                    <button type="button" id="submitButton" class="bg-blue-800 hover:bg-blue-800 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm">
+                    <button type="button" id="submitButton" class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded-md shadow-lg transition duration-300 ease-in-out text-sm">
                         Submit Scores
                     </button>
                 </div>
@@ -102,7 +120,7 @@
                 <div class="flex flex-col items-center w-full sm:w-auto">
                     <div class="flex items-center w-full mb-0.5">
                         <div class="bg-blue-800 text-white font-bold py-0.5 px-2 rounded-r-full text-sm shadow-md">AWAY</div>
-                        <select name="awayTeamName" id="awayTeamNameInput" class="input-field border border-gray-300 rounded-md ml-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
+                        <select name="awayTeamName" id="awayTeamNameInput" class="input-field border border-gray-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md ml-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
                             <option value="">Select Away Team</option>
                             <option value="Beers & Bulls">Beers & Bulls</option>
                             <option value="Birmingham Bulls">Birmingham Bulls</option>
@@ -117,11 +135,11 @@
                             <option value="Who Darted?">Who Darted?</option>
                         </select>
                     </div>
-                    <p class="font-bold text-sm text-blue-800 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800">Total Points: <span id="away-grand-total">0</span></p>
+                    <p class="font-bold text-sm text-blue-800 dark:text-blue-400 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800 dark:border-blue-400">Total Points: <span id="away-grand-total">0</span></p>
                 </div>
                 <div class="flex flex-col items-center w-full sm:w-auto justify-end">
                     <div class="flex items-center w-full mb-0.5 justify-end">
-                        <select name="homeTeamName" id="homeTeamNameInput" class="input-field border border-gray-300 rounded-md mr-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
+                        <select name="homeTeamName" id="homeTeamNameInput" class="input-field border border-gray-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md mr-0.5 px-1 py-0.5 flex-grow sm:flex-grow-0 sm:w-48">
                             <option value="">Select Home Team</option>
                             <option value="Beers & Bulls">Beers & Bulls</option>
                             <option value="Birmingham Bulls">Birmingham Bulls</option>
@@ -137,7 +155,7 @@
                         </select>
                         <div class="bg-blue-800 text-white font-bold py-0.5 px-2 rounded-l-full text-sm shadow-md">HOME</div>
                     </div>
-                    <p class="font-bold text-sm text-blue-800 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800">Total Points: <span id="home-grand-total">0</span></p>
+                    <p class="font-bold text-sm text-blue-800 dark:text-blue-400 text-center py-0.5 px-1 rounded-md w-full sm:w-auto border-2 border-blue-800 dark:border-blue-400">Total Points: <span id="home-grand-total">0</span></p>
                 </div>
             </div>
             <div class="w-full text-center mt-2">
@@ -148,36 +166,36 @@
 
     <!-- Main Content Area -->
     <div class="main-wrapper">
-        <div class="bg-white rounded-lg shadow-xl p-4 sm:p-6 md:p-8 max-w-5xl w-full border border-gray-300">
-            <form id="scoreSheetForm">
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-4 sm:p-6 md:p-8 max-w-5xl w-full border border-gray-300 dark:border-slate-700">
+            <form id="scoreSheetForm" class="dark:text-gray-300">
                 <div class="space-y-4">
                     <!-- Singles 501 -->
                     <div class="border border-black p-2 rounded-md">
-                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">SINGLES 501 <span class="text-xs font-normal ml-1">1 point per game</span>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="singles501-away-players-group">Hide Away Players</button>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="singles501-home-players-group">Hide Home Players</button>
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 dark:bg-slate-700 dark:text-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">SINGLES 501 <span class="text-xs font-normal ml-1">1 point per game</span>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="singles501-away-players-group">Hide Away Players</button>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="singles501-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <!-- Away Team -->
                             <div id="singles501-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="singles501AwayLabel">Away Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singles501-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singles501-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501AwayPlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501AwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singles501-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="singles501-away-total">0</span></div>
                                 </div>
@@ -185,23 +203,23 @@
                             <!-- Home Team -->
                             <div id="singles501-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="singles501HomeLabel">Home Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singles501-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singles501-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singles501-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singles501HomePlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singles501HomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singles501-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="singles501-home-total">0</span></div>
                                 </div>
@@ -211,31 +229,31 @@
 
                     <!-- Singles Cricket -->
                     <div class="border border-black p-2 rounded-md">
-                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">SINGLES CRICKET <span class="text-xs font-normal ml-1">1 point per game</span>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="singlescricket-away-players-group">Hide Away Players</button>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="singlescricket-home-players-group">Hide Home Players</button>
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 dark:bg-slate-700 dark:text-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">SINGLES CRICKET <span class="text-xs font-normal ml-1">1 point per game</span>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="singlescricket-away-players-group">Hide Away Players</button>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="singlescricket-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <!-- Away Team -->
                             <div id="singlescricket-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="singlesCricketAwayLabel">Away Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singlescricket-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singlescricket-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketAwayPlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketAwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singlescricket-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="singlescricket-away-total">0</span></div>
                                 </div>
@@ -243,23 +261,23 @@
                             <!-- Home Team -->
                             <div id="singlescricket-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="singlesCricketHomeLabel">Home Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singlescricket-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singlescricket-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 singlescricket-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="singlesCricketHomePlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="singlesCricketHomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 singlescricket-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="singlescricket-home-total">0</span></div>
                                 </div>
@@ -269,39 +287,39 @@
 
                     <!-- Doubles 301 -->
                     <div class="border border-black p-2 rounded-md">
-                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">DOUBLES 301 <span class="text-xs font-normal ml-1">2 points per game</span>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="doubles301-away-players-group">Hide Away Players</button>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="doubles301-home-players-group">Hide Home Players</button>
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 dark:bg-slate-700 dark:text-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">DOUBLES 301 <span class="text-xs font-normal ml-1">2 points per game</span>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="doubles301-away-players-group">Hide Away Players</button>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="doubles301-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <!-- Away Team -->
                             <div id="doubles301-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="doubles301AwayLabel">Away Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts1" id="doubles301-away-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts1" id="doubles301-away-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doubles301-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts2" id="doubles301-away-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts2" id="doubles301-away-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doubles301-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-away-total">0</span></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts3" id="doubles301-away-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts3" id="doubles301-away-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doubles301-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts4" id="doubles301-away-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301AwayPlayer4" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301AwayPts4" id="doubles301-away-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doubles301-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-away-total-2">0</span></div>
                                 </div>
@@ -309,31 +327,31 @@
                             <!-- Home Team -->
                             <div id="doubles301-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="doubles301HomeLabel">Home Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts1" id="doubles301-home-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts1" id="doubles301-home-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doubles301-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts2" id="doubles301-home-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts2" id="doubles301-home-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doubles301-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-home-total">0</span></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts3" id="doubles301-home-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts3" id="doubles301-home-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doubles301-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts4" id="doubles301-home-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doubles301-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doubles301HomePlayer4" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doubles301HomePts4" id="doubles301-home-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doubles301-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doubles301-home-total-2">0</span></div>
                                 </div>
@@ -343,39 +361,39 @@
 
                     <!-- Doubles Cricket -->
                     <div class="border border-black p-2 rounded-md">
-                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">DOUBLES CRICKET <span class="text-xs font-normal ml-1">2 points per game</span>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="doublescricket-away-players-group">Hide Away Players</button>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="doublescricket-home-players-group">Hide Home Players</button>
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 dark:bg-slate-700 dark:text-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">DOUBLES CRICKET <span class="text-xs font-normal ml-1">2 points per game</span>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="doublescricket-away-players-group">Hide Away Players</button>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="doublescricket-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <!-- Away Team -->
                             <div id="doublescricket-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="doublesCricketAwayLabel">Away Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts1" id="doublescricket-away-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts1" id="doublescricket-away-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doublescricket-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts2" id="doublescricket-away-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts2" id="doublescricket-away-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doublescricket-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-away-total">0</span></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts3" id="doublescricket-away-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts3" id="doublescricket-away-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doublescricket-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts4" id="doublescricket-away-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketAwayPlayer4" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketAwayPts4" id="doublescricket-away-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doublescricket-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-away-total-2">0</span></div>
                                 </div>
@@ -383,31 +401,31 @@
                             <!-- Home Team -->
                             <div id="doublescricket-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="doublesCricketHomeLabel">Home Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts1" id="doublescricket-home-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts1" id="doublescricket-home-player1-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doublescricket-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts2" id="doublescricket-home-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts2" id="doublescricket-home-player2-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doublescricket-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 1)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-home-total">0</span></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts3" id="doublescricket-home-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts3" id="doublescricket-home-player3-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doublescricket-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer4" class="input-field" placeholder="Player 4"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts4" id="doublescricket-home-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 doublescricket-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="doublesCricketHomePlayer4" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 4"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="doublesCricketHomePts4" id="doublescricket-home-player4-pts" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 doublescricket-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL (Pair 2)</div>
                                     <div class="grid-cell py-1"><span id="doublescricket-home-total-2">0</span></div>
                                 </div>
@@ -417,31 +435,31 @@
 
                     <!-- Team Vulcan Cricket / 701 -->
                     <div class="border border-black p-2 rounded-md">
-                        <h2 class="text-base font-bold mb-1 bg-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">TEAM VULCAN CRICKET / 701 <span class="text-xs font-normal ml-1">3 points per game</span>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="teamvulcan-away-players-group">Hide Away Players</button>
-                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 rounded-md toggle-players-btn" data-target="teamvulcan-home-players-group">Hide Home Players</button>
+                        <h2 class="text-base font-bold mb-1 bg-gray-200 dark:bg-slate-700 dark:text-gray-200 p-1 -mx-2 -mt-2 rounded-t-md">TEAM VULCAN CRICKET / 701 <span class="text-xs font-normal ml-1">3 points per game</span>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="teamvulcan-away-players-group">Hide Away Players</button>
+                            <button type="button" class="text-xs font-normal ml-2 px-2 py-0.5 bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-gray-200 rounded-md toggle-players-btn" data-target="teamvulcan-home-players-group">Hide Home Players</button>
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <!-- Away Team -->
                             <div id="teamvulcan-away-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="teamVulcanAwayLabel">Away Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 teamvulcan-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 teamvulcan-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-away-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanAwayPlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanAwayPts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 teamvulcan-away-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="teamvulcan-away-total">0</span></div>
                                 </div>
@@ -449,23 +467,23 @@
                             <!-- Home Team -->
                             <div id="teamvulcan-home-players-group">
                                 <p class="font-semibold mb-1 text-sm" id="teamVulcanHomeLabel">Home Team Player</p>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
                                     <div class="grid-cell py-1">PLAYER</div>
                                     <div class="grid-cell py-1">WIN</div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer1" class="input-field" placeholder="Player 1"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer1" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 1"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts1" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 teamvulcan-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer2" class="input-field" placeholder="Player 2"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer2" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 2"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts2" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 teamvulcan-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 border-t-0">
-                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer3" class="input-field" placeholder="Player 3"></div>
-                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 teamvulcan-home-pts" value="1"></div>
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs border border-gray-300 dark:border-slate-600 border-t-0">
+                                    <div class="grid-cell py-1"><input type="text" name="teamVulcanHomePlayer3" class="input-field dark:text-gray-200 dark:placeholder-gray-400" placeholder="Player 3"></div>
+                                    <div class="grid-cell py-1 flex justify-center items-center"><input type="checkbox" name="teamVulcanHomePts3" class="h-5 w-5 text-blue-800 border-gray-300 rounded focus:ring-blue-700 dark:ring-offset-slate-800 teamvulcan-home-pts" value="1"></div>
                                 </div>
-                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 border border-gray-300 border-t-0">
+                                <div class="grid grid-cols-[3fr_1fr] text-center text-xs font-bold bg-gray-100 dark:bg-slate-700/50 dark:text-gray-300 border border-gray-300 dark:border-slate-600 border-t-0">
                                     <div class="grid-cell py-1">TOTAL</div>
                                     <div class="grid-cell py-1"><span id="teamvulcan-home-total">0</span></div>
                                 </div>
@@ -511,7 +529,7 @@
             awayGrandTotal += parseInt(document.getElementById('doubles301-away-total-2').textContent) || 0;
             awayGrandTotal += parseInt(document.getElementById('doublescricket-away-total').textContent) || 0;
             awayGrandTotal += parseInt(document.getElementById('doublescricket-away-total-2').textContent) || 0;
-            awayGrandTotal += (parseInt(document.getElementById('teamvulcan-away-total').textContent) || 0);
+            awayGrandTotal += (parseInt(document.getElementById('teamvulcan-away-total').textContent) || 0); // Team Vulcan is 3 points
             document.getElementById('away-grand-total').textContent = awayGrandTotal;
 
             let homeGrandTotal = 0;
@@ -521,7 +539,7 @@
             homeGrandTotal += parseInt(document.getElementById('doubles301-home-total-2').textContent) || 0;
             homeGrandTotal += parseInt(document.getElementById('doublescricket-home-total').textContent) || 0;
             homeGrandTotal += parseInt(document.getElementById('doublescricket-home-total-2').textContent) || 0;
-            homeGrandTotal += (parseInt(document.getElementById('teamvulcan-home-total').textContent) || 0);
+            homeGrandTotal += (parseInt(document.getElementById('teamvulcan-home-total').textContent) || 0); // Team Vulcan is 3 points
             document.getElementById('home-grand-total').textContent = homeGrandTotal;
         }
 
@@ -731,6 +749,37 @@
             // Define team name selectors at the top of the scope
             const awayTeamNameSelect = document.getElementById('awayTeamNameInput');
             const homeTeamNameSelect = document.getElementById('homeTeamNameInput');
+            
+            // --- DARK MODE LOGIC ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+
+            const applyTheme = (theme) => {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                    localStorage.setItem('theme', 'light');
+                }
+            };
+
+            // Set initial icon state based on current theme
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.contains('dark');
+                applyTheme(isDark ? 'light' : 'dark');
+            });
+
 
             // Define the function before it's called
             function updateTeamLabels() {
@@ -772,12 +821,12 @@
 
                 if (!awayTeamName || !homeTeamName) {
                     submissionMessage.textContent = 'Please select both an Away and a Home team.';
-                    submissionMessage.className = 'text-sm font-semibold text-red-600';
+                    submissionMessage.className = 'text-sm font-semibold text-red-600 dark:text-red-500';
                     return;
                 }
 
                 submissionMessage.textContent = 'Submitting...';
-                submissionMessage.className = 'text-sm font-semibold text-blue-600';
+                submissionMessage.className = 'text-sm font-semibold text-blue-600 dark:text-blue-400';
 
                 const data = {
                     awayTeamName: awayTeamName,
@@ -795,7 +844,7 @@
                     });
 
                     submissionMessage.textContent = 'Score sheet submitted successfully!';
-                    submissionMessage.className = 'text-sm font-semibold text-blue-800';
+                    submissionMessage.className = 'text-sm font-semibold text-blue-800 dark:text-blue-300';
                     
                     localStorage.removeItem('scoreSheetData'); // Clear saved data on success
                     document.getElementById('scoreSheetForm').reset();
@@ -813,7 +862,7 @@
                 } catch (error) {
                     console.error('Submission error:', error);
                     submissionMessage.textContent = 'Error submitting score sheet. Please try again.';
-                    submissionMessage.className = 'text-sm font-semibold text-red-600';
+                    submissionMessage.className = 'text-sm font-semibold text-red-600 dark:text-red-500';
                 }
             });
 
@@ -839,3 +888,4 @@
     </script>
 </body>
 </html>
+
