@@ -134,6 +134,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const GOLF_STORAGE_KEY = 'dartsGolfGameState';
+
             // --- STATE MANAGEMENT ---
             let gameState = {
                 players: [],
@@ -142,6 +144,19 @@
                 gameStarted: false,
                 currentTurnThrows: [],
             };
+            
+            // --- PERSISTENCE FUNCTIONS ---
+            const saveState = () => {
+                localStorage.setItem(GOLF_STORAGE_KEY, JSON.stringify(gameState));
+            };
+
+            const loadState = () => {
+                const savedState = localStorage.getItem(GOLF_STORAGE_KEY);
+                if (savedState) {
+                    gameState = JSON.parse(savedState);
+                }
+            };
+
 
             // --- DOM ELEMENTS ---
             const playerSetupEl = document.getElementById('player-setup');
@@ -250,12 +265,14 @@
                     });
                     newPlayerNameInput.value = '';
                     renderPlayers();
+                    saveState();
                 }
             };
             
             const removePlayer = (index) => {
                 gameState.players.splice(index, 1);
                 renderPlayers();
+                saveState();
             };
             
             const startGame = () => {
@@ -265,6 +282,7 @@
                     gameSectionEl.classList.remove('hidden');
                     renderScorecard();
                     updateUIForTurn();
+                    saveState();
                 }
             };
             
@@ -277,6 +295,7 @@
                         lockInScore();
                     } else {
                        updateUIForTurn();
+                       saveState();
                     }
                 }
             };
@@ -315,6 +334,7 @@
                 } else {
                     renderScorecard();
                     updateUIForTurn();
+                    saveState();
                     
                     // --- AUTO SCROLL LOGIC ---
                     const scorecardContainer = document.querySelector('.overflow-x-auto');
@@ -373,21 +393,24 @@
 
                 winnerMessage.textContent = winMsg;
                 winnerModal.classList.remove('hidden');
+                localStorage.removeItem(GOLF_STORAGE_KEY); // Game is over, clear state
             };
 
             const resetGame = () => {
-                // Keep players for a quick restart, just reset scores
-                gameState.players.forEach(p => p.scores.fill(null));
-                gameState.currentHole = 1;
-                gameState.currentPlayerIndex = 0;
-                gameState.gameStarted = false;
-                gameState.currentTurnThrows = [];
+                gameState = {
+                    players: [],
+                    currentHole: 1,
+                    currentPlayerIndex: 0,
+                    gameStarted: false,
+                    currentTurnThrows: [],
+                };
 
+                localStorage.removeItem(GOLF_STORAGE_KEY);
+                
                 gameSectionEl.classList.add('hidden');
                 playerSetupEl.classList.remove('hidden');
                 scoringControlsEl.classList.remove('hidden');
                 
-                 // Reset dynamic text
                 const h2 = document.querySelector('#game-section h2');
                 h2.innerHTML = `<span id="current-player-name"></span>'s Turn`;
                 document.querySelector('#game-section p').classList.remove('hidden');
@@ -395,10 +418,21 @@
                 newGameBtn.classList.add('hidden');
                 winnerModal.classList.add('hidden');
                 
-                // Clear highlights from old game
                 document.querySelectorAll('.winner-highlight').forEach(el => el.classList.remove('winner-highlight'));
                 
-                renderPlayers(); // To re-render the player list in setup
+                renderPlayers();
+            };
+            
+             const initialize = () => {
+                loadState();
+                if (gameState.gameStarted) {
+                    playerSetupEl.classList.add('hidden');
+                    gameSectionEl.classList.remove('hidden');
+                    renderScorecard();
+                    updateUIForTurn();
+                } else {
+                    renderPlayers();
+                }
             };
 
             // --- EVENT LISTENERS ---
@@ -430,6 +464,9 @@
 
             newGameBtn.addEventListener('click', resetGame);
             modalNewGameBtn.addEventListener('click', resetGame);
+
+            // --- INITIALIZE GAME ---
+            initialize();
         });
 
         // --- PWA Service Worker ---
@@ -445,3 +482,4 @@
     </script>
 </body>
 </html>
+
