@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darts Golf</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="golf_manifest.json">
+    <meta name="theme-color" content="#1E293B">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .score-cell {
+            min-width: 40px;
+        }
+        .total-score {
+            font-weight: 800;
+        }
+        /* Custom styles for a more "game-like" feel */
+        .btn-score {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-score:active {
+            transform: scale(0.95);
+        }
+        .current-player-highlight {
+            background-color: rgba(253, 224, 71, 0.4); /* semi-transparent yellow-300 */
+            transition: background-color 0.5s ease;
+        }
+         .winner-highlight {
+            animation: winner-pulse 2s infinite;
+        }
+        @keyframes winner-pulse {
+            0% { background-color: #4ade80; } /* green-400 */
+            50% { background-color: #86efac; } /* green-300 */
+            100% { background-color: #4ade80; } /* green-400 */
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-800 text-white min-h-screen flex flex-col items-center p-4">
+
+    <div id="app" class="w-full max-w-4xl mx-auto">
+        <header class="text-center mb-6">
+            <h1 class="text-4xl font-bold text-yellow-300">Darts Golf</h1>
+            <p class="text-slate-400">Lowest score after 18 holes wins!</p>
+        </header>
+
+        <!-- Player Setup Section -->
+        <div id="player-setup" class="bg-slate-700 p-6 rounded-lg shadow-lg mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Players</h2>
+            <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
+            <div class="flex gap-4">
+                <input type="text" id="new-player-name" class="flex-grow bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Enter player name...">
+                <button id="add-player-btn" class="bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-2 px-4 rounded-md transition-colors">Add Player</button>
+            </div>
+            <div class="mt-4 text-center">
+                <button id="start-game-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-md transition-colors w-full sm:w-auto disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>Start Game</button>
+            </div>
+        </div>
+
+        <!-- Game Section -->
+        <div id="game-section" class="hidden">
+            <!-- Current Turn Info -->
+            <div class="bg-slate-700 p-4 rounded-lg shadow-lg mb-6 text-center">
+                 <h2 class="text-3xl font-bold"><span id="current-player-name"></span>'s Turn</h2>
+                 <p class="text-2xl text-slate-300">Hole: <span id="current-hole" class="font-bold text-yellow-300">1</span></p>
+                 <div id="current-throws" class="mt-2 text-lg">Throws: <span class="font-mono"></span></div>
+            </div>
+
+            <!-- Scoring Controls -->
+            <div id="scoring-controls" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+                <button data-score="-3" class="btn-score bg-green-600 hover:bg-green-700 p-4 rounded-lg text-center">
+                    <span class="font-bold text-xl">Double</span><br><span class="text-lg">-3</span>
+                </button>
+                <button data-score="-2" class="btn-score bg-green-500 hover:bg-green-600 p-4 rounded-lg text-center">
+                    <span class="font-bold text-xl">Triple</span><br><span class="text-lg">-2</span>
+                </button>
+                <button data-score="-1" class="btn-score bg-sky-500 hover:bg-sky-600 p-4 rounded-lg text-center">
+                    <span class="font-bold text-xl">Single (Narrow)</span><br><span class="text-lg">-1</span>
+                </button>
+                <button data-score="0" class="btn-score bg-slate-500 hover:bg-slate-600 p-4 rounded-lg text-center">
+                    <span class="font-bold text-xl">Single (Wide)</span><br><span class="text-lg">0</span>
+                </button>
+                <button data-score="2" class="btn-score bg-red-500 hover:bg-red-600 p-4 rounded-lg text-center">
+                    <span class="font-bold text-xl">Miss</span><br><span class="text-lg">+2</span>
+                </button>
+                <button id="lock-in-btn" class="btn-score bg-yellow-400 hover:bg-yellow-500 text-slate-900 p-4 rounded-lg text-center font-bold text-xl disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>
+                    Lock In Score
+                </button>
+            </div>
+
+            <!-- Scorecard -->
+            <div class="bg-slate-900 p-2 rounded-lg shadow-lg overflow-x-auto">
+                <table class="w-full text-center border-collapse">
+                    <thead id="scorecard-head" class="text-slate-300">
+                        <!-- Header will be generated by JS -->
+                    </thead>
+                    <tbody id="scorecard-body" class="divide-y divide-slate-700">
+                        <!-- Player rows will be generated by JS -->
+                    </tbody>
+                </table>
+            </div>
+             <div class="mt-6 text-center">
+                <button id="new-game-btn" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-md transition-colors">Start New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Winner Modal -->
+    <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
+        <div class="bg-slate-700 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
+            <h2 class="text-3xl font-bold text-yellow-300 mb-4">Game Over!</h2>
+            <p id="winner-message" class="text-xl mb-6"></p>
+            <button id="modal-new-game-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-md transition-colors w-full">Play Again</button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE MANAGEMENT ---
+            let gameState = {
+                players: [],
+                currentHole: 1,
+                currentPlayerIndex: 0,
+                gameStarted: false,
+                currentTurnThrows: [],
+            };
+
+            // --- DOM ELEMENTS ---
+            const playerSetupEl = document.getElementById('player-setup');
+            const gameSectionEl = document.getElementById('game-section');
+            const addPlayerBtn = document.getElementById('add-player-btn');
+            const newPlayerNameInput = document.getElementById('new-player-name');
+            const playerListEl = document.getElementById('player-list');
+            const startGameBtn = document.getElementById('start-game-btn');
+            const currentPlayerNameEl = document.getElementById('current-player-name');
+            const currentHoleEl = document.getElementById('current-hole');
+            const currentThrowsEl = document.querySelector('#current-throws span');
+            const scoringControlsEl = document.getElementById('scoring-controls');
+            const lockInBtn = document.getElementById('lock-in-btn');
+            const scorecardHeadEl = document.getElementById('scorecard-head');
+            const scorecardBodyEl = document.getElementById('scorecard-body');
+            const newGameBtn = document.getElementById('new-game-btn');
+            const winnerModal = document.getElementById('winner-modal');
+            const winnerMessage = document.getElementById('winner-message');
+            const modalNewGameBtn = document.getElementById('modal-new-game-btn');
+
+
+            // --- RENDER FUNCTIONS ---
+
+            const renderPlayers = () => {
+                playerListEl.innerHTML = '';
+                gameState.players.forEach((player, index) => {
+                    const playerTag = document.createElement('div');
+                    playerTag.className = 'bg-slate-800 rounded-full px-4 py-2 flex items-center gap-3';
+                    playerTag.innerHTML = `
+                        <span class="font-semibold">${player.name}</span>
+                        <button data-index="${index}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button>
+                    `;
+                    playerListEl.appendChild(playerTag);
+                });
+                startGameBtn.disabled = gameState.players.length < 1;
+            };
+
+            const renderScorecard = () => {
+                // Header
+                scorecardHeadEl.innerHTML = `
+                    <tr>
+                        <th class="p-2 text-left sticky left-0 bg-slate-900">Player</th>
+                        ${Array.from({ length: 18 }, (_, i) => `<th class="p-2 score-cell">${i + 1}</th>`).join('')}
+                        <th class="p-2">Total</th>
+                    </tr>
+                `;
+
+                // Body
+                scorecardBodyEl.innerHTML = '';
+                gameState.players.forEach((player, index) => {
+                    const totalScore = player.scores.reduce((sum, score) => sum + (score === null ? 0 : score), 0);
+                    const row = document.createElement('tr');
+                    row.id = `player-row-${index}`;
+                    row.className = 'transition-colors';
+                    row.innerHTML = `
+                        <td class="p-2 text-left font-semibold sticky left-0 bg-slate-900">${player.name}</td>
+                        ${player.scores.map(score => `<td class="p-2 score-cell">${score !== null ? score : ''}</td>`).join('')}
+                        <td class="p-2 total-score text-yellow-300">${totalScore}</td>
+                    `;
+                    scorecardBodyEl.appendChild(row);
+                });
+                 updateCurrentPlayerHighlight();
+            };
+            
+            const updateUIForTurn = () => {
+                if (!gameState.gameStarted || gameState.players.length === 0) return;
+
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                currentPlayerNameEl.textContent = currentPlayer.name;
+                currentHoleEl.textContent = gameState.currentHole;
+
+                // Update throws display
+                currentThrowsEl.textContent = gameState.currentTurnThrows.join(', ');
+                
+                // Enable/disable buttons
+                const throwsCount = gameState.currentTurnThrows.length;
+                lockInBtn.disabled = throwsCount === 0;
+                document.querySelectorAll('.btn-score[data-score]').forEach(btn => {
+                    btn.disabled = throwsCount >= 3;
+                });
+                
+                updateCurrentPlayerHighlight();
+            };
+
+            const updateCurrentPlayerHighlight = () => {
+                 document.querySelectorAll('#scorecard-body tr').forEach(row => {
+                    row.classList.remove('current-player-highlight');
+                 });
+                 if (gameState.gameStarted && !isGameOver()) {
+                    const currentPlayerRow = document.getElementById(`player-row-${gameState.currentPlayerIndex}`);
+                    if (currentPlayerRow) {
+                        currentPlayerRow.classList.add('current-player-highlight');
+                    }
+                 }
+            }
+
+
+            // --- GAME LOGIC FUNCTIONS ---
+            
+            const addPlayer = () => {
+                const name = newPlayerNameInput.value.trim();
+                if (name) {
+                    gameState.players.push({
+                        name: name,
+                        scores: Array(18).fill(null)
+                    });
+                    newPlayerNameInput.value = '';
+                    renderPlayers();
+                }
+            };
+            
+            const removePlayer = (index) => {
+                gameState.players.splice(index, 1);
+                renderPlayers();
+            };
+            
+            const startGame = () => {
+                if(gameState.players.length > 0) {
+                    gameState.gameStarted = true;
+                    playerSetupEl.classList.add('hidden');
+                    gameSectionEl.classList.remove('hidden');
+                    renderScorecard();
+                    updateUIForTurn();
+                }
+            };
+            
+            const recordScore = (score) => {
+                if (gameState.currentTurnThrows.length < 3) {
+                    gameState.currentTurnThrows.push(score);
+                    
+                    if (gameState.currentTurnThrows.length === 3) {
+                        // Auto-lock after 3 throws
+                        lockInScore();
+                    } else {
+                       updateUIForTurn();
+                    }
+                }
+            };
+            
+            const lockInScore = () => {
+                if (gameState.currentTurnThrows.length === 0) return;
+                
+                const holeIndex = gameState.currentHole - 1;
+                let scoreForHole;
+                
+                if (gameState.currentTurnThrows.length === 3) {
+                    scoreForHole = gameState.currentTurnThrows[2];
+                } else {
+                    scoreForHole = Math.min(...gameState.currentTurnThrows);
+                }
+                
+                gameState.players[gameState.currentPlayerIndex].scores[holeIndex] = scoreForHole;
+                
+                nextTurn();
+            };
+            
+            const nextTurn = () => {
+                gameState.currentTurnThrows = [];
+                let nextPlayerIndex = gameState.currentPlayerIndex + 1;
+                
+                if (nextPlayerIndex >= gameState.players.length) {
+                    // All players have played this hole, move to next hole
+                    nextPlayerIndex = 0;
+                    gameState.currentHole++;
+                }
+                
+                gameState.currentPlayerIndex = nextPlayerIndex;
+                
+                if(isGameOver()){
+                    endGame();
+                } else {
+                    renderScorecard();
+                    updateUIForTurn();
+                }
+            };
+            
+            const isGameOver = () => {
+                return gameState.currentHole > 18;
+            };
+
+            const endGame = () => {
+                renderScorecard();
+                scoringControlsEl.classList.add('hidden');
+                document.querySelector('#game-section h2').textContent = "Final Scores";
+                document.querySelector('#game-section p').classList.add('hidden');
+                newGameBtn.classList.remove('hidden');
+
+                const finalScores = gameState.players.map(p => ({
+                    name: p.name,
+                    score: p.scores.reduce((sum, s) => sum + s, 0)
+                }));
+                
+                finalScores.sort((a, b) => a.score - b.score);
+                
+                const winner = finalScores[0];
+                const winners = finalScores.filter(p => p.score === winner.score);
+
+                // Highlight winner(s) on scorecard
+                gameState.players.forEach((player, index) => {
+                    if (winners.some(w => w.name === player.name)) {
+                        document.getElementById(`player-row-${index}`).classList.add('winner-highlight');
+                    }
+                });
+                
+                let winMsg = '';
+                if(winners.length > 1) {
+                    winMsg = `It's a tie between ${winners.map(w => w.name).join(' & ')} with a score of ${winner.score}!`;
+                } else {
+                    winMsg = `${winner.name} wins with a score of ${winner.score}!`;
+                }
+
+                winnerMessage.textContent = winMsg;
+                winnerModal.classList.remove('hidden');
+            };
+
+            const resetGame = () => {
+                gameState = {
+                    players: [],
+                    currentHole: 1,
+                    currentPlayerIndex: 0,
+                    gameStarted: false,
+                    currentTurnThrows: [],
+                };
+                gameSectionEl.classList.add('hidden');
+                playerSetupEl.classList.remove('hidden');
+                scoringControlsEl.classList.remove('hidden');
+                document.querySelector('#game-section h2').textContent = " 's Turn";
+                document.querySelector('#game-section p').classList.remove('hidden');
+                newGameBtn.classList.add('hidden');
+                winnerModal.classList.add('hidden');
+                renderPlayers();
+            };
+
+            // --- EVENT LISTENERS ---
+
+            addPlayerBtn.addEventListener('click', addPlayer);
+            newPlayerNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addPlayer();
+                }
+            });
+            
+            playerListEl.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-player-btn')) {
+                    const index = parseInt(e.target.dataset.index, 10);
+                    removePlayer(index);
+                }
+            });
+
+            startGameBtn.addEventListener('click', startGame);
+
+            scoringControlsEl.addEventListener('click', (e) => {
+                const button = e.target.closest('button[data-score]');
+                if (button) {
+                    recordScore(parseInt(button.dataset.score, 10));
+                }
+            });
+
+            lockInBtn.addEventListener('click', lockInScore);
+
+            newGameBtn.addEventListener('click', resetGame);
+            modalNewGameBtn.addEventListener('click', resetGame);
+        });
+
+        // --- PWA Service Worker ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('golf_service-worker.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
