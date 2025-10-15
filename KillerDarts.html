@@ -286,13 +286,13 @@
                     grid.appendChild(btn);
                 });
 
-                // Neutral segments check
-                const neutralTargets = {
+                // Nip segments check
+                const NipTargets = {
                     4: ['N'], 6: ['N'], 8: ['N Inner', 'N Outer'], 9: ['N'], 10: ['N'], 14: ['N'], 16: ['N'], 18: ['N Inner', 'N Outer'], 19: ['N'], 20: ['N']
                 };
 
-                if (neutralTargets[selectedNum]) {
-                    neutralTargets[selectedNum].forEach(nType => {
+                if (NipTargets[selectedNum]) {
+                    NipTargets[selectedNum].forEach(nType => {
                          const btn = document.createElement('button');
                          btn.className = 'btn bg-slate-700 hover:bg-slate-600 rounded-md p-4 text-base sm:text-lg font-bold transition-transform text-center border-2 border-sky-500 text-sky-400';
                          btn.dataset.multiplier = nType; // e.g., "N Out"
