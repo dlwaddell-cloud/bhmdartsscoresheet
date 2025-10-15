@@ -38,6 +38,16 @@
             50% { background-color: #86efac; } /* green-300 */
             100% { background-color: #4ade80; } /* green-400 */
         }
+        /* Styles for sticky columns */
+        .sticky-player {
+            width: 120px;
+            min-width: 120px;
+            max-width: 120px;
+        }
+        .sticky-total {
+            /* Position next to the player column */
+            left: 120px;
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -170,16 +180,16 @@
             };
 
             const renderScorecard = () => {
-                // Header
+                // Header - Reordered with Total score on the left
                 scorecardHeadEl.innerHTML = `
                     <tr>
-                        <th class="p-2 text-left sticky left-0 bg-slate-900">Player</th>
+                        <th class="p-2 text-left sticky left-0 bg-slate-900 z-10 sticky-player">Player</th>
+                        <th class="p-2 sticky bg-slate-900 z-10 sticky-total">Total</th>
                         ${Array.from({ length: 18 }, (_, i) => `<th class="p-2 score-cell">${i + 1}</th>`).join('')}
-                        <th class="p-2">Total</th>
                     </tr>
                 `;
 
-                // Body
+                // Body - Reordered with Total score on the left
                 scorecardBodyEl.innerHTML = '';
                 gameState.players.forEach((player, index) => {
                     const totalScore = player.scores.reduce((sum, score) => sum + (score === null ? 0 : score), 0);
@@ -187,9 +197,9 @@
                     row.id = `player-row-${index}`;
                     row.className = 'transition-colors';
                     row.innerHTML = `
-                        <td class="p-2 text-left font-semibold sticky left-0 bg-slate-900">${player.name}</td>
+                        <td class="p-2 text-left font-semibold sticky left-0 bg-slate-900 z-10 sticky-player truncate" title="${player.name}">${player.name}</td>
+                        <td class="p-2 total-score text-yellow-300 sticky bg-slate-900 z-10 sticky-total">${totalScore}</td>
                         ${player.scores.map(score => `<td class="p-2 score-cell">${score !== null ? score : ''}</td>`).join('')}
-                        <td class="p-2 total-score text-yellow-300">${totalScore}</td>
                     `;
                     scorecardBodyEl.appendChild(row);
                 });
@@ -305,6 +315,24 @@
                 } else {
                     renderScorecard();
                     updateUIForTurn();
+                    
+                    // --- AUTO SCROLL LOGIC ---
+                    const scorecardContainer = document.querySelector('.overflow-x-auto');
+                    // Only scroll if we are past a few holes and the view might be cluttered
+                    if (scorecardContainer && gameState.currentHole > 2) { 
+                        const headerCells = scorecardHeadEl.querySelectorAll('th');
+                        // Player is 0, Total is 1, Hole 1 is 2. So Hole 'n' is at index n+1.
+                        const targetHeader = headerCells[gameState.currentHole + 1];
+                        if (targetHeader) {
+                            // Calculate scroll position to center the current hole's column
+                            const scrollPosition = targetHeader.offsetLeft + (targetHeader.offsetWidth / 2) - (scorecardContainer.offsetWidth / 2);
+                            scorecardContainer.scrollTo({
+                                left: scrollPosition,
+                                behavior: 'smooth',
+                            });
+                        }
+                    }
+                    // --- END AUTO SCROLL LOGIC ---
                 }
             };
             
@@ -348,21 +376,29 @@
             };
 
             const resetGame = () => {
-                gameState = {
-                    players: [],
-                    currentHole: 1,
-                    currentPlayerIndex: 0,
-                    gameStarted: false,
-                    currentTurnThrows: [],
-                };
+                // Keep players for a quick restart, just reset scores
+                gameState.players.forEach(p => p.scores.fill(null));
+                gameState.currentHole = 1;
+                gameState.currentPlayerIndex = 0;
+                gameState.gameStarted = false;
+                gameState.currentTurnThrows = [];
+
                 gameSectionEl.classList.add('hidden');
                 playerSetupEl.classList.remove('hidden');
                 scoringControlsEl.classList.remove('hidden');
-                document.querySelector('#game-section h2').textContent = " 's Turn";
+                
+                 // Reset dynamic text
+                const h2 = document.querySelector('#game-section h2');
+                h2.innerHTML = `<span id="current-player-name"></span>'s Turn`;
                 document.querySelector('#game-section p').classList.remove('hidden');
+
                 newGameBtn.classList.add('hidden');
                 winnerModal.classList.add('hidden');
-                renderPlayers();
+                
+                // Clear highlights from old game
+                document.querySelectorAll('.winner-highlight').forEach(el => el.classList.remove('winner-highlight'));
+                
+                renderPlayers(); // To re-render the player list in setup
             };
 
             // --- EVENT LISTENERS ---
