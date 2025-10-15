@@ -105,13 +105,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const VALID_TARGETS = new Set([
-                'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20',
-                'S1','S2','S3','S4','S5','S6','S7','S8','S9','S10','S11','S12','S13','S14','S15','S16','S17','S18','S19','S20', 'SB',
-                'D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','D12','D13','D14','D15','D16','D17','D18','D19','D20', 'DB',
-                'T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12','T13','T14','T15','T16','T17','T18','T19','T20',
-                'N4','N6','N8 Outer','N8 Inner','N9','N10','N14','N16','N18 Outer','N18 Inner','N19','N20'
-            ]);
+             const KILLER_STORAGE_KEY = 'dartsKillerGameState';
 
             // --- STATE MANAGEMENT ---
             let gameState = {
@@ -124,6 +118,18 @@
                     step: 'number', // 'number', 'multiplier'
                     number: null,
                 },
+            };
+            
+            // --- PERSISTENCE ---
+            const saveState = () => {
+                localStorage.setItem(KILLER_STORAGE_KEY, JSON.stringify(gameState));
+            };
+            
+            const loadState = () => {
+                const savedState = localStorage.getItem(KILLER_STORAGE_KEY);
+                if (savedState) {
+                    gameState = JSON.parse(savedState);
+                }
             };
 
             // --- DOM ELEMENTS ---
@@ -181,6 +187,7 @@
                         renderGameboard(); // Show final board
                         break;
                 }
+                 saveState();
             };
 
             const renderPlayerSetupList = () => {
@@ -405,6 +412,7 @@
                 winnerMessage.textContent = winner ? `${winner.name} is the Killer Champion!` : "It's a draw!";
                 winnerModal.classList.remove('hidden');
                 render();
+                localStorage.removeItem(KILLER_STORAGE_KEY);
             };
             
             const resetGame = () => {
@@ -413,6 +421,7 @@
                     killerPlayerIndex: 0, currentTarget: null,
                     targetSelection: { step: 'number', number: null },
                 };
+                localStorage.removeItem(KILLER_STORAGE_KEY);
                 winnerModal.classList.add('hidden');
                 document.getElementById('action-buttons').classList.remove('hidden');
                 render();
@@ -480,6 +489,8 @@
             failedTurnBtn.addEventListener('click', handleFailedTurn);
             newGameBtn.addEventListener('click', resetGame);
 
+            // -- INITIALIZE --
+            loadState();
             render();
         });
 
@@ -495,13 +506,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
