@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Killer Darts Scorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="killer_manifest.json">
     <meta name="theme-color" content="#4A1D1F">
-    <link rel="apple-touch-icon" href="killer_icon-192x192.png">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -47,6 +45,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="text-white min-h-screen flex flex-col items-center p-4">
+
+    <div id="clear-storage-btn" class="hidden fixed top-4 left-4 z-50 bg-red-600 hover:bg-red-700 p-2 rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110" title="Clear data & return home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </div>
 
     <div id="app" class="w-full max-w-5xl mx-auto">
         <header class="text-center mb-6">
@@ -103,9 +107,21 @@
         </div>
     </div>
 
+    <!-- Confirm Clear Modal -->
+    <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-yellow-300 mb-4">Leave Game?</h2>
+            <p class="text-slate-300 mb-6">This will clear the current game's data and return you to the main screen. This action cannot be undone.</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancel-clear-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-md w-full">Cancel</button>
+                <button id="confirm-clear-action-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md w-full">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-             const KILLER_STORAGE_KEY = 'dartsKillerGameState';
+            const STORAGE_KEY = 'dartsKillerGameState';
 
             // --- STATE MANAGEMENT ---
             let gameState = {
@@ -119,20 +135,9 @@
                     number: null,
                 },
             };
-            
-            // --- PERSISTENCE ---
-            const saveState = () => {
-                localStorage.setItem(KILLER_STORAGE_KEY, JSON.stringify(gameState));
-            };
-            
-            const loadState = () => {
-                const savedState = localStorage.getItem(KILLER_STORAGE_KEY);
-                if (savedState) {
-                    gameState = JSON.parse(savedState);
-                }
-            };
 
             // --- DOM ELEMENTS ---
+            const clearStorageBtn = document.getElementById('clear-storage-btn');
             const subtitleEl = document.getElementById('game-phase-subtitle');
             const playerSetupEl = document.getElementById('player-setup');
             const addPlayerBtn = document.getElementById('add-player-btn');
@@ -156,6 +161,31 @@
             const winnerModal = document.getElementById('winner-modal');
             const winnerMessage = document.getElementById('winner-message');
             const newGameBtn = document.getElementById('new-game-btn');
+            
+            const confirmClearModal = document.getElementById('confirm-clear-modal');
+            const cancelClearBtn = document.getElementById('cancel-clear-btn');
+            const confirmClearActionBtn = document.getElementById('confirm-clear-action-btn');
+
+            // --- PERSISTENCE ---
+            const saveState = () => {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+                updateClearButtonVisibility();
+            };
+
+            const loadState = () => {
+                const savedState = localStorage.getItem(STORAGE_KEY);
+                if (savedState) {
+                    gameState = JSON.parse(savedState);
+                }
+            };
+            
+            const updateClearButtonVisibility = () => {
+                if (localStorage.getItem(STORAGE_KEY)) {
+                    clearStorageBtn.classList.remove('hidden');
+                } else {
+                    clearStorageBtn.classList.add('hidden');
+                }
+            };
 
             // --- RENDER FUNCTIONS ---
             const render = () => {
@@ -187,7 +217,7 @@
                         renderGameboard(); // Show final board
                         break;
                 }
-                 saveState();
+                saveState();
             };
 
             const renderPlayerSetupList = () => {
@@ -276,37 +306,14 @@
                 const grid = document.createElement('div');
                 grid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-3';
                 targetSelectionGridEl.appendChild(grid);
-
-                const multipliers = {
-                    'T': { label: 'Triple', style: 'border-red-500 text-red-400'},
-                    'D': { label: 'Double', style: 'border-green-500 text-green-400'},
-                    'S': { label: 'Single (Skinny)', style: 'border-slate-500 text-slate-300'},
-                    'F': { label: 'Single (Fat)', style: 'border-slate-500 text-slate-300'},
-                };
-
-                // Standard Multipliers
-                Object.entries(multipliers).forEach(([key, val]) => {
+                
+                ['Triple', 'Double', 'Single'].forEach(type => {
                     const btn = document.createElement('button');
-                    btn.className = `btn bg-slate-700 hover:bg-slate-600 rounded-md p-4 text-base sm:text-lg font-bold transition-transform text-center border-2 ${val.style}`;
-                    btn.dataset.multiplier = key;
-                    btn.textContent = val.label;
+                    btn.className = `btn bg-slate-700 hover:bg-slate-600 rounded-md p-4 text-base sm:text-lg font-bold transition-transform text-center`;
+                    btn.dataset.multiplier = type.charAt(0);
+                    btn.textContent = type;
                     grid.appendChild(btn);
                 });
-
-                // Nip segments check
-                const NipTargets = {
-                    4: ['N'], 6: ['N'], 8: ['N Inner', 'N Outer'], 9: ['N'], 10: ['N'], 14: ['N'], 16: ['N'], 18: ['N Inner', 'N Outer'], 19: ['N'], 20: ['N']
-                };
-
-                if (NipTargets[selectedNum]) {
-                    NipTargets[selectedNum].forEach(nType => {
-                         const btn = document.createElement('button');
-                         btn.className = 'btn bg-slate-700 hover:bg-slate-600 rounded-md p-4 text-base sm:text-lg font-bold transition-transform text-center border-2 border-sky-500 text-sky-400';
-                         btn.dataset.multiplier = nType; // e.g., "N Out"
-                         btn.textContent = nType === 'N' ? '(.)' : `(.) (${nType.split(' ')[1]})`;
-                         grid.appendChild(btn);
-                    });
-                }
             };
 
             const renderGameboard = () => {
@@ -362,7 +369,7 @@
             const selectTarget = (target) => {
                 gameState.currentTarget = target;
                 gameState.gamePhase = 'playing';
-                gameState.targetSelection = { step: 'number', number: null }; // Reset for next time
+                gameState.targetSelection = { step: 'number', number: null }; // Reset
                 nextTurn();
             };
 
@@ -377,9 +384,8 @@
                 if (playersWithLives.length <= 1) {
                     endGame(playersWithLives[0]);
                 } else {
-                    // If the turn comes back to the killer, skip to the next player
                     if (gameState.currentPlayerIndex === gameState.killerPlayerIndex) {
-                        nextTurn();
+                        nextTurn(); // Skip killer's turn
                         return;
                     }
                     render();
@@ -396,7 +402,6 @@
                 const player = gameState.players[gameState.currentPlayerIndex];
                 player.lives--;
                 if (player.lives <= 0) {
-                    // Eliminated, check for winner
                     const playersWithLives = gameState.players.filter(p => p.lives > 0);
                     if (playersWithLives.length <= 1) {
                         endGame(playersWithLives[0]);
@@ -411,8 +416,9 @@
                 document.getElementById('game-controls').classList.add('hidden');
                 winnerMessage.textContent = winner ? `${winner.name} is the Killer Champion!` : "It's a draw!";
                 winnerModal.classList.remove('hidden');
+                localStorage.removeItem(STORAGE_KEY);
+                updateClearButtonVisibility();
                 render();
-                localStorage.removeItem(KILLER_STORAGE_KEY);
             };
             
             const resetGame = () => {
@@ -421,13 +427,25 @@
                     killerPlayerIndex: 0, currentTarget: null,
                     targetSelection: { step: 'number', number: null },
                 };
-                localStorage.removeItem(KILLER_STORAGE_KEY);
                 winnerModal.classList.add('hidden');
                 document.getElementById('action-buttons').classList.remove('hidden');
                 render();
             };
 
             // --- EVENT LISTENERS ---
+            clearStorageBtn.addEventListener('click', () => {
+                confirmClearModal.classList.remove('hidden');
+            });
+            
+            cancelClearBtn.addEventListener('click', () => {
+                confirmClearModal.classList.add('hidden');
+            });
+
+            confirmClearActionBtn.addEventListener('click', () => {
+                localStorage.removeItem(STORAGE_KEY);
+                window.location.href = 'BarDarts.html';
+            });
+            
             addPlayerBtn.addEventListener('click', addPlayer);
             newPlayerNameInput.addEventListener('keypress', e => e.key === 'Enter' && addPlayer());
             playerListEl.addEventListener('click', e => {
@@ -438,9 +456,6 @@
 
             startGameBtn.addEventListener('click', () => {
                 gameState.gamePhase = 'set_initial_target';
-                gameState.killerPlayerIndex = 0;
-                gameState.currentPlayerIndex = 0;
-                gameState.targetSelection = { step: 'number', number: null };
                 render();
             });
 
@@ -452,36 +467,18 @@
 
                 if (action === 'back') {
                     gameState.targetSelection.step = 'number';
-                    gameState.targetSelection.number = null;
                     renderSetTarget();
                     return;
                 }
                 
                 if (bull) {
                     selectTarget(bull);
-                    return;
-                }
-
-                if (number) {
+                } else if (number) {
                     gameState.targetSelection.step = 'multiplier';
                     gameState.targetSelection.number = number;
                     renderSetTarget();
-                    return;
-                }
-
-                if (multiplier) {
-                    const num = gameState.targetSelection.number;
-                    let target;
-                    if (multiplier.startsWith('N')) {
-                         if (multiplier.includes(' ')) { // 'N Out' or 'N In'
-                             target = `N${num} ${multiplier.split(' ')[1]}`;
-                         } else {
-                             target = `N${num}`;
-                         }
-                    } else {
-                        target = `${multiplier}${num}`;
-                    }
-                    selectTarget(target);
+                } else if (multiplier) {
+                    selectTarget(`${multiplier}${gameState.targetSelection.number}`);
                 }
             });
 
@@ -489,20 +486,12 @@
             failedTurnBtn.addEventListener('click', handleFailedTurn);
             newGameBtn.addEventListener('click', resetGame);
 
-            // -- INITIALIZE --
+            // --- INITIALIZE ---
             loadState();
+            updateClearButtonVisibility();
             render();
         });
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('killer_service-worker.js').then(registration => {
-                    console.log('SW registered: ', registration.scope);
-                }, err => {
-                    console.log('SW registration failed: ', err);
-                });
-            });
-        }
     </script>
 </body>
 </html>
+
