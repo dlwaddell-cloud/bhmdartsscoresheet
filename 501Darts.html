@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>501 Scorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#1E3A8A">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #111827; /* A very dark blue/gray */
+        }
+        .player-card {
+            transition: all 0.3s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .current-player-turn {
+            border-color: #3B82F6; /* blue-500 */
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            transform: scale(1.02);
+        }
+        .btn {
+            transition: all 0.15s ease-in-out;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .winner-highlight {
+            animation: winner-pulse 2s infinite;
+        }
+        @keyframes winner-pulse {
+            0% { background-color: #22c55e; } /* green-500 */
+            50% { background-color: #4ade80; } /* green-400 */
+            100% { background-color: #22c55e; } /* green-500 */
+        }
+        /* Custom scrollbar for better look in dark mode */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="text-white min-h-screen flex flex-col items-center p-4">
+
+    <div id="clear-storage-btn" class="hidden fixed top-4 left-4 z-50 bg-red-600 hover:bg-red-700 p-2 rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110" title="Clear data & return home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </div>
+
+    <div id="app" class="w-full max-w-6xl mx-auto">
+        <header class="text-center mb-6">
+            <h1 class="text-5xl font-bold text-blue-400">501</h1>
+            <p class="text-slate-400 mt-1">First to zero with a double-out wins!</p>
+        </header>
+
+        <!-- Player Setup Section -->
+        <div id="player-setup" class="bg-slate-800 p-6 rounded-lg shadow-lg mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Add Players</h2>
+            <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <input type="text" id="new-player-name" class="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Enter player name...">
+                <button id="add-player-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">Add Player</button>
+            </div>
+            <div class="mt-6 text-center">
+                <button id="start-game-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-md text-lg w-full sm:w-auto" disabled>Start Game</button>
+            </div>
+        </div>
+        
+        <!-- Game Section -->
+        <div id="game-section" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Players -->
+            <div id="player-cards-container" class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 self-start">
+                <!-- Player cards generated here -->
+            </div>
+
+            <!-- Right Column: Scoring -->
+            <div id="scoring-panel" class="bg-slate-800 p-4 rounded-lg shadow-lg self-start">
+                <h2 class="text-2xl font-bold text-center mb-2"><span id="turn-player-name"></span>'s Turn</h2>
+                <div class="bg-slate-900 text-center rounded-lg p-3 my-3">
+                    <div class="text-slate-400 text-sm">Score Entered</div>
+                    <div id="current-score-display" class="text-6xl font-mono font-bold h-20 flex items-center justify-center">0</div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <!-- Numpad -->
+                    <button data-num="1" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">1</button>
+                    <button data-num="2" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">2</button>
+                    <button data-num="3" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">3</button>
+                    <button data-num="4" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">4</button>
+                    <button data-num="5" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">5</button>
+                    <button data-num="6" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">6</button>
+                    <button data-num="7" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">7</button>
+                    <button data-num="8" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">8</button>
+                    <button data-num="9" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">9</button>
+                    <button id="del-btn" class="btn bg-slate-600 hover:bg-slate-500 p-4 rounded-lg text-xl font-bold">DEL</button>
+                    <button data-num="0" class="btn numpad bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-2xl font-bold">0</button>
+                    <button id="enter-score-btn" class="btn bg-green-600 hover:bg-green-500 p-4 rounded-lg text-xl font-bold">Enter</button>
+                </div>
+                
+                <div class="mt-4 text-center">
+                     <button id="bust-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-md w-full">BUST</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Winner Modal -->
+    <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-700 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
+            <h2 class="text-3xl font-bold text-blue-300 mb-4">GAME SHOT!</h2>
+            <p id="winner-message" class="text-xl mb-6"></p>
+            <button id="new-game-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-md w-full">Play Again</button>
+        </div>
+    </div>
+    
+    <!-- Confirm Clear Modal -->
+    <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-yellow-300 mb-4">Leave Game?</h2>
+            <p class="text-slate-300 mb-6">This will clear the current game's data and return you to the main screen. This action cannot be undone.</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancel-clear-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-md w-full">Cancel</button>
+                <button id="confirm-clear-action-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md w-full">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const STORAGE_KEY = 'darts501GameState';
+
+            // --- STATE ---
+            let gameState = {
+                players: [], // { name: string, score: 501, history: [] }
+                gameStarted: false,
+                currentPlayerIndex: 0,
+                currentTurnScore: 0
+            };
+
+            // --- DOM ELEMENTS ---
+            const clearStorageBtn = document.getElementById('clear-storage-btn');
+            const playerSetupEl = document.getElementById('player-setup');
+            const addPlayerBtn = document.getElementById('add-player-btn');
+            const newPlayerNameInput = document.getElementById('new-player-name');
+            const playerListEl = document.getElementById('player-list');
+            const startGameBtn = document.getElementById('start-game-btn');
+            
+            const gameSectionEl = document.getElementById('game-section');
+            const playerCardsContainer = document.getElementById('player-cards-container');
+            const turnPlayerNameEl = document.getElementById('turn-player-name');
+            const currentScoreDisplay = document.getElementById('current-score-display');
+            const scoringPanel = document.getElementById('scoring-panel');
+            const enterScoreBtn = document.getElementById('enter-score-btn');
+            const bustBtn = document.getElementById('bust-btn');
+            const delBtn = document.getElementById('del-btn');
+            
+            const winnerModal = document.getElementById('winner-modal');
+            const winnerMessage = document.getElementById('winner-message');
+            const newGameBtn = document.getElementById('new-game-btn');
+            
+            const confirmClearModal = document.getElementById('confirm-clear-modal');
+            const cancelClearBtn = document.getElementById('cancel-clear-btn');
+            const confirmClearActionBtn = document.getElementById('confirm-clear-action-btn');
+            
+            // --- PERSISTENCE ---
+            const saveState = () => {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+                updateClearButtonVisibility();
+            };
+            
+            const loadState = () => {
+                const savedState = localStorage.getItem(STORAGE_KEY);
+                if (savedState) {
+                    gameState = JSON.parse(savedState);
+                }
+            };
+            
+            const updateClearButtonVisibility = () => {
+                if (localStorage.getItem(STORAGE_KEY)) {
+                    clearStorageBtn.classList.remove('hidden');
+                } else {
+                    clearStorageBtn.classList.add('hidden');
+                }
+            };
+
+            // --- RENDER ---
+            const render = () => {
+                if (gameState.gameStarted) {
+                    playerSetupEl.classList.add('hidden');
+                    gameSectionEl.classList.remove('hidden');
+                    renderPlayerCards();
+                    updateTurnUI();
+                } else {
+                    playerSetupEl.classList.remove('hidden');
+                    gameSectionEl.classList.add('hidden');
+                    renderPlayerSetupList();
+                }
+                saveState();
+            };
+
+            const renderPlayerSetupList = () => {
+                playerListEl.innerHTML = '';
+                gameState.players.forEach((player, index) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'bg-slate-700 rounded-full px-4 py-2 flex items-center gap-3';
+                    tag.innerHTML = `<span class="font-semibold">${player.name}</span><button data-index="${index}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button>`;
+                    playerListEl.appendChild(tag);
+                });
+                startGameBtn.disabled = gameState.players.length < 1;
+            };
+
+            const renderPlayerCards = () => {
+                playerCardsContainer.innerHTML = '';
+                gameState.players.forEach((player, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'player-card bg-slate-800 p-4 rounded-lg shadow-md';
+                    if (index === gameState.currentPlayerIndex) {
+                        card.classList.add('current-player-turn');
+                    }
+                    
+                    const lastScore = player.history.length > 0 ? player.history[player.history.length-1] : '-';
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-baseline">
+                            <h3 class="text-2xl font-bold truncate" title="${player.name}">${player.name}</h3>
+                            <span class="text-slate-400 text-sm">Last: ${lastScore}</span>
+                        </div>
+                        <p class="text-7xl font-bold text-center my-4">${player.score}</p>
+                    `;
+                    playerCardsContainer.appendChild(card);
+                });
+            };
+
+            const updateTurnUI = () => {
+                if (gameState.players.length === 0) return;
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                turnPlayerNameEl.textContent = currentPlayer.name;
+                currentScoreDisplay.textContent = gameState.currentTurnScore;
+            };
+
+            // --- GAME LOGIC ---
+            const addPlayer = () => {
+                const name = newPlayerNameInput.value.trim();
+                if (name) {
+                    gameState.players.push({ name, score: 501, history: [] });
+                    newPlayerNameInput.value = '';
+                    render();
+                }
+            };
+            
+            const removePlayer = index => {
+                gameState.players.splice(index, 1);
+                render();
+            };
+
+            const startGame = () => {
+                gameState.gameStarted = true;
+                gameState.currentPlayerIndex = 0;
+                gameState.currentTurnScore = 0;
+                gameState.players.forEach(p => {
+                    p.score = 501;
+                    p.history = [];
+                });
+                render();
+            };
+            
+            const handleNumpad = (num) => {
+                const currentVal = gameState.currentTurnScore.toString();
+                const newVal = parseInt(currentVal + num, 10);
+                if (newVal <= 180) {
+                    gameState.currentTurnScore = newVal;
+                    updateTurnUI();
+                }
+            };
+
+            const handleDelete = () => {
+                const currentVal = gameState.currentTurnScore.toString();
+                gameState.currentTurnScore = parseInt(currentVal.slice(0, -1) || '0', 10);
+                updateTurnUI();
+            };
+
+            const submitScore = (isBust = false) => {
+                const player = gameState.players[gameState.currentPlayerIndex];
+                const turnScore = gameState.currentTurnScore;
+                const scoreAfterTurn = player.score - turnScore;
+
+                let wasBust = isBust || scoreAfterTurn < 2;
+
+                if (wasBust) {
+                    player.history.push('BUST');
+                } else {
+                    player.score = scoreAfterTurn;
+                    player.history.push(turnScore);
+                }
+                
+                // Check for winner
+                if (player.score === 0) {
+                   // In a real game, we'd need to verify the last throw was a double.
+                   // For this scorer, we'll trust the user to only enter a winning score if it was a valid double-out.
+                   endGame(player);
+                   return;
+                }
+
+                nextTurn();
+            };
+            
+            const nextTurn = () => {
+                gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
+                gameState.currentTurnScore = 0;
+                render();
+            };
+
+            const endGame = (winner) => {
+                winnerMessage.textContent = `${winner.name} wins the game!`;
+                winnerModal.classList.remove('hidden');
+                
+                // Highlight winner card
+                document.querySelectorAll('.player-card').forEach((card, index) => {
+                    if (index === gameState.players.findIndex(p => p.name === winner.name)) {
+                        card.classList.add('winner-highlight');
+                    }
+                    card.classList.remove('current-player-turn');
+                });
+                
+                scoringPanel.classList.add('hidden'); // Hide scoring panel
+                localStorage.removeItem(STORAGE_KEY);
+                updateClearButtonVisibility();
+            };
+
+            const resetGame = () => {
+                gameState = { players: [], gameStarted: false, currentPlayerIndex: 0, currentTurnScore: 0 };
+                winnerModal.classList.add('hidden');
+                scoringPanel.classList.remove('hidden');
+                render();
+            };
+
+            // --- EVENT LISTENERS ---
+            clearStorageBtn.addEventListener('click', () => {
+                confirmClearModal.classList.remove('hidden');
+            });
+            
+            cancelClearBtn.addEventListener('click', () => {
+                confirmClearModal.classList.add('hidden');
+            });
+
+            confirmClearActionBtn.addEventListener('click', () => {
+                localStorage.removeItem(STORAGE_KEY);
+                window.location.href = 'BarDarts.html';
+            });
+
+            addPlayerBtn.addEventListener('click', addPlayer);
+            newPlayerNameInput.addEventListener('keypress', e => e.key === 'Enter' && addPlayer());
+            playerListEl.addEventListener('click', e => {
+                if (e.target.classList.contains('remove-player-btn')) {
+                    removePlayer(parseInt(e.target.dataset.index, 10));
+                }
+            });
+            startGameBtn.addEventListener('click', startGame);
+            
+            scoringPanel.addEventListener('click', e => {
+                const target = e.target.closest('button');
+                if (!target) return;
+                
+                if (target.matches('.numpad')) {
+                    handleNumpad(target.dataset.num);
+                } else if (target.id === 'del-btn') {
+                    handleDelete();
+                } else if (target.id === 'enter-score-btn') {
+                    submitScore(false);
+                } else if (target.id === 'bust-btn') {
+                    submitScore(true);
+                }
+            });
+
+            newGameBtn.addEventListener('click', resetGame);
+
+            // --- INITIALIZE ---
+            loadState();
+            updateClearButtonVisibility();
+            render();
+        });
+    </script>
+</body>
+</html>
+
