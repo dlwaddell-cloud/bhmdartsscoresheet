@@ -99,6 +99,13 @@
             <div id="player-status-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Player cards will be generated here -->
             </div>
+             <!-- Eliminated Players Area -->
+            <div id="eliminated-area" class="mt-8 hidden">
+                <h3 class="text-xl font-semibold text-slate-400 border-b-2 border-slate-600 pb-2 mb-4">Eliminated</h3>
+                <div id="eliminated-players-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Eliminated player cards will be generated here -->
+                </div>
+            </div>
         </div>
     </div>
     
@@ -178,6 +185,8 @@
             const turnPlayerNameEl = document.getElementById('turn-player-name');
             const currentTargetDisplayEl = document.getElementById('current-target-display');
             const playerStatusGridEl = document.getElementById('player-status-grid');
+            const eliminatedAreaEl = document.getElementById('eliminated-area');
+            const eliminatedPlayersGridEl = document.getElementById('eliminated-players-grid');
             
             const becameKillerBtn = document.getElementById('became-killer-btn');
             const failedTurnBtn = document.getElementById('failed-turn-btn');
@@ -338,38 +347,71 @@
                 }
             };
 
+            const createPlayerCard = (player, originalIndex) => {
+                const card = document.createElement('div');
+                card.className = 'player-card bg-slate-700 p-4 rounded-lg shadow-md flex flex-col items-center';
+                
+                if (originalIndex === gameState.killerPlayerIndex) card.classList.add('is-killer');
+                if (player.lives <= 0) card.classList.add('eliminated');
+                if (gameState.gamePhase === 'playing' && originalIndex === gameState.currentPlayerIndex) {
+                    card.classList.add('current-player-turn');
+                }
+
+                const livesHTML = Array(5).fill(0).map((_, i) =>
+                    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 ${i < player.lives ? 'life' : 'text-slate-600'}">
+                      <path d="M11.645 20.91a.75.75 0 0 1-1.29 0C8.633 16.53 3.75 12.25 3.75 8.25 3.75 5.58 5.58 3.75 8.25 3.75c1.74 0 3.32.81 4.25 2.08 1.03-1.27 2.51-2.08 4.25-2.08 2.67 0 4.5 1.83 4.5 4.5 0 4-4.883 8.28-6.605 12.66Z" />
+                    </svg>`).join('');
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between w-full">
+                       <span class="text-xl font-bold">${player.name}</span>
+                    </div>
+                    <div class="text-base font-semibold mt-2">${originalIndex === gameState.killerPlayerIndex ? 'KILLER' : 'Hunter'}</div>
+                    <div class="flex gap-1 mt-3">${livesHTML}</div>
+                `;
+                return card;
+            };
+
             const renderGameboard = () => {
                 playerStatusGridEl.innerHTML = '';
-                gameState.players.forEach((player, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'player-card bg-slate-700 p-4 rounded-lg shadow-md flex flex-col items-center';
-                    if (index === gameState.killerPlayerIndex) card.classList.add('is-killer');
-                    if (player.lives <= 0) card.classList.add('eliminated');
-                    if (gameState.gamePhase === 'playing' && index === gameState.currentPlayerIndex) {
-                        card.classList.add('current-player-turn');
+                eliminatedPlayersGridEl.innerHTML = '';
+
+                const activePlayerInfos = [];
+                const eliminatedPlayerInfos = [];
+                gameState.players.forEach((player, originalIndex) => {
+                    const info = { player, originalIndex };
+                    if (player.lives > 0) {
+                        activePlayerInfos.push(info);
+                    } else {
+                        eliminatedPlayerInfos.push(info);
                     }
-
-                    const livesHTML = Array(5).fill(0).map((_, i) =>
-                        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 ${i < player.lives ? 'life' : 'text-slate-600'}">
-                          <path d="M11.645 20.91a.75.75 0 0 1-1.29 0C8.633 16.53 3.75 12.25 3.75 8.25 3.75 5.58 5.58 3.75 8.25 3.75c1.74 0 3.32.81 4.25 2.08 1.03-1.27 2.51-2.08 4.25-2.08 2.67 0 4.5 1.83 4.5 4.5 0 4-4.883 8.28-6.605 12.66Z" />
-                        </svg>`).join('');
-
-                    card.innerHTML = `
-                        <div class="flex items-center justify-between w-full">
-                           <span class="text-xl font-bold">${player.name}</span>
-                        </div>
-                        <div class="text-base font-semibold mt-2">${index === gameState.killerPlayerIndex ? 'KILLER' : 'Hunter'}</div>
-                        <div class="flex gap-1 mt-3">${livesHTML}</div>
-                    `;
-                    playerStatusGridEl.appendChild(card);
                 });
 
+                eliminatedAreaEl.classList.toggle('hidden', eliminatedPlayerInfos.length === 0);
+                eliminatedPlayerInfos.forEach(info => {
+                    eliminatedPlayersGridEl.appendChild(createPlayerCard(info.player, info.originalIndex));
+                });
+
+                const numActivePlayers = activePlayerInfos.length;
+                if (numActivePlayers > 0) {
+                     const currentActivePlayerIndex = activePlayerInfos.findIndex(info => info.originalIndex === gameState.currentPlayerIndex);
+                    const startIndex = currentActivePlayerIndex === -1 ? 0 : currentActivePlayerIndex;
+
+                    for (let i = 0; i < numActivePlayers; i++) {
+                        const activeIndex = (startIndex + i) % numActivePlayers;
+                        const info = activePlayerInfos[activeIndex];
+                        playerStatusGridEl.appendChild(createPlayerCard(info.player, info.originalIndex));
+                    }
+                }
+                
                 if (gameState.gamePhase === 'playing') {
                     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-                    turnPlayerNameEl.textContent = currentPlayer.name;
-                    currentTargetDisplayEl.textContent = gameState.currentTarget;
-                    const isKiller = gameState.currentPlayerIndex === gameState.killerPlayerIndex;
-                    document.getElementById('action-buttons').classList.toggle('hidden', isKiller);
+                    if (currentPlayer) {
+                        turnPlayerNameEl.textContent = currentPlayer.name;
+                        currentTargetDisplayEl.textContent = gameState.currentTarget;
+                        const isKiller = gameState.currentPlayerIndex === gameState.killerPlayerIndex;
+                        document.getElementById('action-buttons').classList.toggle('hidden', isKiller);
+                    }
                 }
             };
 
@@ -579,6 +621,4 @@
     </script>
 </body>
 </html>
-
-
 
