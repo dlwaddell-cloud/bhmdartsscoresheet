@@ -23,11 +23,6 @@
             left: 120px; /* Adjust based on player name column width */
             z-index: 10;
         }
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-        }
         .total-score {
             font-weight: 800;
         }
@@ -64,6 +59,7 @@
             <p class="text-slate-400">Lowest score after 18 holes wins!</p>
         </header>
 
+        <!-- Player Setup Section -->
         <div id="player-setup" class="bg-slate-700 p-6 rounded-lg shadow-lg mb-6">
             <h2 class="text-2xl font-semibold mb-4">Players</h2>
             <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
@@ -76,13 +72,16 @@
             </div>
         </div>
 
+        <!-- Game Section -->
         <div id="game-section" class="hidden">
+            <!-- Current Turn Info -->
             <div class="bg-slate-700 p-4 rounded-lg shadow-lg mb-6 text-center">
                  <h2 class="text-3xl font-bold"><span id="current-player-name"></span>'s Turn</h2>
                  <p class="text-2xl text-slate-300">Hole: <span id="current-hole" class="font-bold text-yellow-300">1</span></p>
                  <div id="current-throws" class="mt-2 text-lg">Throws: <span class="font-mono"></span></div>
             </div>
 
+            <!-- Scoring Controls -->
             <div id="scoring-controls" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
                 <button data-score="-3" class="btn-score bg-green-600 hover:bg-green-700 p-4 rounded-lg text-center">
                     <span class="font-bold text-xl">Double</span><br><span class="text-lg">-3</span>
@@ -104,7 +103,8 @@
                 </button>
             </div>
 
-            <div id="scorecard-container" class="bg-slate-900 p-2 rounded-lg shadow-lg overflow-x-auto overflow-y-auto max-h-[45vh]">
+            <!-- Scorecard -->
+            <div id="scorecard-container" class="bg-slate-900 p-2 rounded-lg shadow-lg overflow-x-auto">
                 <table class="w-full text-center border-collapse">
                     <thead id="scorecard-head" class="text-slate-300">
                     </thead>
@@ -118,6 +118,7 @@
         </div>
     </div>
 
+    <!-- Winner Modal -->
     <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
         <div class="bg-slate-700 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
             <h2 class="text-3xl font-bold text-yellow-300 mb-4">Game Over!</h2>
@@ -126,6 +127,7 @@
         </div>
     </div>
 
+    <!-- Confirm Clear Modal -->
     <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
             <h2 class="text-2xl font-bold text-yellow-300 mb-4">Leave Game?</h2>
@@ -226,18 +228,34 @@
 
             const renderScorecard = () => {
                 scorecardHeadEl.innerHTML = `
-                    <tr class="sticky-header">
+                    <tr>
                         <th class="p-2 text-left sticky-player bg-slate-900 w-32">Player</th>
                         <th class="p-2 sticky-total bg-slate-900">Total</th>
-                        ${Array.from({ length: 18 }, (_, i) => `<th class="p-2 score-cell bg-slate-900">${i + 1}</th>`).join('')}
+                        ${Array.from({ length: 18 }, (_, i) => `<th class="p-2 score-cell">${i + 1}</th>`).join('')}
                     </tr>
                 `;
 
                 scorecardBodyEl.innerHTML = '';
-                gameState.players.forEach((player, index) => {
+
+                if (gameState.players.length === 0) {
+                    updateCurrentPlayerHighlight();
+                    return;
+                }
+
+                // Create a display order for players so the current player is always at the top.
+                const playersInOrder = [];
+                for (let i = 0; i < gameState.players.length; i++) {
+                    const playerIndex = (gameState.currentPlayerIndex + i) % gameState.players.length;
+                    playersInOrder.push({
+                        player: gameState.players[playerIndex],
+                        originalIndex: playerIndex
+                    });
+                }
+
+                playersInOrder.forEach(({ player, originalIndex }) => {
                     const totalScore = player.scores.reduce((sum, score) => sum + (score === null ? 0 : score), 0);
                     const row = document.createElement('tr');
-                    row.id = `player-row-${index}`;
+                    row.id = `player-row-${originalIndex}`; // Use original index for stable IDs
                     row.className = 'transition-colors';
                     row.innerHTML = `
                         <td class="p-2 text-left font-semibold sticky-player bg-slate-900 truncate" title="${player.name}">${player.name}</td>
@@ -274,7 +292,6 @@
                     const currentPlayerRow = document.getElementById(`player-row-${gameState.currentPlayerIndex}`);
                     if (currentPlayerRow) {
                         currentPlayerRow.classList.add('current-player-highlight');
-                        currentPlayerRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                  }
             };
@@ -432,4 +449,3 @@
     </script>
 </body>
 </html>
-```
