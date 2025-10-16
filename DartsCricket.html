@@ -225,11 +225,24 @@
                 startGameBtn.disabled = gameState.players.length < 1; // Can start with 1 player
             };
 
+            const abbreviateName = (name) => {
+                if (name.length <= 4) return name;
+                const parts = name.split(/\s+/).filter(Boolean);
+                if (parts.length > 1 && parts.length <= 3) {
+                    return parts.map(p => p[0]).join('').toUpperCase();
+                }
+                return name.substring(0, 3);
+            };
+
             const renderScorecard = () => {
                 // Player Names Header Row
                 let headHTML = '<tr><th class="p-1 sm:p-2 text-sm sm:text-base"></th>';
                 gameState.players.forEach((p, i) => {
-                    headHTML += `<th class="p-1 sm:p-2 text-sm sm:text-lg truncate ${i === gameState.currentPlayerIndex ? 'text-green-300' : ''}" title="${p.name}">${p.name}</th>`;
+                    const abbreviated = abbreviateName(p.name);
+                    headHTML += `<th class="p-1 sm:p-2 text-sm sm:text-lg ${i === gameState.currentPlayerIndex ? 'text-green-300' : ''}" title="${p.name}">
+                        <span class="hidden sm:inline truncate">${p.name}</span>
+                        <span class="sm:hidden">${abbreviated}</span>
+                    </th>`;
                 });
                 headHTML += '</tr>';
 
