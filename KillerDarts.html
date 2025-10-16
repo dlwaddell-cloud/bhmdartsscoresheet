@@ -48,6 +48,12 @@
 </head>
 <body class="text-white min-h-screen flex flex-col items-center p-4">
 
+    <div id="clear-storage-btn" class="fixed top-4 left-4 z-50 bg-red-600 hover:bg-red-700 p-2 rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110" title="Return to BarDarts.html">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </div>
+    
     <div id="app" class="w-full max-w-5xl mx-auto">
         <header class="text-center mb-6">
             <h1 class="text-4xl font-bold text-red-400">Killer Darts</h1>
@@ -62,8 +68,9 @@
                 <input type="text" id="new-player-name" class="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400" placeholder="Enter player name...">
                 <button id="add-player-btn" class="btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md transition-transform">Add Player</button>
             </div>
-            <div class="mt-4 text-center">
-                <button id="start-game-btn" class="btn bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-md transition-transform w-full sm:w-auto" disabled>Start Game</button>
+            <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <button id="start-game-btn" class="btn bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-md transition-transform w-full sm:w-auto flex-grow" disabled>Start Game</button>
+                <button id="reset-data-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded-md transition-transform w-full sm:w-auto">Reset & Clear Data</button>
             </div>
         </div>
         
@@ -103,18 +110,24 @@
         </div>
     </div>
 
+    <!-- Confirm Clear Modal -->
+    <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-yellow-300 mb-4">Leave Game?</h2>
+            <p class="text-slate-300 mb-6">This will clear the current game's data and return you to the main screen. This action cannot be undone.</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancel-clear-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-md w-full">Cancel</button>
+                <button id="confirm-clear-action-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md w-full">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const VALID_TARGETS = new Set([
-                'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20',
-                'S1','S2','S3','S4','S5','S6','S7','S8','S9','S10','S11','S12','S13','S14','S15','S16','S17','S18','S19','S20', 'SB',
-                'D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','D12','D13','D14','D15','D16','D17','D18','D19','D20', 'DB',
-                'T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12','T13','T14','T15','T16','T17','T18','T19','T20',
-                'N4','N6','N8 Outer','N8 Inner','N9','N10','N14','N16','N18 Outer','N18 Inner','N19','N20'
-            ]);
+            // --- STATE MANAGEMENT & PERSISTENCE ---
+            const STORAGE_KEY = 'killerDartsGameState';
 
-            // --- STATE MANAGEMENT ---
-            let gameState = {
+            const getInitialState = () => ({
                 players: [], // { name: string, lives: int }
                 gamePhase: 'setup', // 'setup', 'set_initial_target', 'set_new_target', 'playing', 'over'
                 currentPlayerIndex: 0,
@@ -124,15 +137,37 @@
                     step: 'number', // 'number', 'multiplier'
                     number: null,
                 },
+            });
+
+            const saveState = () => {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+                } catch (e) {
+                    console.error("Failed to save state to localStorage", e);
+                }
             };
 
+            const loadState = () => {
+                try {
+                    const savedState = localStorage.getItem(STORAGE_KEY);
+                    return savedState ? JSON.parse(savedState) : getInitialState();
+                } catch (e) {
+                    console.error("Failed to load state from localStorage", e);
+                    return getInitialState();
+                }
+            };
+
+            let gameState = loadState();
+
             // --- DOM ELEMENTS ---
+            const clearStorageBtn = document.getElementById('clear-storage-btn');
             const subtitleEl = document.getElementById('game-phase-subtitle');
             const playerSetupEl = document.getElementById('player-setup');
             const addPlayerBtn = document.getElementById('add-player-btn');
             const newPlayerNameInput = document.getElementById('new-player-name');
             const playerListEl = document.getElementById('player-list');
             const startGameBtn = document.getElementById('start-game-btn');
+            const resetDataBtn = document.getElementById('reset-data-btn');
             
             const setTargetSectionEl = document.getElementById('set-target-section');
             const setTargetTitleEl = document.getElementById('set-target-title');
@@ -150,6 +185,9 @@
             const winnerModal = document.getElementById('winner-modal');
             const winnerMessage = document.getElementById('winner-message');
             const newGameBtn = document.getElementById('new-game-btn');
+            const confirmClearModal = document.getElementById('confirm-clear-modal');
+            const cancelClearBtn = document.getElementById('cancel-clear-btn');
+            const confirmClearActionBtn = document.getElementById('confirm-clear-action-btn');
 
             // --- RENDER FUNCTIONS ---
             const render = () => {
@@ -277,7 +315,6 @@
                     'F': { label: 'Single (Fat)', style: 'border-slate-500 text-slate-300'},
                 };
 
-                // Standard Multipliers
                 Object.entries(multipliers).forEach(([key, val]) => {
                     const btn = document.createElement('button');
                     btn.className = `btn bg-slate-700 hover:bg-slate-600 rounded-md p-4 text-base sm:text-lg font-bold transition-transform text-center border-2 ${val.style}`;
@@ -286,7 +323,6 @@
                     grid.appendChild(btn);
                 });
 
-                // Nip segments check
                 const NipTargets = {
                     4: ['N'], 6: ['N'], 8: ['N Inner', 'N Outer'], 9: ['N'], 10: ['N'], 14: ['N'], 16: ['N'], 18: ['N Inner', 'N Outer'], 19: ['N'], 20: ['N']
                 };
@@ -295,7 +331,7 @@
                     NipTargets[selectedNum].forEach(nType => {
                          const btn = document.createElement('button');
                          btn.className = 'btn bg-slate-700 hover:bg-slate-600 rounded-md p-4 text-base sm:text-lg font-bold transition-transform text-center border-2 border-sky-500 text-sky-400';
-                         btn.dataset.multiplier = nType; // e.g., "N Out"
+                         btn.dataset.multiplier = nType;
                          btn.textContent = nType === 'N' ? '(.)' : `(.) (${nType.split(' ')[1]})`;
                          grid.appendChild(btn);
                     });
@@ -340,41 +376,49 @@
             // --- GAME LOGIC ---
             const addPlayer = () => {
                 const name = newPlayerNameInput.value.trim();
-                if (name) {
+                if (name && gameState.gamePhase === 'setup') {
                     gameState.players.push({ name, lives: 5 });
                     newPlayerNameInput.value = '';
+                    saveState();
                     render();
                 }
             };
 
             const removePlayer = (index) => {
-                gameState.players.splice(index, 1);
-                render();
+                if (gameState.gamePhase === 'setup') {
+                    gameState.players.splice(index, 1);
+                    saveState();
+                    render();
+                }
             };
             
             const selectTarget = (target) => {
                 gameState.currentTarget = target;
                 gameState.gamePhase = 'playing';
                 gameState.targetSelection = { step: 'number', number: null }; // Reset for next time
-                nextTurn();
+                nextTurn(false); // don't save here, will be saved below
+                saveState();
+                render();
             };
 
-            const nextTurn = () => {
+            const nextTurn = (shouldSave = true) => {
                 let nextIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
-                while (gameState.players[nextIndex].lives <= 0) {
+                let loops = 0; // safety break
+                while (gameState.players[nextIndex].lives <= 0 && loops < gameState.players.length) {
                     nextIndex = (nextIndex + 1) % gameState.players.length;
+                    loops++;
                 }
                 gameState.currentPlayerIndex = nextIndex;
 
                 const playersWithLives = gameState.players.filter(p => p.lives > 0);
                 if (playersWithLives.length <= 1) {
-                    endGame(playersWithLives[0]);
+                    endGame();
                 } else {
-                    // If the turn comes back to the killer, skip to the next player
                     if (gameState.currentPlayerIndex === gameState.killerPlayerIndex) {
-                        nextTurn();
+                        nextTurn(false); // Recursively find the next non-killer player
                         return;
                     }
+                    if (shouldSave) saveState();
                     render();
                 }
             };
@@ -382,6 +426,7 @@
             const handleBecameKiller = () => {
                 gameState.killerPlayerIndex = gameState.currentPlayerIndex;
                 gameState.gamePhase = 'set_new_target';
+                saveState();
                 render();
             };
 
@@ -389,34 +434,44 @@
                 const player = gameState.players[gameState.currentPlayerIndex];
                 player.lives--;
                 if (player.lives <= 0) {
-                    // Eliminated, check for winner
                     const playersWithLives = gameState.players.filter(p => p.lives > 0);
                     if (playersWithLives.length <= 1) {
-                        endGame(playersWithLives[0]);
+                        endGame();
                         return;
                     }
                 }
                 nextTurn();
             };
 
-            const endGame = (winner) => {
+            const endGame = () => {
                 gameState.gamePhase = 'over';
                 document.getElementById('game-controls').classList.add('hidden');
+                const winner = gameState.players.find(p => p.lives > 0);
                 winnerMessage.textContent = winner ? `${winner.name} is the Killer Champion!` : "It's a draw!";
                 winnerModal.classList.remove('hidden');
+                saveState();
                 render();
             };
             
-            const resetGame = () => {
-                gameState = {
-                    players: [], gamePhase: 'setup', currentPlayerIndex: 0,
-                    killerPlayerIndex: 0, currentTarget: null,
-                    targetSelection: { step: 'number', number: null },
-                };
+            const newGame = () => {
+                // Keep players, reset scores and state
+                gameState.players.forEach(p => p.lives = 5);
+                gameState.gamePhase = 'set_initial_target';
+                gameState.currentPlayerIndex = 0;
+                gameState.killerPlayerIndex = 0;
+                gameState.currentTarget = null;
+                gameState.targetSelection = { step: 'number', number: null };
                 winnerModal.classList.add('hidden');
                 document.getElementById('action-buttons').classList.remove('hidden');
+                saveState();
                 render();
             };
+
+            const resetAndClearData = () => {
+                gameState = getInitialState();
+                saveState();
+                render();
+            }
 
             // --- EVENT LISTENERS ---
             addPlayerBtn.addEventListener('click', addPlayer);
@@ -432,6 +487,7 @@
                 gameState.killerPlayerIndex = 0;
                 gameState.currentPlayerIndex = 0;
                 gameState.targetSelection = { step: 'number', number: null };
+                saveState();
                 render();
             });
 
@@ -444,6 +500,7 @@
                 if (action === 'back') {
                     gameState.targetSelection.step = 'number';
                     gameState.targetSelection.number = null;
+                    saveState();
                     renderSetTarget();
                     return;
                 }
@@ -456,6 +513,7 @@
                 if (number) {
                     gameState.targetSelection.step = 'multiplier';
                     gameState.targetSelection.number = number;
+                    saveState();
                     renderSetTarget();
                     return;
                 }
@@ -464,7 +522,7 @@
                     const num = gameState.targetSelection.number;
                     let target;
                     if (multiplier.startsWith('N')) {
-                         if (multiplier.includes(' ')) { // 'N Out' or 'N In'
+                         if (multiplier.includes(' ')) {
                              target = `N${num} ${multiplier.split(' ')[1]}`;
                          } else {
                              target = `N${num}`;
@@ -478,20 +536,49 @@
 
             becameKillerBtn.addEventListener('click', handleBecameKiller);
             failedTurnBtn.addEventListener('click', handleFailedTurn);
-            newGameBtn.addEventListener('click', resetGame);
+            newGameBtn.addEventListener('click', newGame);
 
-            render();
-        });
+            // Modal Logic
+            let onConfirmAction = null;
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('killer_service-worker.js').then(registration => {
-                    console.log('SW registered: ', registration.scope);
-                }, err => {
-                    console.log('SW registration failed: ', err);
+            const showConfirmModal = (action) => {
+                onConfirmAction = action;
+                confirmClearModal.classList.remove('hidden');
+            };
+
+            const hideConfirmModal = () => {
+                onConfirmAction = null;
+                confirmClearModal.classList.add('hidden');
+            };
+
+            confirmClearActionBtn.addEventListener('click', () => {
+                if (typeof onConfirmAction === 'function') {
+                    onConfirmAction();
+                }
+                hideConfirmModal();
+            });
+
+            cancelClearBtn.addEventListener('click', hideConfirmModal);
+
+            resetDataBtn.addEventListener('click', () => {
+                showConfirmModal(() => {
+                    resetAndClearData();
                 });
             });
-        }
+
+            clearStorageBtn.addEventListener('click', () => {
+                showConfirmModal(() => {
+                    resetAndClearData();
+                    window.location.href = 'BarDarts.html';
+                });
+            });
+
+            // Initial Render on Load
+            render();
+        });
     </script>
 </body>
 </html>
+
+
+
