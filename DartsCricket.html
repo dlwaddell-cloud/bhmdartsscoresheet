@@ -7,6 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="theme-color" content="#052e16"> <!-- dark-green -->
     <style>
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling on the body */
+        }
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
@@ -29,8 +33,8 @@
         .mark-icon {
             font-family: monospace;
             font-weight: bold;
-            font-size: 1.5rem; /* 24px */
-            line-height: 2rem; /* 32px */
+            font-size: 1.25rem; /* 20px */
+            line-height: 1.75rem; /* 28px */
             color: #facc15; /* yellow-400 */
         }
         .winner-highlight {
@@ -41,17 +45,12 @@
             50% { background-color: #22c55e; }
             100% { background-color: #16a34a; }
         }
-        .active-multiplier {
-            background-color: #facc15; /* yellow-400 */
-            color: #1e293b; /* slate-800 */
-            box-shadow: 0 0 10px #facc15;
-        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="text-white min-h-screen flex flex-col items-center p-2 sm:p-4">
+<body class="text-white flex flex-col">
 
     <div id="clear-storage-btn" class="hidden fixed top-4 left-4 z-50 bg-red-600 hover:bg-red-700 p-2 rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110" title="Clear data & return home">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -59,10 +58,10 @@
         </svg>
     </div>
 
-    <div id="app" class="w-full max-w-7xl mx-auto">
-        <header class="text-center mb-4">
-            <h1 class="text-4xl sm:text-5xl font-bold text-green-400">Cricket</h1>
-            <p class="text-slate-400 mt-1">Close all numbers with the highest score to win!</p>
+    <div id="app" class="w-full max-w-7xl mx-auto flex flex-col flex-grow p-2 sm:p-4">
+        <header class="text-center mb-2 sm:mb-4">
+            <h1 class="text-3xl sm:text-5xl font-bold text-green-400">Cricket</h1>
+            <p class="text-slate-400 text-sm sm:text-base mt-1">Close all numbers with the highest score to win!</p>
         </header>
 
         <!-- Player Setup Section -->
@@ -79,36 +78,42 @@
         </div>
         
         <!-- Game Section -->
-        <div id="game-section" class="hidden">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <!-- Scoreboard -->
-                <div class="md:col-span-3 bg-slate-900 rounded-lg shadow-lg overflow-x-auto">
+        <div id="game-section" class="hidden flex-grow flex flex-col md:flex-row gap-4">
+            <!-- Scoreboard -->
+            <div class="flex-grow bg-slate-900 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                <table class="w-full text-center">
+                    <thead id="scorecard-head">
+                        <!-- Player names generated here -->
+                    </thead>
+                </table>
+                <div class="overflow-y-auto flex-grow">
                     <table class="w-full text-center">
-                        <thead id="scorecard-head">
-                            <!-- Player names generated here -->
-                        </thead>
                         <tbody id="scorecard-body" class="divide-y divide-slate-700">
                             <!-- Score rows generated here -->
                         </tbody>
-                        <tfoot id="scorecard-foot" class="bg-slate-800">
-                            <!-- Totals generated here -->
-                        </tfoot>
                     </table>
                 </div>
+                 <table class="w-full text-center">
+                    <tfoot id="scorecard-foot" class="bg-slate-800">
+                        <!-- Totals generated here -->
+                    </tfoot>
+                </table>
+            </div>
 
-                <!-- Scoring Panel -->
-                <div class="bg-slate-800 p-4 rounded-lg shadow-lg self-start">
-                    <h2 class="text-xl font-bold text-center mb-3"><span id="turn-player-name" class="text-green-300"></span>'s Turn</h2>
-                    <div id="throw-tracker" class="flex justify-center items-center gap-2 h-8 mb-3">
+            <!-- Scoring Panel -->
+            <div class="bg-slate-800 p-2 sm:p-4 rounded-lg shadow-lg md:w-64 flex-shrink-0 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-center mb-2"><span id="turn-player-name" class="text-green-300"></span>'s Turn</h2>
+                    <div id="throw-tracker" class="flex justify-center items-center gap-2 h-6 mb-2">
                         <!-- Throw indicators will be added here -->
                     </div>
-                    <div id="scoring-grid" class="flex flex-col gap-2">
+                    <div id="scoring-grid" class="grid grid-cols-3 gap-1">
                         <!-- Scoring buttons are generated by JS here -->
                     </div>
-                    <div class="mt-4 flex justify-around">
-                        <button id="undo-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-5 rounded-md">Undo</button>
-                        <button id="miss-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-md">Miss</button>
-                    </div>
+                </div>
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                    <button id="undo-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-md">Undo</button>
+                    <button id="miss-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-md">Miss</button>
                 </div>
             </div>
         </div>
@@ -166,6 +171,7 @@
             const scoringPanel = document.getElementById('game-section'); // Listen on a higher container
             const undoBtn = document.getElementById('undo-btn');
             const missBtn = document.getElementById('miss-btn');
+            const scoringGridEl = document.getElementById('scoring-grid');
 
             const winnerModal = document.getElementById('winner-modal');
             const winnerMessage = document.getElementById('winner-message');
@@ -216,14 +222,14 @@
                 gameState.players.forEach((p, i) => {
                     playerListEl.innerHTML += `<div class="bg-slate-700 rounded-full px-4 py-2 flex items-center gap-3"><span class="font-semibold">${p.name}</span><button data-index="${i}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button></div>`;
                 });
-                startGameBtn.disabled = gameState.players.length < 2;
+                startGameBtn.disabled = gameState.players.length < 1; // Can start with 1 player
             };
 
             const renderScorecard = () => {
                 // Header
-                let headHTML = '<tr><th class="p-3"></th>';
+                let headHTML = '<tr><th class="p-1 sm:p-2 text-sm sm:text-base"></th>';
                 gameState.players.forEach((p, i) => {
-                    headHTML += `<th class="p-3 text-lg truncate ${i === gameState.currentPlayerIndex ? 'text-green-300' : ''}" title="${p.name}">${p.name}</th>`;
+                    headHTML += `<th class="p-1 sm:p-2 text-sm sm:text-lg truncate ${i === gameState.currentPlayerIndex ? 'text-green-300' : ''}" title="${p.name}">${p.name}</th>`;
                 });
                 headHTML += '</tr>';
                 scorecardHead.innerHTML = headHTML;
@@ -232,12 +238,12 @@
                 let bodyHTML = '';
                 NUMBERS_TO_CLOSE.forEach(num => {
                     const isClosed = gameState.numberStatus[num] === 'closed';
-                    let rowHTML = `<tr class="h-16 ${isClosed ? 'number-closed' : ''}">`;
-                    rowHTML += `<td class="font-bold text-xl">${num === 25 ? 'Bull' : num}</td>`;
+                    let rowHTML = `<tr class="h-10 sm:h-12 ${isClosed ? 'number-closed' : ''}">`;
+                    rowHTML += `<td class="font-bold text-base sm:text-xl">${num === 25 ? 'Bull' : num}</td>`;
                     gameState.players.forEach((p, i) => {
                         const marks = p.marks[num];
-                        const markIcons = ['', '/', 'X', '&#9678;']; // Using a different closed symbol
-                        rowHTML += `<td class="mark-icon ${i === gameState.currentPlayerIndex ? 'current-player-highlight' : ''}">${markIcons[marks] || ''}</td>`;
+                        const markIcons = ['', '/', 'X', '&#9678;']; 
+                        rowHTML += `<td class="mark-icon text-lg sm:text-xl ${i === gameState.currentPlayerIndex ? 'current-player-highlight' : ''}">${markIcons[marks] || ''}</td>`;
                     });
                     rowHTML += '</tr>';
                     bodyHTML += rowHTML;
@@ -245,9 +251,9 @@
                 scorecardBody.innerHTML = bodyHTML;
                 
                 // Footer (Scores)
-                let footHTML = '<tr><td class="p-3 font-bold text-lg">Score</td>';
+                let footHTML = '<tr><td class="p-1 sm:p-2 font-bold text-sm sm:text-lg">Score</td>';
                 gameState.players.forEach((p, i) => {
-                    footHTML += `<td class="p-3 font-bold text-2xl ${i === gameState.currentPlayerIndex ? 'current-player-highlight' : ''}">${p.score}</td>`;
+                    footHTML += `<td class="p-1 sm:p-2 font-bold text-base sm:text-2xl ${i === gameState.currentPlayerIndex ? 'current-player-highlight' : ''}">${p.score}</td>`;
                 });
                 footHTML += '</tr>';
                 scorecardFoot.innerHTML = footHTML;
@@ -263,36 +269,28 @@
                 throwTrackerEl.innerHTML = '';
                 for(let i=0; i<3; i++){
                     const dartEl = document.createElement('div');
-                    dartEl.className = `w-4 h-4 rounded-full border-2 ${i < gameState.currentTurnThrows.length ? 'bg-yellow-400 border-yellow-400' : 'border-slate-500'}`;
+                    dartEl.className = `w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 ${i < gameState.currentTurnThrows.length ? 'bg-yellow-400 border-yellow-400' : 'border-slate-500'}`;
                     throwTrackerEl.appendChild(dartEl);
                 }
             };
             
             const renderScoringPanel = () => {
-                const scoringGridEl = document.getElementById('scoring-grid');
                 scoringGridEl.innerHTML = '';
                 const numbers = [20, 19, 18, 17, 16, 15];
                 
                 numbers.forEach(num => {
-                    const row = document.createElement('div');
-                    row.className = 'grid grid-cols-3 gap-1';
-                    row.innerHTML = `
-                        <button data-num="${num}" data-multiplier="2" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 p-2 rounded-lg text-lg font-bold">D</button>
-                        <button data-num="${num}" data-multiplier="1" class="btn score-hit-btn bg-slate-600 hover:bg-slate-500 p-2 rounded-lg text-xl font-bold">${num}</button>
-                        <button data-num="${num}" data-multiplier="3" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 p-2 rounded-lg text-lg font-bold">T</button>
+                    scoringGridEl.innerHTML += `
+                        <button data-num="${num}" data-multiplier="2" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 py-1 sm:py-2 rounded-lg text-sm sm:text-lg font-bold">D</button>
+                        <button data-num="${num}" data-multiplier="1" class="btn score-hit-btn bg-slate-600 hover:bg-slate-500 py-1 sm:py-2 rounded-lg text-base sm:text-xl font-bold">${num}</button>
+                        <button data-num="${num}" data-multiplier="3" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 py-1 sm:py-2 rounded-lg text-sm sm:text-lg font-bold">T</button>
                     `;
-                    scoringGridEl.appendChild(row);
                 });
-
-                scoringGridEl.innerHTML += '<hr class="border-slate-700 my-2">';
-
-                const bullRow = document.createElement('div');
-                bullRow.className = 'grid grid-cols-2 gap-2';
-                bullRow.innerHTML = `
-                    <button data-num="25" data-multiplier="1" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-xl font-bold">S-Bull</button>
-                    <button data-num="25" data-multiplier="2" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-xl font-bold">D-Bull</button>
+                
+                // Bull buttons
+                 scoringGridEl.innerHTML += `
+                    <button data-num="25" data-multiplier="1" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 py-2 sm:py-3 rounded-lg text-base sm:text-xl font-bold col-span-1">Bull</button>
+                    <button data-num="25" data-multiplier="2" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 py-2 sm:py-3 rounded-lg text-base sm:text-xl font-bold col-span-2">D-Bull</button>
                 `;
-                scoringGridEl.appendChild(bullRow);
             }
             
             // --- GAME LOGIC ---
@@ -446,12 +444,11 @@
                     const num = parseInt(target.dataset.num);
                     const multiplier = parseInt(target.dataset.multiplier);
                     handleHit(num, multiplier);
-                } else if (target.id === 'miss-btn') {
-                    handleMiss();
-                } else if (target.id === 'undo-btn') {
-                    handleUndo();
                 }
             });
+            
+            undoBtn.addEventListener('click', handleUndo);
+            missBtn.addEventListener('click', handleMiss);
 
             clearStorageBtn.addEventListener('click', () => {
                 confirmClearModal.classList.remove('hidden');
@@ -476,4 +473,3 @@
     </script>
 </body>
 </html>
-
