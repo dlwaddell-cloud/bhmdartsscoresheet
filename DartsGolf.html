@@ -20,7 +20,8 @@
         }
         .sticky-total {
             position: sticky;
-            left: 120px; /* Adjust based on player name column width */
+            /* This value is a default and will be dynamically adjusted by JavaScript */
+            left: 8rem; 
             z-index: 10;
         }
         .total-score {
@@ -147,9 +148,10 @@
             let gameState = {
                 players: [],
                 currentHole: 1,
-                currentPlayerIndex: 0,
+                currentPlayerIndex: 0, // Will always be 0 after game starts, but needed for setup
                 gameStarted: false,
                 currentTurnThrows: [],
+                turnsThisHole: 0,
             };
 
             // --- DOM ELEMENTS ---
@@ -186,6 +188,12 @@
                 const savedState = localStorage.getItem(STORAGE_KEY);
                 if (savedState) {
                     gameState = JSON.parse(savedState);
+                    // Backwards compatibility for saves without IDs
+                    gameState.players.forEach(p => {
+                        if (!p.id) {
+                            p.id = crypto.randomUUID();
+                        }
+                    });
                 }
             };
             
@@ -196,6 +204,21 @@
                     clearStorageBtn.classList.add('hidden');
                 }
             };
+            
+            // --- LAYOUT ADJUSTMENT ---
+            const adjustStickyColumns = () => {
+                requestAnimationFrame(() => {
+                    const playerHeader = document.querySelector('#scorecard-head .sticky-player');
+                    if (!playerHeader) return;
+
+                    const playerColumnWidth = playerHeader.offsetWidth;
+                    const totalCells = document.querySelectorAll('.sticky-total');
+                    
+                    totalCells.forEach(cell => {
+                        cell.style.left = `${playerColumnWidth}px`;
+                    });
+                });
+            };
 
             // --- RENDER FUNCTIONS ---
             const render = () => {
@@ -204,6 +227,7 @@
                     gameSectionEl.classList.remove('hidden');
                     renderScorecard();
                     updateUIForTurn();
+                    adjustStickyColumns();
                 } else {
                     playerSetupEl.classList.remove('hidden');
                     gameSectionEl.classList.add('hidden');
@@ -214,12 +238,12 @@
 
             const renderPlayers = () => {
                 playerListEl.innerHTML = '';
-                gameState.players.forEach((player, index) => {
+                gameState.players.forEach((player) => {
                     const playerTag = document.createElement('div');
                     playerTag.className = 'bg-slate-800 rounded-full px-4 py-2 flex items-center gap-3';
                     playerTag.innerHTML = `
                         <span class="font-semibold">${player.name}</span>
-                        <button data-index="${index}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button>
+                        <button data-id="${player.id}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button>
                     `;
                     playerListEl.appendChild(playerTag);
                 });
@@ -229,33 +253,17 @@
             const renderScorecard = () => {
                 scorecardHeadEl.innerHTML = `
                     <tr>
-                        <th class="p-2 text-left sticky-player bg-slate-900 w-32">Player</th>
+                        <th class="p-2 text-left sticky-player bg-slate-900">Player</th>
                         <th class="p-2 sticky-total bg-slate-900">Total</th>
                         ${Array.from({ length: 18 }, (_, i) => `<th class="p-2 score-cell">${i + 1}</th>`).join('')}
                     </tr>
                 `;
 
                 scorecardBodyEl.innerHTML = '';
-
-                if (gameState.players.length === 0) {
-                    updateCurrentPlayerHighlight();
-                    return;
-                }
-
-                // Create a display order for players so the current player is always at the top.
-                const playersInOrder = [];
-                for (let i = 0; i < gameState.players.length; i++) {
-                    const playerIndex = (gameState.currentPlayerIndex + i) % gameState.players.length;
-                    playersInOrder.push({
-                        player: gameState.players[playerIndex],
-                        originalIndex: playerIndex
-                    });
-                }
-
-                playersInOrder.forEach(({ player, originalIndex }) => {
+                gameState.players.forEach((player) => {
                     const totalScore = player.scores.reduce((sum, score) => sum + (score === null ? 0 : score), 0);
                     const row = document.createElement('tr');
-                    row.id = `player-row-${originalIndex}`; // Use original index for stable IDs
+                    row.id = `player-row-${player.id}`;
                     row.className = 'transition-colors';
                     row.innerHTML = `
                         <td class="p-2 text-left font-semibold sticky-player bg-slate-900 truncate" title="${player.name}">${player.name}</td>
@@ -269,8 +277,9 @@
             
             const updateUIForTurn = () => {
                 if (!gameState.gameStarted || gameState.players.length === 0) return;
-
-                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                
+                // The current player is always the first one in the array.
+                const currentPlayer = gameState.players[0];
                 currentPlayerNameEl.textContent = currentPlayer.name;
                 currentHoleEl.textContent = gameState.currentHole;
                 currentThrowsEl.textContent = gameState.currentTurnThrows.join(', ');
@@ -288,8 +297,8 @@
                  document.querySelectorAll('#scorecard-body tr').forEach(row => {
                     row.classList.remove('current-player-highlight');
                  });
-                 if (gameState.gameStarted && !isGameOver()) {
-                    const currentPlayerRow = document.getElementById(`player-row-${gameState.currentPlayerIndex}`);
+                 if (gameState.gameStarted && !isGameOver() && gameState.players.length > 0) {
+                    const currentPlayerRow = document.getElementById(`player-row-${gameState.players[0].id}`);
                     if (currentPlayerRow) {
                         currentPlayerRow.classList.add('current-player-highlight');
                     }
@@ -301,6 +310,7 @@
                 const name = newPlayerNameInput.value.trim();
                 if (name) {
                     gameState.players.push({
+                        id: crypto.randomUUID(),
                         name: name,
                         scores: Array(18).fill(null)
                     });
@@ -310,8 +320,8 @@
                 }
             };
             
-            const removePlayer = (index) => {
-                gameState.players.splice(index, 1);
+            const removePlayer = (playerId) => {
+                gameState.players = gameState.players.filter(p => p.id !== playerId);
                 renderPlayers();
                 saveState();
             };
@@ -319,6 +329,8 @@
             const startGame = () => {
                 if(gameState.players.length > 0) {
                     gameState.gameStarted = true;
+                    gameState.currentPlayerIndex = 0;
+                    gameState.turnsThisHole = 0;
                     render();
                 }
             };
@@ -338,20 +350,25 @@
                 if (gameState.currentTurnThrows.length === 0) return;
                 const holeIndex = gameState.currentHole - 1;
                 const scoreForHole = Math.min(...gameState.currentTurnThrows);
-                gameState.players[gameState.currentPlayerIndex].scores[holeIndex] = scoreForHole;
+                // Current player is always at index 0
+                gameState.players[0].scores[holeIndex] = scoreForHole;
                 nextTurn();
             };
             
             const nextTurn = () => {
                 gameState.currentTurnThrows = [];
-                let nextPlayerIndex = gameState.currentPlayerIndex + 1;
-                
-                if (nextPlayerIndex >= gameState.players.length) {
-                    nextPlayerIndex = 0;
+                gameState.turnsThisHole++;
+
+                if (gameState.turnsThisHole >= gameState.players.length) {
                     gameState.currentHole++;
+                    gameState.turnsThisHole = 0;
                 }
-                
-                gameState.currentPlayerIndex = nextPlayerIndex;
+
+                // Rotate the players array: move the first player to the end.
+                if (gameState.players.length > 1) {
+                    const finishedPlayer = gameState.players.shift();
+                    gameState.players.push(finishedPlayer);
+                }
                 
                 if(isGameOver()){
                     endGame();
@@ -376,14 +393,15 @@
 
                 const finalScores = gameState.players.map(p => ({
                     name: p.name,
+                    id: p.id,
                     score: p.scores.reduce((sum, s) => sum + s, 0)
                 }));
                 finalScores.sort((a, b) => a.score - b.score);
                 const winners = finalScores.filter(p => p.score === finalScores[0].score);
                 
-                gameState.players.forEach((player, index) => {
+                gameState.players.forEach((player) => {
                     if (winners.some(w => w.name === player.name)) {
-                        document.getElementById(`player-row-${index}`).classList.add('winner-highlight');
+                        document.getElementById(`player-row-${player.id}`).classList.add('winner-highlight');
                     }
                 });
                 
@@ -393,15 +411,17 @@
 
                 winnerMessage.textContent = winMsg;
                 winnerModal.classList.remove('hidden');
-                localStorage.removeItem(STORAGE_KEY); // Clear data on game end
+                localStorage.removeItem(STORAGE_KEY);
                 updateClearButtonVisibility();
             };
 
             const resetGame = () => {
+                // Keep players, but reset scores and game state
                 gameState.players.forEach(p => p.scores.fill(null));
                 gameState.currentHole = 1;
                 gameState.currentPlayerIndex = 0;
                 gameState.currentTurnThrows = [];
+                gameState.turnsThisHole = 0;
                 
                 winnerModal.classList.add('hidden');
                 scoringControlsEl.classList.remove('hidden');
@@ -412,6 +432,8 @@
             };
 
             // --- EVENT LISTENERS ---
+            window.addEventListener('resize', adjustStickyColumns);
+
             clearStorageBtn.addEventListener('click', () => {
                 confirmClearModal.classList.remove('hidden');
             });
@@ -429,7 +451,7 @@
             newPlayerNameInput.addEventListener('keypress', (e) => e.key === 'Enter' && addPlayer());
             playerListEl.addEventListener('click', (e) => {
                 if (e.target.classList.contains('remove-player-btn')) {
-                    removePlayer(parseInt(e.target.dataset.index, 10));
+                    removePlayer(e.target.dataset.id);
                 }
             });
             startGameBtn.addEventListener('click', startGame);
@@ -449,3 +471,4 @@
     </script>
 </body>
 </html>
+
