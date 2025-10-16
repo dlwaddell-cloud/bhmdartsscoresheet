@@ -83,7 +83,7 @@
             <div class="flex-grow bg-slate-900 rounded-lg shadow-lg overflow-hidden flex flex-col">
                 <table class="w-full text-center">
                     <thead id="scorecard-head">
-                        <!-- Player names generated here -->
+                        <!-- Player names and mobile turn indicator generated here -->
                     </thead>
                 </table>
                 <div class="overflow-y-auto flex-grow">
@@ -103,7 +103,7 @@
             <!-- Scoring Panel -->
             <div class="bg-slate-800 p-2 sm:p-4 rounded-lg shadow-lg md:w-64 flex-shrink-0 flex flex-col justify-between">
                 <div>
-                    <h2 class="text-lg sm:text-xl font-bold text-center mb-2"><span id="turn-player-name" class="text-green-300"></span>'s Turn</h2>
+                    <h2 class="hidden md:block text-lg sm:text-xl font-bold text-center mb-2"><span id="turn-player-name" class="text-green-300"></span>'s Turn</h2>
                     <div id="throw-tracker" class="flex justify-center items-center gap-2 h-6 mb-2">
                         <!-- Throw indicators will be added here -->
                     </div>
@@ -226,13 +226,27 @@
             };
 
             const renderScorecard = () => {
-                // Header
+                // Player Names Header Row
                 let headHTML = '<tr><th class="p-1 sm:p-2 text-sm sm:text-base"></th>';
                 gameState.players.forEach((p, i) => {
                     headHTML += `<th class="p-1 sm:p-2 text-sm sm:text-lg truncate ${i === gameState.currentPlayerIndex ? 'text-green-300' : ''}" title="${p.name}">${p.name}</th>`;
                 });
                 headHTML += '</tr>';
-                scorecardHead.innerHTML = headHTML;
+
+                // Mobile Turn Indicator Row
+                let mobileTurnIndicatorHTML = '<tr class="md:hidden">'; // Hide on medium screens and up
+                mobileTurnIndicatorHTML += '<th></th>'; // Empty cell for the numbers column
+                gameState.players.forEach((p, i) => {
+                    if (i === gameState.currentPlayerIndex) {
+                        mobileTurnIndicatorHTML += `<td class="pt-1 pb-2"><span class="bg-green-600 text-white text-xs font-bold py-1 px-2 rounded-full">TURN</span></td>`;
+                    } else {
+                        mobileTurnIndicatorHTML += '<td></td>';
+                    }
+                });
+                mobileTurnIndicatorHTML += '</tr>';
+
+                scorecardHead.innerHTML = headHTML + mobileTurnIndicatorHTML;
+
 
                 // Body
                 let bodyHTML = '';
@@ -258,7 +272,7 @@
                 footHTML += '</tr>';
                 scorecardFoot.innerHTML = footHTML;
 
-                // Turn Info
+                // Turn Info for Desktop
                 if (gameState.players.length > 0) {
                     turnPlayerNameEl.textContent = gameState.players[gameState.currentPlayerIndex].name;
                 }
@@ -473,3 +487,4 @@
     </script>
 </body>
 </html>
+
