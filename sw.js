@@ -1,14 +1,16 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v1';
+const CACHE_NAME = 'bar-darts-cache-v2'; // Incremented cache version
 const urlsToCache = [
   './',
   'bardarts.html',
-  '501darts.html',
-  'dartscricket.html',
-  'nscricket.html',
-  'dartshalveit.html',
-  'dartsgolf.html',
-  'killerdarts.html'
+  '501Darts.html',
+  'DartsCricket.html',
+  'NSCricket.html',
+  'DartsHalveIt.html',
+  'DartsGolf.html',
+  'KillerDarts.html',
+  'icon-192x192.png',
+  'icon-512x512.png'
 ];
 
 /**
@@ -21,8 +23,9 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened cache and caching files for offline use.');
         // Add all the specified URLs to the cache
+        // Using correct case-sensitive filenames is crucial here.
         return cache.addAll(urlsToCache);
       })
   );
@@ -64,6 +67,7 @@ self.addEventListener('activate', event => {
         cacheNames.map(cacheName => {
           // If a cache is found that is not in our whitelist, delete it
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -71,4 +75,3 @@ self.addEventListener('activate', event => {
     })
   );
 });
-
