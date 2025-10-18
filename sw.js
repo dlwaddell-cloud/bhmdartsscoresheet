@@ -8,7 +8,7 @@ const urlsToCache = [
   'NSCricket.html',
   'DartsHalveIt.html',
   'DartsGolf.html',
-  'KillerDarts.html',
+  'bhamdartsscoresheet.netlify.app/KillerDarts.html',
   'icon-192x192.png',
   'icon-512x512.png',
   'manifest.json'
