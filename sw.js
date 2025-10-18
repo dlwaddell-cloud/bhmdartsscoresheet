@@ -1,9 +1,9 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v7'; // Incremented cache version for update
+const CACHE_NAME = 'bar-darts-cache-v8'; // Incremented cache version to trigger update
 const urlsToCache = [
   './',
   'bardarts.html',
-  '501darts.html', // Corrected filename case
+  '501darts.html',
   'DartsCricket.html',
   'NSCricket.html',
   'DartsHalveIt.html',
@@ -11,7 +11,7 @@ const urlsToCache = [
   'KillerDarts.html',
   'icon-192x192.png',
   'icon-512x512.png',
-  'manifest.json' // Added manifest for better PWA behavior
+  'manifest.json'
 ];
 
 /**
@@ -92,4 +92,3 @@ self.addEventListener('activate', event => {
     }).then(() => self.clients.claim()) // Take control of all open pages
   );
 });
-
