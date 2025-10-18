@@ -2,7 +2,7 @@
   "name": "Bar Darts Game Hub",
   "short_name": "Bar Darts",
   "description": "A collection of dart game scorekeepers.",
-  "start_url": "bardarts",
+  "start_url": "bardarts.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
