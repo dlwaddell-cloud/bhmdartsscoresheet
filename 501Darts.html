@@ -23,7 +23,12 @@
         .btn {
             transition: all 0.15s ease-in-out;
         }
-        .btn:active {
+        .btn:disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn:active:not(:disabled) {
             transform: scale(0.95);
         }
         .winner-highlight {
@@ -103,8 +108,13 @@
                     <button id="enter-score-btn" class="btn bg-green-600 hover:bg-green-500 p-3 sm:p-4 rounded-lg text-lg sm:text-xl font-bold">Enter</button>
                 </div>
                 
-                <div class="mt-4 text-center">
-                     <button id="bust-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-md w-full">BUST</button>
+                <div class="grid grid-cols-5 gap-2 mt-4">
+                     <button id="bust-btn" class="btn col-span-4 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-md">BUST</button>
+                     <button id="undo-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-md flex justify-center items-center" title="Undo last action">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                        </svg>
+                     </button>
                 </div>
             </div>
         </div>
@@ -134,6 +144,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const STORAGE_KEY = 'darts501GameState';
+            let previousGameState = null;
 
             // --- STATE ---
             let gameState = {
@@ -158,6 +169,7 @@
             const scoringPanel = document.getElementById('scoring-panel');
             const enterScoreBtn = document.getElementById('enter-score-btn');
             const bustBtn = document.getElementById('bust-btn');
+            const undoBtn = document.getElementById('undo-btn');
             const delBtn = document.getElementById('del-btn');
             
             const winnerModal = document.getElementById('winner-modal');
@@ -243,6 +255,7 @@
                 const currentPlayer = gameState.players[gameState.currentPlayerIndex];
                 turnPlayerNameEl.textContent = currentPlayer.name;
                 currentScoreDisplay.textContent = gameState.currentTurnScore;
+                undoBtn.disabled = !previousGameState;
             };
 
             // --- GAME LOGIC ---
@@ -261,6 +274,7 @@
             };
 
             const startGame = () => {
+                previousGameState = null;
                 gameState.gameStarted = true;
                 gameState.currentPlayerIndex = 0;
                 gameState.currentTurnScore = 0;
@@ -269,6 +283,14 @@
                     p.history = [];
                 });
                 render();
+            };
+
+            const undoTurn = () => {
+                if (previousGameState) {
+                    gameState = JSON.parse(JSON.stringify(previousGameState));
+                    previousGameState = null; // Prevent multiple undos
+                    render();
+                }
             };
             
             const handleNumpad = (num) => {
@@ -287,6 +309,7 @@
             };
 
             const submitScore = (isBust = false) => {
+                previousGameState = JSON.parse(JSON.stringify(gameState)); // Save state before action
                 const player = gameState.players[gameState.currentPlayerIndex];
                 const turnScore = gameState.currentTurnScore;
                 const scoreAfterTurn = player.score - turnScore;
@@ -335,6 +358,7 @@
             };
 
             const resetGame = () => {
+                previousGameState = null;
                 gameState = { players: [], gameStarted: false, currentPlayerIndex: 0, currentTurnScore: 0 };
                 winnerModal.classList.add('hidden');
                 scoringPanel.classList.remove('hidden');
@@ -376,6 +400,8 @@
                     submitScore(false);
                 } else if (target.id === 'bust-btn') {
                     submitScore(true);
+                } else if (target.id === 'undo-btn') {
+                    undoTurn();
                 }
             });
 
@@ -389,4 +415,3 @@
     </script>
 </body>
 </html>
-
