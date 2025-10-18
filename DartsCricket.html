@@ -20,6 +20,11 @@
             transform: scale(0.95);
             transition: transform 0.1s;
         }
+        .btn:disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
         .current-player-highlight {
             background-color: rgba(22, 163, 74, 0.2); /* green-600 transparent */
         }
@@ -112,8 +117,12 @@
                     </div>
                 </div>
                 <div class="mt-2 grid grid-cols-2 gap-2">
-                    <button id="undo-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-md">Undo</button>
-                    <button id="miss-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-md">Miss</button>
+                    <button id="miss-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-md">Miss</button>
+                    <button id="undo-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-md flex justify-center items-center" title="Undo">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -143,6 +152,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const STORAGE_KEY = 'dartsCricketGameState';
+            let previousGameState = null;
             const NUMBERS_TO_CLOSE = [20, 19, 18, 17, 16, 15, 25];
 
             // --- STATE ---
@@ -290,6 +300,18 @@
                     turnPlayerNameEl.textContent = gameState.players[gameState.currentPlayerIndex].name;
                 }
                 renderThrowTracker();
+
+                // Update Undo button state and title
+                const canUndoThrow = gameState.currentTurnThrows.length > 0;
+                const canUndoTurn = gameState.currentTurnThrows.length === 0 && !!previousGameState;
+                undoBtn.disabled = !(canUndoThrow || canUndoTurn);
+                if (canUndoThrow) {
+                    undoBtn.title = 'Undo last throw';
+                } else if (canUndoTurn) {
+                    undoBtn.title = 'Undo last turn';
+                } else {
+                    undoBtn.title = 'Undo';
+                }
             };
 
             const renderThrowTracker = () => {
@@ -334,6 +356,7 @@
                 gameState.gameStarted = true;
                 gameState.currentPlayerIndex = 0;
                 gameState.currentTurnThrows = [];
+                previousGameState = null;
                 render();
             };
             
@@ -377,20 +400,28 @@
             };
             
             const handleUndo = () => {
-                if (gameState.currentTurnThrows.length === 0) return;
-                
-                const lastThrow = gameState.currentTurnThrows.pop();
-                if(lastThrow.num !== null) {
-                    const { num, marksAdded, pointsAdded } = lastThrow;
-                    const player = gameState.players[gameState.currentPlayerIndex];
-                    player.marks[num] -= marksAdded;
-                    player.score -= pointsAdded;
+                // If there are throws in the current turn, undo the last one.
+                if (gameState.currentTurnThrows.length > 0) {
+                    const lastThrow = gameState.currentTurnThrows.pop();
+                    if(lastThrow.num !== null) {
+                        const { num, marksAdded, pointsAdded } = lastThrow;
+                        const player = gameState.players[gameState.currentPlayerIndex];
+                        player.marks[num] -= marksAdded;
+                        player.score -= pointsAdded;
+                    }
+                    updateNumberStatus(); // Re-evaluate if any numbers are closed/opened
+                    render();
+                } 
+                // Otherwise, if no throws this turn, undo the entire previous player's turn.
+                else if (previousGameState) {
+                    gameState = JSON.parse(JSON.stringify(previousGameState));
+                    previousGameState = null; // Prevent multiple undos in a row
+                    render();
                 }
-                updateNumberStatus();
-                render();
             };
 
             const nextTurn = () => {
+                previousGameState = JSON.parse(JSON.stringify(gameState)); // Save state before turn change
                 checkWinner();
                 if(winnerModal.classList.contains('hidden')) {
                     gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
@@ -430,6 +461,7 @@
             };
 
             const resetGame = () => {
+                 previousGameState = null;
                  gameState = { players: [], gameStarted: false, currentPlayerIndex: 0, currentTurnThrows: [], numberStatus: {} };
                  winnerModal.classList.add('hidden');
                  render();
