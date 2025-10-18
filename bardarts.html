@@ -147,11 +147,46 @@
                 </div>
             </div>
         </main>
+        
+        <footer class="mt-12 text-center text-slate-400">
+            <a href="#" id="ios-install-link" class="hidden inline-block rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500">
+                Install on iPhone/iPad
+            </a>
+        </footer>
     </div>
 
+    <!-- iOS Install Instructions Modal -->
+    <div id="ios-install-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative border border-slate-700">
+            <button id="close-modal-btn" class="absolute top-3 right-3 text-slate-400 hover:text-white transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-xl font-bold mb-4">Install on iOS</h3>
+            <p class="text-slate-300 mb-6">To add this web app to your Home Screen, follow these simple steps in Safari.</p>
+            <ol class="text-left space-y-4">
+                <li class="flex items-center">
+                    <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">1</span>
+                    <span>Tap the <strong>Share</strong> icon in the browser toolbar.</span>
+                    <svg class="w-8 h-8 text-blue-400 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                </li>
+                <li class="flex items-center">
+                    <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">2</span>
+                    <span>Scroll down and tap <strong>'Add to Home Screen'</strong>.</span>
+                     <div class="w-8 h-8 bg-white rounded-md flex items-center justify-center ml-auto flex-shrink-0">
+                        <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v12m6-6H6"></path></svg>
+                    </div>
+                </li>
+                <li class="flex items-center">
+                     <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">3</span>
+                     <span>Confirm by tapping <strong>'Add'</strong> in the top right.</span>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+
     <script>
-        // This script registers the service worker.
-        // It should be added to all pages you want to be part of the PWA experience.
+        // --- Service Worker Registration ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(registration => {
@@ -161,6 +196,45 @@
                 });
             });
         }
+
+        // --- PWA Install Modal Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const iosInstallLink = document.getElementById('ios-install-link');
+            const iosInstallModal = document.getElementById('ios-install-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+
+            // Function to check if the user is on an iOS device
+            const isIos = () => {
+                const userAgent = window.navigator.userAgent.toLowerCase();
+                return /iphone|ipad|ipod/.test(userAgent);
+            };
+
+            // Function to check if the app is in standalone mode (already installed)
+            const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
+            // Show the install link ONLY on iOS devices that are not in standalone mode
+            if (isIos() && !isInStandaloneMode()) {
+                iosInstallLink.classList.remove('hidden');
+            }
+
+            // Event listener to show the modal
+            iosInstallLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                iosInstallModal.classList.remove('hidden');
+            });
+
+            // Event listener to hide the modal via the close button
+            closeModalBtn.addEventListener('click', () => {
+                iosInstallModal.classList.add('hidden');
+            });
+
+            // Event listener to hide the modal by clicking on the background overlay
+            iosInstallModal.addEventListener('click', (e) => {
+                if (e.target === iosInstallModal) {
+                    iosInstallModal.classList.add('hidden');
+                }
+            });
+        });
     </script>
 
 </body>
