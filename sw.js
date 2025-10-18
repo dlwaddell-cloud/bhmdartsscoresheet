@@ -1,6 +1,8 @@
 // Define the cache name and files to cache
 const CACHE_NAME = 'bar-darts-cache-v1';
 const urlsToCache = [
+  './',
+  'index.html',
   'BarDarts.html',
   '501Darts.html',
   'DartsCricket.html',
@@ -70,3 +72,4 @@ self.addEventListener('activate', event => {
     })
   );
 });
+
