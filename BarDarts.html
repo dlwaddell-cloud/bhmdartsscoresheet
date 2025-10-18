@@ -29,9 +29,9 @@
 
     <div class="text-center w-full max-w-6xl relative">
         <div class="absolute top-0 right-0 z-10 flex items-center space-x-2">
-            <button id="install-button" class="hidden inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-green-500">
+            <a href="#" id="install-link" class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-green-500">
                 Install App
-            </button>
+            </a>
             <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-sky-500">
                 Donate
             </a>
@@ -161,34 +161,36 @@
     </script>
     <script>
       let deferredPrompt;
-      const installButton = document.getElementById('install-button');
+      const installLink = document.getElementById('install-link');
 
       window.addEventListener('beforeinstallprompt', (e) => {
         console.log('beforeinstallprompt event fired');
-        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        // Prevent the browser from showing the prompt automatically.
         e.preventDefault();
         // Stash the event so it can be triggered later.
         deferredPrompt = e;
-        // Update UI to notify the user they can add to home screen
-        installButton.classList.remove('hidden');
+        // The link is now visible by default.
       });
 
-      installButton.addEventListener('click', async () => {
-        // Hide the install button
-        installButton.classList.add('hidden');
-        // Show the prompt
-        deferredPrompt.prompt();
-        // Wait for the user to respond to the prompt
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        // We've used the prompt, and can't use it again, throw it away
-        deferredPrompt = null;
+      installLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        // If the deferred prompt is available, show it.
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          // Wait for the user to respond to the prompt.
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(`User response to the install prompt: ${outcome}`);
+          // The prompt can only be used once.
+          deferredPrompt = null;
+        } else {
+            // This case handles when the app is already installed or the browser doesn't support it.
+            console.log('The app cannot be installed right now.');
+        }
       });
 
       window.addEventListener('appinstalled', () => {
-        // Hide the install button
-        installButton.classList.add('hidden');
-        // Clear the deferredPrompt so it can be garbage collected
+        // The link remains visible, as requested.
+        // Clear the deferredPrompt.
         deferredPrompt = null;
         console.log('PWA was installed');
       });
