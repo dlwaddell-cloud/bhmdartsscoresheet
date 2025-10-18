@@ -1,0 +1,22 @@
+{
+  "name": "Bar Darts Game Hub",
+  "short_name": "Bar Darts",
+  "description": "A collection of dart game scorekeepers.",
+  "start_url": "BarDarts.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
