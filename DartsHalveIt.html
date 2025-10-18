@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>No Score Cricket Scorer</title>
+    <title>Halve-It Scorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="theme-color" content="#052e16"> <!-- dark-green -->
     <style>
@@ -20,30 +20,20 @@
             transform: scale(0.95);
             transition: transform 0.1s;
         }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .current-player-highlight {
-            bAackground-color: rgba(22, 163, 74, 0.2); /* green-600 transparent */
-        }
-        .number-closed {
-            background-color: rgba(120, 113, 108, 0.3); /* stone-500 transparent */
-            color: #64748b; /* slate-500, for graying out text */
-        }
-        .number-closed .mark-icon {
-            color: #64748b; /* Ensure marks are also grayed out */
-        }
-        .mark-icon {
-            font-family: monospace;
-            font-weight: bold;
-            font-size: 1.25rem; /* 20px */
-            line-height: 1.75rem; /* 28px */
-            color: #facc15; /* yellow-400 */
+            background-color: rgba(250, 204, 21, 0.2); /* yellow-400 transparent */
         }
         .winner-highlight {
             animation: winner-pulse 2s infinite;
         }
         @keyframes winner-pulse {
-            0% { background-color: #16a34a; }
-            50% { background-color: #22c55e; }
-            100% { background-color: #16a34a; }
+            0% { background-color: #f59e0b; }
+            50% { background-color: #facc15; }
+            100% { background-color: #f59e0b; }
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,17 +50,19 @@
 
     <div id="app" class="w-full max-w-7xl mx-auto flex flex-col flex-grow p-2 sm:p-4">
         <header class="text-center mb-2 sm:mb-4">
-            <h1 class="text-3xl sm:text-5xl font-bold text-green-400">No Score Cricket</h1>
-            <p class="text-slate-400 text-sm sm:text-base mt-1">Be the first to close all numbers to win!</p>
+            <h1 class="text-3xl sm:text-5xl font-bold text-yellow-400">Halve-It</h1>
+            <p class="text-slate-400 text-sm sm:text-base mt-1">Score on the target each round. Miss, and your score is halved!</p>
         </header>
 
         <!-- Player Setup Section -->
-        <div id="player-setup" class="bg-slate-800 p-6 rounded-lg shadow-lg mb-6 max-w-2xl mx-auto">
-            <h2 class="text-2xl font-semibold mb-4">Players</h2>
-            <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
-            <div class="flex flex-col sm:flex-row gap-4">
-                <input type="text" id="new-player-name" class="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-400" placeholder="Enter player name...">
-                <button id="add-player-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Add Player</button>
+        <div id="player-setup" class="bg-slate-800 p-6 rounded-lg shadow-lg mb-6 max-w-4xl mx-auto">
+            <h2 class="text-2xl font-semibold mb-4 text-center">Players</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <div id="player-list" class="flex flex-wrap justify-center gap-2 order-2 md:order-1 flex-grow"></div>
+                <div class="flex items-center gap-2 order-1 md:order-2">
+                    <input type="text" id="new-player-name" class="w-48 bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Enter player name...">
+                    <button id="add-player-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Add</button>
+                </div>
             </div>
             <div class="mt-6 text-center">
                 <button id="start-game-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-md text-lg w-full sm:w-auto" disabled>Start Game</button>
@@ -81,34 +73,36 @@
         <div id="game-section" class="hidden flex-grow flex flex-col md:flex-row gap-4">
             <!-- Scoreboard -->
             <div class="flex-grow bg-slate-900 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                <!-- Round Tracker -->
+                 <div id="round-tracker" class="text-center bg-slate-800 p-3 sm:p-4 rounded-t-lg shadow-lg">
+                    <h2 class="text-lg sm:text-xl font-bold">Round <span id="round-number">1</span> of 9</h2>
+                    <p class="text-6xl sm:text-8xl font-bold text-yellow-300 mt-1" id="round-target">20</p>
+                </div>
+
                 <table class="w-full text-center table-fixed">
                     <thead id="scorecard-head">
-                        <!-- Player names and mobile turn indicator generated here -->
+                        <!-- Player names and scores are generated here -->
                     </thead>
                 </table>
-                <div class="overflow-y-auto flex-grow">
-                    <table class="w-full text-center table-fixed">
-                        <tbody id="scorecard-body" class="divide-y divide-slate-700">
-                            <!-- Score rows generated here -->
-                        </tbody>
-                    </table>
-                </div>
             </div>
 
             <!-- Scoring Panel -->
-            <div class="bg-slate-800 p-2 sm:p-4 rounded-lg shadow-lg md:w-64 flex-shrink-0 flex flex-col justify-between">
+            <div class="bg-slate-800 p-2 sm:p-4 rounded-lg shadow-lg md:w-96 flex-shrink-0 flex flex-col">
                 <div>
-                    <h2 class="hidden md:block text-lg sm:text-xl font-bold text-center mb-2"><span id="turn-player-name" class="text-green-300"></span>'s Turn</h2>
-                    <div id="throw-tracker" class="flex justify-center items-center gap-2 h-6 mb-2">
+                    <h2 class="hidden md:block text-lg sm:text-xl font-bold text-center mb-2"><span id="turn-player-name" class="text-yellow-300"></span>'s Turn</h2>
+                    <div id="throw-tracker" class="flex justify-center items-center gap-2 h-6 mb-4">
                         <!-- Throw indicators will be added here -->
                     </div>
-                    <div id="scoring-grid" class="grid grid-cols-3 gap-1">
-                        <!-- Scoring buttons are generated by JS here -->
-                    </div>
                 </div>
-                <div class="mt-2 grid grid-cols-2 gap-2">
-                    <button id="undo-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-md">Undo</button>
-                    <button id="miss-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-md">Miss</button>
+                <div id="scoring-grid" class="flex-grow h-64 sm:h-80">
+                    <!-- Scoring buttons are generated by JS here -->
+                </div>
+                <div class="mt-2 grid grid-cols-3 gap-2">
+                    <button id="miss-btn" class="btn bg-stone-200 hover:bg-white text-slate-800 rounded-lg text-xl font-bold flex items-center justify-center py-4 col-span-2">MISS</button>
+                    <button id="undo-btn" class="btn bg-stone-200 hover:bg-white text-slate-800 rounded-lg text-3xl font-bold flex items-center justify-center">&#8634;</button>
+                </div>
+                <div class="mt-2">
+                    <button id="next-player-btn" class="btn bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 rounded-md w-full text-xl transition-opacity">Next Player</button>
                 </div>
             </div>
         </div>
@@ -117,7 +111,7 @@
      <!-- Winner Modal -->
     <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-md w-full">
-            <h2 class="text-3xl font-bold text-green-400 mb-4">WINNER!</h2>
+            <h2 class="text-3xl font-bold text-yellow-400 mb-4">Game Over!</h2>
             <p id="winner-message" class="text-xl mb-6"></p>
             <button id="new-game-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md w-full">Play New Game</button>
         </div>
@@ -137,16 +131,27 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const STORAGE_KEY = 'noScoreCricketGameState';
-            const NUMBERS_TO_CLOSE = [20, 19, 18, 17, 16, 15, 25];
+            const STORAGE_KEY = 'dartsHalfItGameState';
+            const TARGETS = [
+                { num: 20, name: '20' },
+                { num: 19, name: '19' },
+                { num: 'D', name: 'Any Double' },
+                { num: 18, name: '18' },
+                { num: 17, name: '17' },
+                { num: 'T', name: 'Any Triple' },
+                { num: 16, name: '16' },
+                { num: 15, name: '15' },
+                { num: 25, name: 'Bullseye' }
+            ];
 
             // --- STATE ---
             let gameState = {
-                players: [], // { name: string, marks: {20:0, ...} }
+                players: [], // { name: string, score: number }
                 gameStarted: false,
                 currentPlayerIndex: 0,
-                currentTurnThrows: [], // { num: number, multiplier: number, marksAdded: number }
-                numberStatus: {} // {20: 'open', 19: 'closed', ...}
+                currentRound: 0, // index of TARGETS
+                currentTurnThrows: [], // { num, multiplier, points, hitTarget }
+                hitThisRound: false,
             };
 
             // --- DOM ELEMENTS ---
@@ -158,14 +163,15 @@
             const startGameBtn = document.getElementById('start-game-btn');
             
             const gameSectionEl = document.getElementById('game-section');
+            const roundNumberEl = document.getElementById('round-number');
+            const roundTargetEl = document.getElementById('round-target');
             const scorecardHead = document.getElementById('scorecard-head');
-            const scorecardBody = document.getElementById('scorecard-body');
             const turnPlayerNameEl = document.getElementById('turn-player-name');
             const throwTrackerEl = document.getElementById('throw-tracker');
-            const scoringPanel = document.getElementById('game-section');
+            const scoringGridEl = document.getElementById('scoring-grid');
             const undoBtn = document.getElementById('undo-btn');
             const missBtn = document.getElementById('miss-btn');
-            const scoringGridEl = document.getElementById('scoring-grid');
+            const nextPlayerBtn = document.getElementById('next-player-btn');
 
             const winnerModal = document.getElementById('winner-modal');
             const winnerMessage = document.getElementById('winner-message');
@@ -180,23 +186,15 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
                 updateClearButtonVisibility();
             };
-            
             const loadState = () => {
                 const savedState = localStorage.getItem(STORAGE_KEY);
-                if (savedState) {
-                    gameState = JSON.parse(savedState);
-                }
+                if (savedState) gameState = JSON.parse(savedState);
             };
-
             const updateClearButtonVisibility = () => {
-                if (localStorage.getItem(STORAGE_KEY)) {
-                    clearStorageBtn.classList.remove('hidden');
-                } else {
-                    clearStorageBtn.classList.add('hidden');
-                }
+                clearStorageBtn.classList.toggle('hidden', !localStorage.getItem(STORAGE_KEY));
             };
 
-            // --- RENDER ---
+            // --- RENDER & UI ---
             const render = () => {
                 if (gameState.gameStarted) {
                     playerSetupEl.classList.add('hidden');
@@ -208,69 +206,46 @@
                     gameSectionEl.classList.add('hidden');
                     renderPlayerSetupList();
                 }
+                updateButtonStates();
                 saveState();
             };
 
             const renderPlayerSetupList = () => {
-                playerListEl.innerHTML = '';
-                gameState.players.forEach((p, i) => {
-                    playerListEl.innerHTML += `<div class="bg-slate-700 rounded-full px-4 py-2 flex items-center gap-3"><span class="font-semibold">${p.name}</span><button data-index="${i}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button></div>`;
-                });
+                playerListEl.innerHTML = gameState.players.map((p, i) => 
+                    `<div class="bg-slate-700 rounded-full px-4 py-2 flex items-center gap-3">
+                        <span class="font-semibold">${p.name}</span>
+                        <button data-index="${i}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button>
+                    </div>`
+                ).join('');
                 startGameBtn.disabled = gameState.players.length < 1;
             };
-
+            
             const abbreviateName = (name) => {
                 if (name.length <= 4) return name;
                 const parts = name.split(/\s+/).filter(Boolean);
-                if (parts.length > 1 && parts.length <= 3) {
-                    return parts.map(p => p[0]).join('').toUpperCase();
-                }
+                if (parts.length > 1 && parts.length <= 3) return parts.map(p => p[0]).join('').toUpperCase();
                 return name.substring(0, 3);
             };
 
             const renderScorecard = () => {
-                // Player Names Header Row
-                let headHTML = '<tr><th class="p-1 sm:p-2 text-sm sm:text-base"></th>';
+                roundNumberEl.textContent = `${gameState.currentRound + 1}`;
+                roundTargetEl.textContent = TARGETS[gameState.currentRound].name;
+                
+                let headHTML = '<tr>';
                 gameState.players.forEach((p, i) => {
+                    const isCurrent = i === gameState.currentPlayerIndex;
                     const abbreviated = abbreviateName(p.name);
-                    headHTML += `<th class="p-1 sm:p-2 text-sm sm:text-lg ${i === gameState.currentPlayerIndex ? 'text-green-300' : ''}" title="${p.name}">
-                        <span class="hidden sm:inline truncate">${p.name}</span>
-                        <span class="sm:hidden">${abbreviated}</span>
+                    headHTML += `<th class="p-2 sm:p-3 text-sm sm:text-lg ${isCurrent ? 'current-player-highlight' : ''}" title="${p.name}">
+                        <div class="${isCurrent ? 'text-yellow-300' : ''}">
+                            <span class="hidden sm:inline truncate">${p.name}</span>
+                            <span class="sm:hidden">${abbreviated}</span>
+                        </div>
+                        <div class="font-bold text-xl sm:text-3xl mt-1">${p.score}</div>
                     </th>`;
                 });
                 headHTML += '</tr>';
+                scorecardHead.innerHTML = headHTML;
 
-                // Mobile Turn Indicator Row
-                let mobileTurnIndicatorHTML = '<tr class="md:hidden">';
-                mobileTurnIndicatorHTML += '<th></th>'; 
-                gameState.players.forEach((p, i) => {
-                    if (i === gameState.currentPlayerIndex) {
-                        mobileTurnIndicatorHTML += `<td class="pt-1 pb-2"><span class="bg-green-600 text-white text-xs font-bold py-1 px-2 rounded-full">TURN</span></td>`;
-                    } else {
-                        mobileTurnIndicatorHTML += '<td></td>';
-                    }
-                });
-                mobileTurnIndicatorHTML += '</tr>';
-
-                scorecardHead.innerHTML = headHTML + mobileTurnIndicatorHTML;
-
-                // Body
-                let bodyHTML = '';
-                NUMBERS_TO_CLOSE.forEach(num => {
-                    const isClosed = gameState.numberStatus[num] === 'closed';
-                    let rowHTML = `<tr class="h-10 sm:h-12 ${isClosed ? 'number-closed' : ''}">`;
-                    rowHTML += `<td class="font-bold text-base sm:text-xl">${num === 25 ? 'Bull' : num}</td>`;
-                    gameState.players.forEach((p, i) => {
-                        const marks = p.marks[num];
-                        const markIcons = ['', '/', 'X', '&#9678;']; 
-                        rowHTML += `<td class="mark-icon text-lg sm:text-xl ${i === gameState.currentPlayerIndex ? 'current-player-highlight' : ''}">${markIcons[marks] || ''}</td>`;
-                    });
-                    rowHTML += '</tr>';
-                    bodyHTML += rowHTML;
-                });
-                scorecardBody.innerHTML = bodyHTML;
-                
-                // Turn Info
                 if (gameState.players.length > 0) {
                     turnPlayerNameEl.textContent = gameState.players[gameState.currentPlayerIndex].name;
                 }
@@ -278,133 +253,132 @@
             };
 
             const renderThrowTracker = () => {
-                throwTrackerEl.innerHTML = '';
-                for(let i=0; i<3; i++){
-                    const dartEl = document.createElement('div');
-                    dartEl.className = `w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 ${i < gameState.currentTurnThrows.length ? 'bg-yellow-400 border-yellow-400' : 'border-slate-500'}`;
-                    throwTrackerEl.appendChild(dartEl);
-                }
+                throwTrackerEl.innerHTML = Array(3).fill('').map((_, i) => 
+                    `<div class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 ${i < gameState.currentTurnThrows.length ? 'bg-yellow-400 border-yellow-400' : 'border-slate-500'}"></div>`
+                ).join('');
             };
             
             const renderScoringPanel = () => {
+                const target = TARGETS[gameState.currentRound];
                 scoringGridEl.innerHTML = '';
-                const numbers = [20, 19, 18, 17, 16, 15];
-                
-                numbers.forEach(num => {
-                    scoringGridEl.innerHTML += `
-                        <button data-num="${num}" data-multiplier="2" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 py-1 sm:py-2 rounded-lg text-sm sm:text-lg font-bold">D</button>
-                        <button data-num="${num}" data-multiplier="1" class="btn score-hit-btn bg-slate-600 hover:bg-slate-500 py-1 sm:py-2 rounded-lg text-base sm:text-xl font-bold">${num}</button>
-                        <button data-num="${num}" data-multiplier="3" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 py-1 sm:py-2 rounded-lg text-sm sm:text-lg font-bold">T</button>
+
+                if (typeof target.num === 'number') {
+                    const numName = target.num === 25 ? 'BULL' : target.num;
+                    const sdtButtonClasses = "btn rounded-lg text-2xl sm:text-3xl font-bold flex items-center justify-center transition-opacity";
+                    let buttonsHTML = `
+                        <button data-multiplier="1" class="score-direct-hit-btn bg-stone-200 hover:bg-white text-slate-800 ${sdtButtonClasses}">S-${numName}</button>
+                        <button data-multiplier="2" class="score-direct-hit-btn bg-stone-300 hover:bg-stone-100 text-slate-800 ${sdtButtonClasses}">D-${numName}</button>
                     `;
-                });
-                
-                // Bull buttons
-                 scoringGridEl.innerHTML += `
-                    <button data-num="25" data-multiplier="1" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 py-2 sm:py-3 rounded-lg text-base sm:text-xl font-bold col-span-1">Bull</button>
-                    <button data-num="25" data-multiplier="2" class="btn score-hit-btn bg-slate-700 hover:bg-slate-600 py-2 sm:py-3 rounded-lg text-base sm:text-xl font-bold col-span-2">D-Bull</button>
-                `;
-            }
+                    if (target.num !== 25) {
+                        buttonsHTML += `<button data-multiplier="3" class="score-direct-hit-btn bg-stone-400 hover:bg-stone-300 text-slate-800 ${sdtButtonClasses}">T-${numName}</button>`;
+                    } else {
+                        buttonsHTML += `<div class="bg-slate-800 rounded-lg"></div>`;
+                    }
+                    scoringGridEl.className = 'grid grid-cols-3 gap-2 h-full';
+                    scoringGridEl.innerHTML = buttonsHTML;
+                } else if (target.num === 'D' || target.num === 'T') {
+                    const numbers = Array.from({ length: 20 }, (_, i) => i + 1);
+                    const prefix = target.num;
+                    const anyButtonClasses = "btn rounded-md text-sm sm:text-base font-bold bg-stone-200 hover:bg-white text-slate-800 py-2 transition-opacity";
+                    let buttonsHTML = numbers.map(num => `<button data-num="${num}" class="score-any-hit-btn ${anyButtonClasses}">${prefix}-${num}</button>`).join('');
+                    buttonsHTML += `<button data-num="25" class="score-any-hit-btn col-span-5 mt-1 ${anyButtonClasses}">${prefix}-BULL</button>`;
+                    scoringGridEl.className = 'grid grid-cols-5 gap-1 h-full overflow-y-auto pr-1';
+                    scoringGridEl.innerHTML = buttonsHTML;
+                }
+            };
+
+            const updateButtonStates = () => {
+                const isTurnOver = gameState.currentTurnThrows.length >= 3;
+                const isFirstThrow = gameState.currentTurnThrows.length === 0;
+
+                document.querySelectorAll('.score-direct-hit-btn, .score-any-hit-btn, #miss-btn').forEach(btn => btn.disabled = isTurnOver);
+                undoBtn.disabled = isFirstThrow;
+                nextPlayerBtn.disabled = !isTurnOver && gameState.gameStarted;
+            };
             
             // --- GAME LOGIC ---
             const initializeGame = () => {
-                const marks = {};
-                NUMBERS_TO_CLOSE.forEach(n => {
-                    marks[n] = 0;
-                    gameState.numberStatus[n] = 'open';
-                });
-                gameState.players.forEach(p => {
-                    p.marks = {...marks};
-                });
+                gameState.players.forEach(p => { p.score = 0; });
                 gameState.gameStarted = true;
                 gameState.currentPlayerIndex = 0;
+                gameState.currentRound = 0;
                 gameState.currentTurnThrows = [];
+                gameState.hitThisRound = false;
                 render();
             };
             
             const handleHit = (num, multiplier) => {
                 if (gameState.currentTurnThrows.length >= 3) return;
                 
-                const player = gameState.players[gameState.currentPlayerIndex];
-                let marksAdded = 0;
+                const target = TARGETS[gameState.currentRound];
+                let points = 0;
+                let hitTarget = false;
 
-                for(let i=0; i<multiplier; i++){
-                    if (player.marks[num] < 3) {
-                        player.marks[num]++;
-                        marksAdded++;
-                    }
+                if (target.num === 'D' && multiplier === 2) hitTarget = true;
+                else if (target.num === 'T' && multiplier === 3) hitTarget = true;
+                else if (target.num === num) hitTarget = true;
+                
+                if (hitTarget) {
+                    points = num * multiplier;
+                    gameState.hitThisRound = true;
                 }
-                
-                gameState.currentTurnThrows.push({num, multiplier, marksAdded});
-                
-                updateNumberStatus();
-                checkWinner();
+
+                gameState.currentTurnThrows.push({ num, multiplier, points, hitTarget });
                 render();
-
-                if (gameState.currentTurnThrows.length >= 3) {
-                   setTimeout(() => nextTurn(), 400);
-                }
             };
             
             const handleMiss = () => {
                 if (gameState.currentTurnThrows.length >= 3) return;
-                gameState.currentTurnThrows.push({num: null, multiplier: 0, marksAdded: 0});
+                gameState.currentTurnThrows.push({num: null, multiplier: 0, points: 0, hitTarget: false});
                 render();
-                 if (gameState.currentTurnThrows.length >= 3) {
-                   setTimeout(() => nextTurn(), 400);
-                }
             };
             
             const handleUndo = () => {
                 if (gameState.currentTurnThrows.length === 0) return;
-                
-                const lastThrow = gameState.currentTurnThrows.pop();
-                if(lastThrow.num !== null) {
-                    const { num, marksAdded } = lastThrow;
-                    const player = gameState.players[gameState.currentPlayerIndex];
-                    player.marks[num] -= marksAdded;
-                }
-                updateNumberStatus();
+                gameState.currentTurnThrows.pop();
+                gameState.hitThisRound = gameState.currentTurnThrows.some(dart => dart.hitTarget);
                 render();
             };
 
-            const nextTurn = () => {
-                checkWinner();
-                if(winnerModal.classList.contains('hidden')) {
-                    gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
-                    gameState.currentTurnThrows = [];
-                    render();
-                }
-            };
-
-            const updateNumberStatus = () => {
-                 NUMBERS_TO_CLOSE.forEach(num => {
-                    if (gameState.players.every(p => p.marks[num] === 3)) {
-                        gameState.numberStatus[num] = 'closed';
-                    } else {
-                        gameState.numberStatus[num] = 'open';
-                    }
-                });
-            };
-
-            const checkWinner = () => {
+            const endPlayerTurn = () => {
                 const player = gameState.players[gameState.currentPlayerIndex];
-                const playerHasClosedAll = NUMBERS_TO_CLOSE.every(num => player.marks[num] === 3);
-                
-                if (playerHasClosedAll) {
-                    endGame(player);
+                const roundScore = gameState.currentTurnThrows.reduce((sum, dart) => sum + dart.points, 0);
+
+                if (gameState.hitThisRound) {
+                    player.score += roundScore;
+                } else {
+                    player.score = Math.floor(player.score / 2);
                 }
+
+                const isLastPlayerOfRound = gameState.currentPlayerIndex === gameState.players.length - 1;
+                
+                if (isLastPlayerOfRound) {
+                    gameState.currentRound++;
+                    if (gameState.currentRound >= TARGETS.length) {
+                        endGame();
+                        return;
+                    }
+                    gameState.currentPlayerIndex = 0;
+                } else {
+                    gameState.currentPlayerIndex++;
+                }
+
+                gameState.currentTurnThrows = [];
+                gameState.hitThisRound = false;
+                render();
             };
 
-            const endGame = (winner) => {
-                winnerMessage.textContent = `${winner.name} has won the game!`;
+            const endGame = () => {
+                if (gameState.players.length === 0) return resetGame();
+                const winner = gameState.players.reduce((prev, current) => (prev.score > current.score) ? prev : current);
+                winnerMessage.textContent = `${winner.name} wins with a final score of ${winner.score}!`;
                 winnerModal.classList.remove('hidden');
-                scorecardHead.querySelector(`th:nth-child(${gameState.currentPlayerIndex + 2})`).classList.add('winner-highlight');
                 localStorage.removeItem(STORAGE_KEY);
                 updateClearButtonVisibility();
             };
 
             const resetGame = () => {
-                 gameState = { players: [], gameStarted: false, currentPlayerIndex: 0, currentTurnThrows: [], numberStatus: {} };
+                 gameState = { players: [], gameStarted: false, currentPlayerIndex: 0, currentRound: 0, currentTurnThrows: [], hitThisRound: false };
                  winnerModal.classList.add('hidden');
                  render();
             };
@@ -412,7 +386,7 @@
             const addPlayer = () => {
                 const name = newPlayerNameInput.value.trim();
                 if (name) {
-                    gameState.players.push({ name, marks: {} });
+                    gameState.players.push({ name, score: 0 });
                     newPlayerNameInput.value = '';
                     renderPlayerSetupList();
                     saveState();
@@ -421,13 +395,7 @@
 
             // --- EVENT LISTENERS ---
             addPlayerBtn.addEventListener('click', addPlayer);
-
-            newPlayerNameInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    addPlayer();
-                }
-            });
-
+            newPlayerNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addPlayer(); });
             playerListEl.addEventListener('click', e => {
                  if (e.target.matches('.remove-player-btn')) {
                     gameState.players.splice(e.target.dataset.index, 1);
@@ -437,33 +405,32 @@
             });
             startGameBtn.addEventListener('click', initializeGame);
             
-            scoringPanel.addEventListener('click', (e) => {
+            scoringGridEl.addEventListener('click', (e) => {
                 const target = e.target.closest('button');
-                if (!target) return;
+                if (!target || target.disabled) return;
 
-                if (target.matches('.score-hit-btn')) {
-                    const num = parseInt(target.dataset.num);
+                if (target.matches('.score-direct-hit-btn')) {
                     const multiplier = parseInt(target.dataset.multiplier);
+                    const num = TARGETS[gameState.currentRound].num;
+                    handleHit(num, multiplier);
+                } 
+                else if (target.matches('.score-any-hit-btn')) {
+                    const num = parseInt(target.dataset.num);
+                    const multiplier = TARGETS[gameState.currentRound].num === 'D' ? 2 : 3;
                     handleHit(num, multiplier);
                 }
             });
             
             undoBtn.addEventListener('click', handleUndo);
             missBtn.addEventListener('click', handleMiss);
+            nextPlayerBtn.addEventListener('click', endPlayerTurn);
 
-            clearStorageBtn.addEventListener('click', () => {
-                confirmClearModal.classList.remove('hidden');
-            });
-            
-            cancelClearBtn.addEventListener('click', () => {
-                confirmClearModal.classList.add('hidden');
-            });
-
+            clearStorageBtn.addEventListener('click', () => confirmClearModal.classList.remove('hidden'));
+            cancelClearBtn.addEventListener('click', () => confirmClearModal.classList.add('hidden'));
             confirmClearActionBtn.addEventListener('click', () => {
                 localStorage.removeItem(STORAGE_KEY);
                 window.location.reload();
             });
-
             newGameBtn.addEventListener('click', resetGame);
             
             // --- INITIALIZE ---
