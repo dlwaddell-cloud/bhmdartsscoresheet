@@ -89,9 +89,14 @@
             <div id="game-controls" class="bg-slate-800 p-4 rounded-lg shadow-lg mb-6 text-center">
                 <h2 class="text-2xl font-bold mb-2"><span id="turn-player-name" class="text-amber-300"></span>'s Turn</h2>
                 <p class="text-5xl text-slate-300">Current Target: <span id="current-target-display" class="font-bold text-yellow-300"></span></p>
-                <div id="action-buttons" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                     <button id="became-killer-btn" class="btn bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md transition-transform">Hit Target & Became Killer</button>
-                     <button id="failed-turn-btn" class="btn bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-md transition-transform">Failed to Hit Target (-1 Life)</button>
+                <div id="action-buttons" class="mt-4 grid grid-cols-5 gap-3">
+                     <button id="became-killer-btn" class="btn col-span-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md transition-transform">Hit Target & Became Killer</button>
+                     <button id="failed-turn-btn" class="btn col-span-2 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-md transition-transform">Failed to Hit Target (-1 Life)</button>
+                     <button id="undo-turn-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-md transition-transform flex justify-center items-center" title="Undo last action">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                        </svg>
+                     </button>
                 </div>
             </div>
             
@@ -131,6 +136,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            let previousGameState = null;
+
             // --- STATE MANAGEMENT & PERSISTENCE ---
             const STORAGE_KEY = 'killerDartsGameState';
 
@@ -190,6 +197,7 @@
             
             const becameKillerBtn = document.getElementById('became-killer-btn');
             const failedTurnBtn = document.getElementById('failed-turn-btn');
+            const undoTurnBtn = document.getElementById('undo-turn-btn');
             
             const winnerModal = document.getElementById('winner-modal');
             const winnerMessage = document.getElementById('winner-message');
@@ -245,7 +253,7 @@
             };
 
             const renderSetTarget = () => {
-                const setterIndex = gameState.gamePhase === 'set_initial_target' ? 0 : gameState.killerPlayerIndex;
+                const setterIndex = gameState.gamePhase === 'set_initial_target' ? 0 : gameState.currentPlayerIndex;
                 const setter = gameState.players[setterIndex];
                 setTargetTitleEl.textContent = gameState.gamePhase === 'set_initial_target' ? 'Set Initial Target' : 'Set NEW Target';
                 targetSetterNameEl.textContent = setter.name;
@@ -253,14 +261,33 @@
                 targetSelectionGridEl.innerHTML = ''; // Clear previous buttons
 
                 if (gameState.targetSelection.step === 'number') {
+                    // This is the first screen for target selection
+                    const header = document.createElement('div');
+                    header.className = 'flex justify-end items-center mb-4';
+                    const backBtn = document.createElement('button');
+                    backBtn.className = 'btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-md transition-transform flex justify-center items-center';
+                    backBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>`;
+
+                    if (gameState.gamePhase === 'set_new_target') {
+                        // Add a "Back to Game" button when setting a *new* target
+                        backBtn.dataset.action = 'backToGame';
+                        backBtn.title = 'Back to Game';
+                        header.appendChild(backBtn);
+                        targetSelectionGridEl.appendChild(header);
+                    } else if (gameState.gamePhase === 'set_initial_target') {
+                        // Add a "Back to Setup" button when setting the *initial* target
+                        backBtn.dataset.action = 'backToSetup';
+                        backBtn.title = 'Back to Player Setup';
+                        header.appendChild(backBtn);
+                        targetSelectionGridEl.appendChild(header);
+                    }
                     renderNumberSelection();
                 } else {
-                    renderMultiplierSelection();
+                    renderMultiplierSelection(); // This one already has its own back button
                 }
             };
 
             const renderNumberSelection = () => {
-                targetSelectionGridEl.innerHTML = ``;
                 const createSection = (title, elements, gridCols = 'sm:grid-cols-10') => {
                     const sectionEl = document.createElement('div');
                     sectionEl.className = 'mb-4';
@@ -300,22 +327,26 @@
 
             const renderMultiplierSelection = () => {
                 const selectedNum = gameState.targetSelection.number;
-                targetSelectionGridEl.innerHTML = '';
+                const multiplierContainer = document.createElement('div');
 
                 const header = document.createElement('div');
                 header.className = 'flex justify-between items-center mb-4';
                 header.innerHTML = `<h3 class="text-lg font-semibold text-amber-300">Select Type for <span class="text-white text-2xl">${selectedNum}</span></h3>`;
                 
                 const backBtn = document.createElement('button');
-                backBtn.className = 'btn bg-slate-500 hover:bg-slate-400 text-slate-900 font-bold py-2 px-4 rounded-md transition-transform';
+                backBtn.className = 'btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-md transition-transform flex justify-center items-center';
                 backBtn.dataset.action = 'back';
-                backBtn.textContent = '← Back';
+                backBtn.title = 'Back to number selection';
+                backBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>`;
                 header.appendChild(backBtn);
-                targetSelectionGridEl.appendChild(header);
+                multiplierContainer.appendChild(header);
 
                 const grid = document.createElement('div');
                 grid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-3';
-                targetSelectionGridEl.appendChild(grid);
+                multiplierContainer.appendChild(grid);
+                
+                targetSelectionGridEl.appendChild(multiplierContainer);
+
 
                 const multipliers = {
                     'T': { label: 'Triple', style: 'border-red-500 text-red-400'},
@@ -411,6 +442,7 @@
                         currentTargetDisplayEl.textContent = gameState.currentTarget;
                         const isKiller = gameState.currentPlayerIndex === gameState.killerPlayerIndex;
                         document.getElementById('action-buttons').classList.toggle('hidden', isKiller);
+                        undoTurnBtn.disabled = !previousGameState;
                     }
                 }
             };
@@ -435,6 +467,15 @@
             };
             
             const selectTarget = (target) => {
+                if (gameState.gamePhase === 'set_new_target') {
+                    previousGameState = JSON.parse(JSON.stringify(gameState));
+                } else {
+                    previousGameState = null;
+                }
+                // If we are setting a new target, the current player officially becomes the new killer.
+                if (gameState.gamePhase === 'set_new_target') {
+                    gameState.killerPlayerIndex = gameState.currentPlayerIndex;
+                }
                 gameState.currentTarget = target;
                 gameState.gamePhase = 'playing';
                 gameState.targetSelection = { step: 'number', number: null }; // Reset for next time
@@ -464,15 +505,24 @@
                     render();
                 }
             };
+            
+            const undoTurn = () => {
+                if (previousGameState) {
+                    gameState = JSON.parse(JSON.stringify(previousGameState));
+                    previousGameState = null;
+                    saveState();
+                    render();
+                }
+            };
 
             const handleBecameKiller = () => {
-                gameState.killerPlayerIndex = gameState.currentPlayerIndex;
                 gameState.gamePhase = 'set_new_target';
                 saveState();
                 render();
             };
 
             const handleFailedTurn = () => {
+                previousGameState = JSON.parse(JSON.stringify(gameState));
                 const player = gameState.players[gameState.currentPlayerIndex];
                 player.lives--;
                 if (player.lives <= 0) {
@@ -496,6 +546,7 @@
             };
             
             const newGame = () => {
+                previousGameState = null;
                 // Keep players, reset scores and state
                 gameState.players.forEach(p => p.lives = 5);
                 gameState.gamePhase = 'set_initial_target';
@@ -510,6 +561,7 @@
             };
 
             const resetAndClearData = () => {
+                previousGameState = null;
                 gameState = getInitialState();
                 saveState();
                 render();
@@ -547,6 +599,20 @@
                     return;
                 }
                 
+                if (action === 'backToGame') {
+                    gameState.gamePhase = 'playing';
+                    saveState();
+                    render();
+                    return;
+                }
+
+                if (action === 'backToSetup') {
+                    gameState.gamePhase = 'setup';
+                    saveState();
+                    render();
+                    return;
+                }
+
                 if (bull) {
                     selectTarget(bull);
                     return;
@@ -579,6 +645,7 @@
 
             becameKillerBtn.addEventListener('click', handleBecameKiller);
             failedTurnBtn.addEventListener('click', handleFailedTurn);
+            undoTurnBtn.addEventListener('click', undoTurn);
             newGameBtn.addEventListener('click', newGame);
 
             // Modal Logic
@@ -622,4 +689,6 @@
     </script>
 </body>
 </html>
+
+
 
