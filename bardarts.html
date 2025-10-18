@@ -149,20 +149,20 @@
         </main>
         
         <footer class="mt-12 text-center text-slate-400">
-            <a href="#" id="ios-install-link" class="hidden inline-block rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500">
-                Install on iPhone/iPad
+            <a href="#" id="install-link" class="hidden inline-block rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500">
+                Install App
             </a>
         </footer>
     </div>
 
-    <!-- iOS Install Instructions Modal -->
-    <div id="ios-install-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+    <!-- Install Instructions Modal -->
+    <div id="install-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative border border-slate-700">
             <button id="close-modal-btn" class="absolute top-3 right-3 text-slate-400 hover:text-white transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h3 class="text-xl font-bold mb-4">Install on iOS</h3>
-            <p class="text-slate-300 mb-6">To add this web app to your Home Screen, follow these simple steps in Safari.</p>
+            <h3 class="text-xl font-bold mb-4">Install App on IOS</h3>
+            <p class="text-slate-300 mb-6">To add this web app to your Home Screen for easy access, follow the instructions for your browser. The steps below are for Safari on iOS.</p>
             <ol class="text-left space-y-4">
                 <li class="flex items-center">
                     <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">1</span>
@@ -199,39 +199,33 @@
 
         // --- PWA Install Modal Logic ---
         document.addEventListener('DOMContentLoaded', () => {
-            const iosInstallLink = document.getElementById('ios-install-link');
-            const iosInstallModal = document.getElementById('ios-install-modal');
+            const installLink = document.getElementById('install-link');
+            const installModal = document.getElementById('install-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
-
-            // Function to check if the user is on an iOS device
-            const isIos = () => {
-                const userAgent = window.navigator.userAgent.toLowerCase();
-                return /iphone|ipad|ipod/.test(userAgent);
-            };
 
             // Function to check if the app is in standalone mode (already installed)
             const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
-            // Show the install link ONLY on iOS devices that are not in standalone mode
-            if (isIos() && !isInStandaloneMode()) {
-                iosInstallLink.classList.remove('hidden');
+            // Show the install link if the app is not already installed
+            if (!isInStandaloneMode()) {
+                installLink.classList.remove('hidden');
             }
 
             // Event listener to show the modal
-            iosInstallLink.addEventListener('click', (e) => {
+            installLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                iosInstallModal.classList.remove('hidden');
+                installModal.classList.remove('hidden');
             });
 
             // Event listener to hide the modal via the close button
             closeModalBtn.addEventListener('click', () => {
-                iosInstallModal.classList.add('hidden');
+                installModal.classList.add('hidden');
             });
 
             // Event listener to hide the modal by clicking on the background overlay
-            iosInstallModal.addEventListener('click', (e) => {
-                if (e.target === iosInstallModal) {
-                    iosInstallModal.classList.add('hidden');
+            installModal.addEventListener('click', (e) => {
+                if (e.target === installModal) {
+                    installModal.classList.add('hidden');
                 }
             });
         });
@@ -239,3 +233,4 @@
 
 </body>
 </html>
+
