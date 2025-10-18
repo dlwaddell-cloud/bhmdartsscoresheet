@@ -1,5 +1,5 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v2'; // Incremented cache version
+const CACHE_NAME = 'bar-darts-cache-v3'; // Incremented cache version for update
 const urlsToCache = [
   './',
   'bardarts.html',
@@ -24,8 +24,6 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Opened cache and caching files for offline use.');
-        // Add all the specified URLs to the cache
-        // Using correct case-sensitive filenames is crucial here.
         return cache.addAll(urlsToCache);
       })
   );
@@ -34,25 +32,44 @@ self.addEventListener('install', event => {
 /**
  * Fetch event
  * This event is triggered for every network request made by the page.
- * It follows a "cache-first" strategy:
- * 1. It checks if the requested resource is in the cache.
- * 2. If it is, the cached version is returned.
- * 3. If it's not in the cache, it fetches it from the network.
+ * It follows a robust "cache-first, then network, with offline fallback" strategy.
  */
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return the cached response
+        // Cache hit - return the cached response.
         if (response) {
           return response;
         }
-        // Not in cache - fetch from the network
+        
+        // Not in cache - fetch from the network.
         return fetch(event.request);
-      }
-    )
+      })
+      .catch(() => {
+        // This .catch() block is triggered if the initial cache match fails AND the network fetch fails.
+        // This is crucial for handling "clean URLs" (e.g., /501Darts) when offline.
+        
+        // We only want to do this for navigation requests (i.e., loading a page).
+        if (event.request.mode === 'navigate') {
+          const url = new URL(event.request.url);
+          const path = url.pathname;
+          
+          // Check if the requested path is for a file (contains a dot).
+          const hasFileExtension = path.split('/').pop().indexOf('.') > -1;
+
+          // If it's a clean URL without a file extension, try to find a matching .html file in the cache.
+          if (!hasFileExtension) {
+            return caches.match(path + '.html');
+          }
+        }
+
+        // For any other failed request (e.g., an image not in the cache), the request will fail as expected.
+        // You could return a generic offline fallback page here if you had one.
+      })
   );
 });
+
 
 /**
  * Activate event
@@ -75,3 +92,4 @@ self.addEventListener('activate', event => {
     })
   );
 });
+
