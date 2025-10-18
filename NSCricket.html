@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>No Score Cricket Scorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <meta name="theme-color" content="#134e4a"> <!-- dark-teal -->
+    <meta name="theme-color" content="#14b8a6"> <!-- teal-500 -->
     <style>
         html, body {
             height: 100%;
@@ -70,7 +70,7 @@
             <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
             <div class="flex flex-col sm:flex-row gap-4">
                 <input type="text" id="new-player-name" class="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="Enter player name...">
-                <button id="add-player-btn" class="btn bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-md">Add Player</button>
+                <button id="add-player-btn" class="btn bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md">Add Player</button>
             </div>
             <div class="mt-6 text-center">
                 <button id="start-game-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-md text-lg w-full sm:w-auto" disabled>Start Game</button>
@@ -245,7 +245,7 @@
                 mobileTurnIndicatorHTML += '<th></th>'; 
                 gameState.players.forEach((p, i) => {
                     if (i === gameState.currentPlayerIndex) {
-                        mobileTurnIndicatorHTML += `<td class="pt-1 pb-2"><span class="bg-teal-500 text-white text-xs font-bold py-1 px-2 rounded-full">TURN</span></td>`;
+                        mobileTurnIndicatorHTML += `<td class="pt-1 pb-2"><span class="bg-teal-600 text-white text-xs font-bold py-1 px-2 rounded-full">TURN</span></td>`;
                     } else {
                         mobileTurnIndicatorHTML += '<td></td>';
                     }
@@ -461,9 +461,7 @@
 
             confirmClearActionBtn.addEventListener('click', () => {
                 localStorage.removeItem(STORAGE_KEY);
-                // Go back to a generic or non-existent page to reset, or just reset the game state
-                resetGame();
-                confirmClearModal.classList.add('hidden');
+                window.location.href = 'BarDarts.html';
             });
 
             newGameBtn.addEventListener('click', resetGame);
@@ -476,3 +474,4 @@
     </script>
 </body>
 </html>
+
