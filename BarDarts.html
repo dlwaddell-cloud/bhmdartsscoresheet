@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bar Darts Game Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="icon" href="favicon.ico">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -28,10 +25,7 @@
 <body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
 
     <div class="text-center w-full max-w-6xl relative">
-        <div class="absolute top-0 right-0 z-10 flex items-center space-x-2">
-            <a href="#" id="install-link" class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-green-500">
-                Install App
-            </a>
+        <div class="absolute top-0 right-0 z-10">
             <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-sky-500">
                 Donate
             </a>
@@ -146,55 +140,7 @@
             </div>
         </main>
     </div>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            })
-            .catch(error => {
-              console.log('ServiceWorker registration failed: ', error);
-            });
-        });
-      }
-    </script>
-    <script>
-      let deferredPrompt;
-      const installLink = document.getElementById('install-link');
 
-      window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('beforeinstallprompt event fired');
-        // Prevent the browser from showing the prompt automatically.
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        deferredPrompt = e;
-        // The link is now visible by default.
-      });
-
-      installLink.addEventListener('click', async (e) => {
-        e.preventDefault();
-        // If the deferred prompt is available, show it.
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          // Wait for the user to respond to the prompt.
-          const { outcome } = await deferredPrompt.userChoice;
-          console.log(`User response to the install prompt: ${outcome}`);
-          // The prompt can only be used once.
-          deferredPrompt = null;
-        } else {
-            // This case handles when the app is already installed or the browser doesn't support it.
-            console.log('The app cannot be installed right now.');
-        }
-      });
-
-      window.addEventListener('appinstalled', () => {
-        // The link remains visible, as requested.
-        // Clear the deferredPrompt.
-        deferredPrompt = null;
-        console.log('PWA was installed');
-      });
-    </script>
 </body>
 </html>
 
