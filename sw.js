@@ -1,5 +1,5 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v4'; // Incremented cache version for update
+const CACHE_NAME = 'bar-darts-cache-v5'; // Incremented cache version for update
 const urlsToCache = [
   './',
   'bardarts.html',
@@ -49,24 +49,30 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => {
         // This .catch() block is triggered if the initial cache match fails AND the network fetch fails.
-        // This is crucial for handling "clean URLs" (e.g., /501Darts) when offline.
         
-        // We only want to do this for navigation requests (i.e., loading a page).
+        // Handle navigation requests (i.e., loading a page) when offline.
         if (event.request.mode === 'navigate') {
           const url = new URL(event.request.url);
           const path = url.pathname;
+
+          // If it's the root URL, serve the main page.
+          if (path === '/') {
+              return caches.match('bardarts.html');
+          }
           
-          // Check if the requested path is for a file (contains a dot).
+          // Check if it's a "clean URL" without a file extension.
           const hasFileExtension = path.split('/').pop().indexOf('.') > -1;
 
-          // If it's a clean URL without a file extension, try to find a matching .html file in the cache.
+          // If it is a clean URL, try to find the matching .html file in the cache.
           if (!hasFileExtension) {
             return caches.match(path + '.html');
           }
         }
 
-        // For any other failed request (e.g., an image not in the cache), the request will fail as expected.
-        // You could return a generic offline fallback page here if you had one.
+        // For any other type of request that fails (e.g., an image not in the cache),
+        // we must return a valid Response object to avoid the Safari error.
+        // Returning a simple 404 response is a safe way to handle this.
+        return new Response('', { status: 404 });
       })
   );
 });
