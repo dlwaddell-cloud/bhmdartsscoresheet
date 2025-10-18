@@ -1,5 +1,5 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v3'; // Incremented cache version for update
+const CACHE_NAME = 'bar-darts-cache-v4'; // Incremented cache version for update
 const urlsToCache = [
   './',
   'bardarts.html',
@@ -16,7 +16,7 @@ const urlsToCache = [
 /**
  * Installation event
  * This event is triggered when the service worker is first installed.
- * It opens a cache and adds the core application files to it.
+ * self.skipWaiting() forces the waiting service worker to become the active one.
  */
 self.addEventListener('install', event => {
   // Perform install steps
@@ -26,6 +26,7 @@ self.addEventListener('install', event => {
         console.log('Opened cache and caching files for offline use.');
         return cache.addAll(urlsToCache);
       })
+      .then(() => self.skipWaiting()) // Force the new service worker to activate immediately
   );
 });
 
@@ -74,7 +75,7 @@ self.addEventListener('fetch', event => {
 /**
  * Activate event
  * This event is triggered when the new service worker is activated.
- * It's a good place to clean up old caches to remove outdated files.
+ * self.clients.claim() ensures that the new service worker takes control of the page immediately.
  */
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
@@ -89,7 +90,7 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // Take control of all open pages
   );
 });
 
