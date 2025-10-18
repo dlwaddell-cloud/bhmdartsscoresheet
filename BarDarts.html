@@ -22,26 +22,26 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 relative">
 
-    <div class="mb-12 text-center">
-        <p class="text-slate-400 mb-4">Enjoying the games? Consider a donation!</p>
-        <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-block bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-sky-500">
-            Donate on Venmo
+    <div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+        <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-sky-500">
+            Donate
         </a>
     </div>
 
     <div class="text-center">
-        <header class="mb-10">
-            <h1 class="text-5xl font-extrabold mb-2">Bar Darts Game Hub</h1>
-            <p class="text-xl text-slate-400">Choose a game to score</p>
+        <header class="mb-8">
+            <h1 class="text-4xl sm:text-5xl font-extrabold mb-2">Bar Darts Game Hub</h1>
+            <p class="text-lg sm:text-xl text-slate-400">Choose a game to score. Except for Killer, all games can be played solo.</p>
         </header>
 
-        <main class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div class="game-card bg-slate-800 p-8 rounded-xl shadow-lg flex flex-col">
+        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <!-- Killer Darts Card -->
+            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
                 <div>
                     <div class="mb-4">
-                        <h2 class="text-3xl font-bold text-red-400">Killer Darts</h2>
+                        <h2 class="text-2xl font-bold text-red-400">Killer</h2>
                     </div>
                     <p class="text-slate-300">
                         Become the "Killer" and hunt down your opponents. Be the last player with lives remaining to win.
@@ -54,10 +54,11 @@
                 </div>
             </div>
 
-            <div class="game-card bg-slate-800 p-8 rounded-xl shadow-lg flex flex-col">
+            <!-- Darts Golf Card -->
+            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
                  <div>
                     <div class="mb-4">
-                        <h2 class="text-3xl font-bold text-yellow-300">Darts Golf</h2>
+                        <h2 class="text-2xl font-bold text-yellow-300">Golf</h2>
                     </div>
                     <p class="text-slate-300">
                         Play 18 "holes" and aim for the lowest score possible. Lowest score wins.
@@ -70,10 +71,11 @@
                 </div>
             </div>
 
-            <div class="game-card bg-slate-800 p-8 rounded-xl shadow-lg flex flex-col">
+            <!-- 501 Card -->
+            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
                  <div>
                     <div class="mb-4">
-                        <h2 class="text-3xl font-bold text-blue-400">501</h2>
+                        <h2 class="text-2xl font-bold text-blue-400">501</h2>
                     </div>
                     <p class="text-slate-300">
                         The classic game of darts. Be the first player to reach exactly zero from 501, finishing on a double.
@@ -86,10 +88,11 @@
                 </div>
             </div>
 
-            <div class="game-card bg-slate-800 p-8 rounded-xl shadow-lg flex flex-col">
+            <!-- Cricket Card -->
+            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
                  <div>
                     <div class="mb-4">
-                        <h2 class="text-3xl font-bold text-green-400">Cricket</h2>
+                        <h2 class="text-2xl font-bold text-green-400">Cricket</h2>
                     </div>
                     <p class="text-slate-300">
                         Close out numbers 15-20 and the bullseye. Score points on closed numbers if your opponents haven't caught up.
@@ -101,9 +104,43 @@
                     </a>
                 </div>
             </div>
+
+            <!-- No Score Cricket Card -->
+            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
+                <div>
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold text-teal-400">No Score Cricket</h2>
+                    </div>
+                    <p class="text-slate-300">
+                        A simpler version of Cricket. Be the first to close all the numbers (15-20 and Bull) to win. No points are scored.
+                    </p>
+                </div>
+                <div class="mt-auto pt-6 flex gap-4 items-center">
+                    <a href="NSCricket.html" class="w-full text-center bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-5 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-teal-500">
+                        Play Game
+                    </a>
+                </div>
+            </div>
+
+            <!-- Halve It Card -->
+            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
+                <div>
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold text-orange-400">Halve It</h2>
+                    </div>
+                    <p class="text-slate-300">
+                        Score on the target each round. If you miss with all three darts, your current score is halved! Highest score wins.
+                    </p>
+                </div>
+                <div class="mt-auto pt-6 flex gap-4 items-center">
+                    <a href="DartsHalveIt.html" class="w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-5 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-orange-500">
+                        Play Game
+                    </a>
+                </div>
+            </div>
         </main>
     </div>
 
 </body>
 </html>
-```
+
