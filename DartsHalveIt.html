@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halve-It Scorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <meta name="theme-color" content="#052e16"> <!-- dark-green -->
+    <meta name="theme-color" content="#9a3412"> <!-- dark-orange -->
     <style>
         html, body {
             height: 100%;
@@ -25,15 +25,15 @@
             cursor: not-allowed;
         }
         .current-player-highlight {
-            background-color: rgba(250, 204, 21, 0.2); /* yellow-400 transparent */
+            background-color: rgba(251, 146, 60, 0.2); /* orange-400 transparent */
         }
         .winner-highlight {
             animation: winner-pulse 2s infinite;
         }
         @keyframes winner-pulse {
-            0% { background-color: #f59e0b; }
-            50% { background-color: #facc15; }
-            100% { background-color: #f59e0b; }
+            0% { background-color: #f97316; } /* orange-500 */
+            50% { background-color: #ea580c; } /* orange-600 */
+            100% { background-color: #f97316; } /* orange-500 */
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,19 +50,17 @@
 
     <div id="app" class="w-full max-w-7xl mx-auto flex flex-col flex-grow p-2 sm:p-4">
         <header class="text-center mb-2 sm:mb-4">
-            <h1 class="text-3xl sm:text-5xl font-bold text-yellow-400">Halve-It</h1>
+            <h1 class="text-3xl sm:text-5xl font-bold text-orange-400">Halve-It</h1>
             <p class="text-slate-400 text-sm sm:text-base mt-1">Score on the target each round. Miss, and your score is halved!</p>
         </header>
 
         <!-- Player Setup Section -->
         <div id="player-setup" class="bg-slate-800 p-6 rounded-lg shadow-lg mb-6 max-w-4xl mx-auto">
-            <h2 class="text-2xl font-semibold mb-4 text-center">Players</h2>
-            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
-                <div id="player-list" class="flex flex-wrap justify-center gap-2 order-2 md:order-1 flex-grow"></div>
-                <div class="flex items-center gap-2 order-1 md:order-2">
-                    <input type="text" id="new-player-name" class="w-48 bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Enter player name...">
-                    <button id="add-player-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Add</button>
-                </div>
+            <h2 class="text-2xl font-semibold mb-4">Players</h2>
+            <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <input type="text" id="new-player-name" class="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-orange-400" placeholder="Enter player name...">
+                <button id="add-player-btn" class="btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md">Add Player</button>
             </div>
             <div class="mt-6 text-center">
                 <button id="start-game-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-md text-lg w-full sm:w-auto" disabled>Start Game</button>
@@ -76,7 +74,7 @@
                 <!-- Round Tracker -->
                  <div id="round-tracker" class="text-center bg-slate-800 p-3 sm:p-4 rounded-t-lg shadow-lg">
                     <h2 class="text-lg sm:text-xl font-bold">Round <span id="round-number">1</span> of 9</h2>
-                    <p class="text-6xl sm:text-8xl font-bold text-yellow-300 mt-1" id="round-target">20</p>
+                    <p class="text-6xl sm:text-8xl font-bold text-orange-300 mt-1" id="round-target">20</p>
                 </div>
 
                 <table class="w-full text-center table-fixed">
@@ -89,7 +87,7 @@
             <!-- Scoring Panel -->
             <div class="bg-slate-800 p-2 sm:p-4 rounded-lg shadow-lg md:w-96 flex-shrink-0 flex flex-col">
                 <div>
-                    <h2 class="hidden md:block text-lg sm:text-xl font-bold text-center mb-2"><span id="turn-player-name" class="text-yellow-300"></span>'s Turn</h2>
+                    <h2 class="hidden md:block text-lg sm:text-xl font-bold text-center mb-2"><span id="turn-player-name" class="text-orange-300"></span>'s Turn</h2>
                     <div id="throw-tracker" class="flex justify-center items-center gap-2 h-6 mb-4">
                         <!-- Throw indicators will be added here -->
                     </div>
@@ -102,7 +100,7 @@
                     <button id="undo-btn" class="btn bg-stone-200 hover:bg-white text-slate-800 rounded-lg text-3xl font-bold flex items-center justify-center">&#8634;</button>
                 </div>
                 <div class="mt-2">
-                    <button id="next-player-btn" class="btn bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 rounded-md w-full text-xl transition-opacity">Next Player</button>
+                    <button id="next-player-btn" class="btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-md w-full text-xl transition-opacity">Next Player</button>
                 </div>
             </div>
         </div>
@@ -111,7 +109,7 @@
      <!-- Winner Modal -->
     <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-md w-full">
-            <h2 class="text-3xl font-bold text-yellow-400 mb-4">Game Over!</h2>
+            <h2 class="text-3xl font-bold text-orange-400 mb-4">Game Over!</h2>
             <p id="winner-message" class="text-xl mb-6"></p>
             <button id="new-game-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md w-full">Play New Game</button>
         </div>
@@ -120,7 +118,7 @@
     <!-- Confirm Clear Modal -->
     <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
-            <h2 class="text-2xl font-bold text-yellow-300 mb-4">Leave Game?</h2>
+            <h2 class="text-2xl font-bold text-orange-300 mb-4">Leave Game?</h2>
             <p class="text-slate-300 mb-6">This will clear the current game's data and return you to the main screen. This action cannot be undone.</p>
             <div class="flex justify-center gap-4">
                 <button id="cancel-clear-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-md w-full">Cancel</button>
@@ -237,7 +235,7 @@
                     const isCurrent = i === gameState.currentPlayerIndex;
                     const abbreviated = abbreviateName(p.name);
                     headHTML += `<th class="p-2 sm:p-3 text-sm sm:text-lg ${isCurrent ? 'current-player-highlight' : ''}" title="${p.name}">
-                        <div class="${isCurrent ? 'text-yellow-300' : ''}">
+                        <div class="${isCurrent ? 'text-orange-300' : ''}">
                             <span class="hidden sm:inline truncate">${p.name}</span>
                             <span class="sm:hidden">${abbreviated}</span>
                         </div>
@@ -255,7 +253,7 @@
 
             const renderThrowTracker = () => {
                 throwTrackerEl.innerHTML = Array(3).fill('').map((_, i) => 
-                    `<div class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 ${i < gameState.currentTurnThrows.length ? 'bg-yellow-400 border-yellow-400' : 'border-slate-500'}"></div>`
+                    `<div class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 ${i < gameState.currentTurnThrows.length ? 'bg-orange-400 border-orange-400' : 'border-slate-500'}"></div>`
                 ).join('');
             };
             
