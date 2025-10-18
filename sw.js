@@ -3,13 +3,13 @@ const CACHE_NAME = 'bar-darts-cache-v1';
 const urlsToCache = [
   './',
   'index.html',
-  'BarDarts.html',
-  '501Darts.html',
-  'DartsCricket.html',
-  'NSCricket.html',
-  'DartsHalveIt.html',
-  'DartsGolf.html',
-  'KillerDarts.html'
+  'bardarts.html',
+  '501darts.html',
+  'dartscricket.html',
+  'nscricket.html',
+  'dartshalveit.html',
+  'dartsgolf.html',
+  'killerdarts.html'
 ];
 
 /**
