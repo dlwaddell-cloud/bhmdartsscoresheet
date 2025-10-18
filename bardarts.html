@@ -33,27 +33,24 @@
 <body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
 
     <div class="text-center w-full max-w-6xl relative">
+        <div class="absolute top-0 left-0 z-10 flex space-x-2">
+             <a href="#" id="install-link-ios" class="hidden inline-block bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500">
+                Install App on iOS
+            </a>
+            <a href="#" id="install-link-android" class="hidden inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-emerald-500">
+                Install App on Android
+            </a>
+        </div>
         <div class="absolute top-0 right-0 z-10">
             <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-sky-500">
                 Donate
             </a>
         </div>
 
-        <header class="mb-8 pt-12 sm:pt-0">
+        <header class="mb-8 pt-16 sm:pt-16">
             <h1 class="text-4xl sm:text-5xl font-extrabold mb-2">Bar Darts Game Hub</h1>
             <p class="text-lg sm:text-xl text-slate-400">Choose a game to score. Except for Killer, all games can be played solo.</p>
         </header>
-
-        <!-- Install App on iOS -->
-        <div id="ios-install-prompt" class="bg-slate-800 p-4 rounded-lg mb-8 max-w-md mx-auto flex items-center gap-4">
-            <svg class="w-8 h-8 text-sky-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-            </svg>
-            <div class="text-left">
-                <p class="font-bold text-white">Install on your iPhone</p>
-                <p class="text-sm text-slate-300">Tap the Share button, then find and tap 'Add to Home Screen'.</p>
-            </div>
-        </div>
 
         <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- 501 Card -->
@@ -158,11 +155,70 @@
                 </div>
             </div>
         </main>
+        
     </div>
 
+    <!-- Install Instructions Modal - iOS -->
+    <div id="install-modal-ios" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative border border-slate-700">
+            <button id="close-modal-btn-ios" class="absolute top-3 right-3 text-slate-400 hover:text-white transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-xl font-bold mb-4">Install App on iOS</h3>
+            <p class="text-slate-300 mb-6">To add this web app to your Home Screen for easy access, follow the instructions for your browser. The steps below are for Safari on iOS.</p>
+            <ol class="text-left space-y-4">
+                <li class="flex items-center">
+                    <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">1</span>
+                    <span>Tap the <strong>Share</strong> icon in the browser toolbar.</span>
+                    <svg class="w-8 h-8 text-blue-400 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                </li>
+                <li class="flex items-center">
+                    <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">2</span>
+                    <span>Scroll down and tap <strong>'Add to Home Screen'</strong>.</span>
+                     <div class="w-8 h-8 bg-white rounded-md flex items-center justify-center ml-auto flex-shrink-0">
+                        <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v12m6-6H6"></path></svg>
+                    </div>
+                </li>
+                <li class="flex items-center">
+                     <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">3</span>
+                     <span>Confirm by tapping <strong>'Add'</strong> in the top right.</span>
+                </li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- Install Instructions Modal - Android -->
+    <div id="install-modal-android" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative border border-slate-700">
+            <button id="close-modal-btn-android" class="absolute top-3 right-3 text-slate-400 hover:text-white transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-xl font-bold mb-4">Install App on Android</h3>
+            <p class="text-slate-300 mb-6">To add this web app to your Home Screen for easy access, follow the instructions for Chrome.</p>
+            <ol class="text-left space-y-4">
+                <li class="flex items-center">
+                    <span class="bg-slate-700 text-emerald-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">1</span>
+                    <span>Tap the <strong>three-dot menu</strong> icon in the browser toolbar.</span>
+                    <svg class="w-8 h-8 text-emerald-400 ml-auto flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+                </li>
+                <li class="flex items-center">
+                    <span class="bg-slate-700 text-emerald-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">2</span>
+                    <span>Tap <strong>'Install app'</strong> or <strong>'Add to Home Screen'</strong>.</span>
+                     <div class="w-8 h-8 bg-white rounded-md flex items-center justify-center ml-auto flex-shrink-0">
+                        <svg class="w-5 h-5 text-black" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 4h6v2H9V4zm6 14H9v-2h6v2zm-3-4c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"></path></svg>
+                    </div>
+                </li>
+                <li class="flex items-center">
+                     <span class="bg-slate-700 text-emerald-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">3</span>
+                     <span>Follow the on-screen prompts to confirm.</span>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+
     <script>
-        // This script registers the service worker.
-        // It should be added to all pages you want to be part of the PWA experience.
+        // --- Service Worker Registration ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(registration => {
@@ -172,6 +228,60 @@
                 });
             });
         }
+
+        // --- PWA Install Modal Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // iOS Elements
+            const installLinkIOS = document.getElementById('install-link-ios');
+            const installModalIOS = document.getElementById('install-modal-ios');
+            const closeModalBtnIOS = document.getElementById('close-modal-btn-ios');
+
+            // Android Elements
+            const installLinkAndroid = document.getElementById('install-link-android');
+            const installModalAndroid = document.getElementById('install-modal-android');
+            const closeModalBtnAndroid = document.getElementById('close-modal-btn-android');
+
+            // Function to check if the app is in standalone mode (already installed)
+            const isInStandaloneMode = () => window.matchMedia('(display-mode: standalone)').matches || (('standalone' in window.navigator) && window.navigator.standalone);
+
+            // Show the install links if the app is not already installed
+            if (!isInStandaloneMode()) {
+                installLinkIOS.classList.remove('hidden');
+                installLinkAndroid.classList.remove('hidden');
+            }
+
+            // --- iOS Modal Logic ---
+            installLinkIOS.addEventListener('click', (e) => {
+                e.preventDefault();
+                installModalIOS.classList.remove('hidden');
+            });
+
+            closeModalBtnIOS.addEventListener('click', () => {
+                installModalIOS.classList.add('hidden');
+            });
+
+            installModalIOS.addEventListener('click', (e) => {
+                if (e.target === installModalIOS) {
+                    installModalIOS.classList.add('hidden');
+                }
+            });
+
+            // --- Android Modal Logic ---
+            installLinkAndroid.addEventListener('click', (e) => {
+                e.preventDefault();
+                installModalAndroid.classList.remove('hidden');
+            });
+
+            closeModalBtnAndroid.addEventListener('click', () => {
+                installModalAndroid.classList.add('hidden');
+            });
+
+            installModalAndroid.addEventListener('click', (e) => {
+                if (e.target === installModalAndroid) {
+                    installModalAndroid.classList.add('hidden');
+                }
+            });
+        });
     </script>
 
 </body>
