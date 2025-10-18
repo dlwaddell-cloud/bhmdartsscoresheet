@@ -152,6 +152,7 @@
                 currentRound: 0, // index of TARGETS
                 currentTurnThrows: [], // { num, multiplier, points, hitTarget }
                 hitThisRound: false,
+                turnHistory: [], // For undoing turns
             };
 
             // --- DOM ELEMENTS ---
@@ -289,10 +290,10 @@
 
             const updateButtonStates = () => {
                 const isTurnOver = gameState.currentTurnThrows.length >= 3;
-                const isFirstThrow = gameState.currentTurnThrows.length === 0;
-
+                const turnJustStarted = gameState.currentTurnThrows.length === 0;
+                
                 document.querySelectorAll('.score-direct-hit-btn, .score-any-hit-btn, #miss-btn').forEach(btn => btn.disabled = isTurnOver);
-                undoBtn.disabled = isFirstThrow;
+                undoBtn.disabled = turnJustStarted && gameState.turnHistory.length === 0;
                 nextPlayerBtn.disabled = !isTurnOver && gameState.gameStarted;
             };
             
@@ -304,6 +305,7 @@
                 gameState.currentRound = 0;
                 gameState.currentTurnThrows = [];
                 gameState.hitThisRound = false;
+                gameState.turnHistory = [];
                 render();
             };
             
@@ -321,6 +323,7 @@
                 if (hitTarget) {
                     points = num * multiplier;
                     gameState.hitThisRound = true;
+                    gameState.players[gameState.currentPlayerIndex].score += points;
                 }
 
                 gameState.currentTurnThrows.push({ num, multiplier, points, hitTarget });
@@ -334,19 +337,26 @@
             };
             
             const handleUndo = () => {
-                if (gameState.currentTurnThrows.length === 0) return;
-                gameState.currentTurnThrows.pop();
-                gameState.hitThisRound = gameState.currentTurnThrows.some(dart => dart.hitTarget);
+                if (gameState.currentTurnThrows.length > 0) {
+                    // Undo the last throw in the current turn
+                    const lastThrow = gameState.currentTurnThrows.pop();
+                    const player = gameState.players[gameState.currentPlayerIndex];
+                    player.score -= lastThrow.points; // Revert score change from that throw
+                    gameState.hitThisRound = gameState.currentTurnThrows.some(dart => dart.hitTarget);
+                } else if (gameState.turnHistory.length > 0) {
+                    // If turn hasn't started, revert to the previous player's state
+                    gameState = gameState.turnHistory.pop();
+                }
                 render();
             };
 
             const endPlayerTurn = () => {
-                const player = gameState.players[gameState.currentPlayerIndex];
-                const roundScore = gameState.currentTurnThrows.reduce((sum, dart) => sum + dart.points, 0);
+                // Save state before modifying for the next player
+                gameState.turnHistory.push(JSON.parse(JSON.stringify(gameState)));
 
-                if (gameState.hitThisRound) {
-                    player.score += roundScore;
-                } else {
+                const player = gameState.players[gameState.currentPlayerIndex];
+                
+                if (!gameState.hitThisRound) {
                     player.score = Math.floor(player.score / 2);
                 }
 
@@ -378,7 +388,15 @@
             };
 
             const resetGame = () => {
-                 gameState = { players: [], gameStarted: false, currentPlayerIndex: 0, currentRound: 0, currentTurnThrows: [], hitThisRound: false };
+                 gameState = { 
+                     players: [], 
+                     gameStarted: false, 
+                     currentPlayerIndex: 0, 
+                     currentRound: 0, 
+                     currentTurnThrows: [], 
+                     hitThisRound: false,
+                     turnHistory: [] 
+                };
                  winnerModal.classList.add('hidden');
                  render();
             };
