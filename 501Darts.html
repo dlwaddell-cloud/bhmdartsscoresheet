@@ -77,35 +77,35 @@
             </div>
         </div>
         
-        <!-- Game Section: Uses flexbox for responsive stacking -->
-        <div id="game-section" class="hidden flex-grow flex flex-col lg:flex-row gap-6">
-            <!-- Left Column: Players - grows to fill space -->
-            <div id="player-cards-container" class="flex-grow grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 content-start">
+        <!-- Game Section: Uses flex-row for all screen sizes -->
+        <div id="game-section" class="hidden flex-grow flex flex-row gap-4">
+            <!-- Player cards on the left (narrow) -->
+            <div id="player-cards-container" class="w-1/3 grid grid-cols-1 gap-2 content-start">
                 <!-- Player cards generated here -->
             </div>
-
-            <!-- Right Column: Scoring - fixed width on large screens -->
-            <div id="scoring-panel" class="bg-slate-800 p-4 rounded-lg shadow-lg lg:w-96 lg:flex-shrink-0">
-                <h2 class="text-2xl font-bold text-center mb-2"><span id="turn-player-name"></span>'s Turn</h2>
-                <div class="bg-slate-900 text-center rounded-lg p-3 my-3">
-                    <div class="text-slate-400 text-sm">Score Entered</div>
-                    <div id="current-score-display" class="text-5xl sm:text-6xl font-mono font-bold min-h-[5rem] flex items-center justify-center">0</div>
+            
+            <!-- Scoring panel on the right (wide) -->
+            <div id="scoring-panel" class="w-2/3 bg-slate-800 p-2 sm:p-4 rounded-lg shadow-lg">
+                <h2 class="text-xl sm:text-2xl font-bold text-center mb-2"><span id="turn-player-name"></span>'s Turn</h2>
+                <div class="bg-slate-900 text-center rounded-lg p-2 sm:p-3 my-3">
+                    <div class="text-slate-400 text-xs sm:text-sm">Score Entered</div>
+                    <div id="current-score-display" class="text-4xl sm:text-6xl font-mono font-bold min-h-[4rem] sm:min-h-[5rem] flex items-center justify-center">0</div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2">
                     <!-- Numpad with responsive padding and text -->
-                    <button data-num="1" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">1</button>
-                    <button data-num="2" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">2</button>
-                    <button data-num="3" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">3</button>
-                    <button data-num="4" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">4</button>
-                    <button data-num="5" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">5</button>
-                    <button data-num="6" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">6</button>
-                    <button data-num="7" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">7</button>
-                    <button data-num="8" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">8</button>
-                    <button data-num="9" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">9</button>
-                    <button id="del-btn" class="btn bg-slate-600 hover:bg-slate-500 p-3 sm:p-4 rounded-lg text-lg sm:text-xl font-bold">DEL</button>
-                    <button data-num="0" class="btn numpad bg-slate-700 hover:bg-slate-600 p-3 sm:p-4 rounded-lg text-xl sm:text-2xl font-bold">0</button>
-                    <button id="enter-score-btn" class="btn bg-green-600 hover:bg-green-500 p-3 sm:p-4 rounded-lg text-lg sm:text-xl font-bold">Enter</button>
+                    <button data-num="1" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">1</button>
+                    <button data-num="2" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">2</button>
+                    <button data-num="3" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">3</button>
+                    <button data-num="4" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">4</button>
+                    <button data-num="5" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">5</button>
+                    <button data-num="6" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">6</button>
+                    <button data-num="7" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">7</button>
+                    <button data-num="8" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">8</button>
+                    <button data-num="9" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">9</button>
+                    <button id="del-btn" class="btn bg-slate-600 hover:bg-slate-500 p-2 sm:p-4 rounded-lg text-base sm:text-xl font-bold">DEL</button>
+                    <button data-num="0" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">0</button>
+                    <button id="enter-score-btn" class="btn bg-green-600 hover:bg-green-500 p-2 sm:p-4 rounded-lg text-base sm:text-xl font-bold">Enter</button>
                 </div>
                 
                 <div class="grid grid-cols-5 gap-2 mt-4">
@@ -231,21 +231,21 @@
                 playerCardsContainer.innerHTML = '';
                 gameState.players.forEach((player, index) => {
                     const card = document.createElement('div');
-                    // Applied responsive padding
-                    card.className = 'player-card bg-slate-800 p-3 sm:p-4 rounded-lg shadow-md';
+                    // Compacted for side-by-side mobile view
+                    card.className = 'player-card bg-slate-800 p-2 sm:p-3 rounded-lg shadow-md';
                     if (index === gameState.currentPlayerIndex) {
                         card.classList.add('current-player-turn');
                     }
                     
                     const lastScore = player.history.length > 0 ? player.history[player.history.length-1] : '-';
 
-                    // Made font sizes and margins responsive
+                    // Made font sizes and margins responsive for smaller card
                     card.innerHTML = `
-                        <div class="flex justify-between items-baseline">
-                            <h3 class="text-xl sm:text-2xl font-bold truncate" title="${player.name}">${player.name}</h3>
+                        <div class="flex flex-col sm:flex-row justify-between items-baseline">
+                            <h3 class="text-lg sm:text-xl font-bold truncate" title="${player.name}">${player.name}</h3>
                             <span class="text-slate-400 text-xs sm:text-sm">Last: ${lastScore}</span>
                         </div>
-                        <p class="text-4xl sm:text-5xl md:text-6xl font-bold text-center my-3 sm:my-4">${player.score}</p>
+                        <p class="text-3xl sm:text-5xl font-bold text-center my-2 sm:my-3">${player.score}</p>
                     `;
                     playerCardsContainer.appendChild(card);
                 });
@@ -416,3 +416,4 @@
     </script>
 </body>
 </html>
+
