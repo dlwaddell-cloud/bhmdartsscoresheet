@@ -44,6 +44,17 @@
             <p class="text-lg sm:text-xl text-slate-400">Choose a game to score. Except for Killer, all games can be played solo.</p>
         </header>
 
+        <!-- Install App on iOS -->
+        <div id="ios-install-prompt" class="hidden bg-slate-800 p-4 rounded-lg mb-8 max-w-md mx-auto flex items-center gap-4">
+            <svg class="w-8 h-8 text-sky-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <div class="text-left">
+                <p class="font-bold text-white">Install on your iPhone</p>
+                <p class="text-sm text-slate-300">Tap the Share button, then find and tap 'Add to Home Screen'.</p>
+            </div>
+        </div>
+
         <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- 501 Card -->
             <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
@@ -147,46 +158,11 @@
                 </div>
             </div>
         </main>
-        
-        <footer class="mt-12 text-center text-slate-400">
-            <a href="#" id="install-link" class="hidden inline-block rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500">
-                Install App on iOS
-            </a>
-        </footer>
     </div>
-
-    <!-- Install Instructions Modal -->
-    <div id="install-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative border border-slate-700">
-            <button id="close-modal-btn" class="absolute top-3 right-3 text-slate-400 hover:text-white transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h3 class="text-xl font-bold mb-4">Install App on IOS</h3>
-            <p class="text-slate-300 mb-6">To add this web app to your Home Screen for easy access, follow the instructions for your browser. The steps below are for Safari on iOS.</p>
-            <ol class="text-left space-y-4">
-                <li class="flex items-center">
-                    <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">1</span>
-                    <span>Tap the <strong>Share</strong> icon in the browser toolbar.</span>
-                    <svg class="w-8 h-8 text-blue-400 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                </li>
-                <li class="flex items-center">
-                    <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">2</span>
-                    <span>Scroll down and tap <strong>'Add to Home Screen'</strong>.</span>
-                     <div class="w-8 h-8 bg-white rounded-md flex items-center justify-center ml-auto flex-shrink-0">
-                        <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v12m6-6H6"></path></svg>
-                    </div>
-                </li>
-                <li class="flex items-center">
-                     <span class="bg-slate-700 text-blue-400 rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mr-4">3</span>
-                     <span>Confirm by tapping <strong>'Add'</strong> in the top right.</span>
-                </li>
-            </ol>
-        </div>
-    </div>
-
 
     <script>
-        // --- Service Worker Registration ---
+        // This script registers the service worker.
+        // It should be added to all pages you want to be part of the PWA experience.
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(registration => {
@@ -196,41 +172,23 @@
                 });
             });
         }
+    </script>
+    <script>
+        // Show install prompt on iOS
+        (() => {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            // Check if the app is running in standalone mode.
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-        // --- PWA Install Modal Logic ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const installLink = document.getElementById('install-link');
-            const installModal = document.getElementById('install-modal');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-
-            // Function to check if the app is in standalone mode (already installed)
-            const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
-
-            // Show the install link if the app is not already installed
-            if (!isInStandaloneMode()) {
-                installLink.classList.remove('hidden');
-            }
-
-            // Event listener to show the modal
-            installLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                installModal.classList.remove('hidden');
-            });
-
-            // Event listener to hide the modal via the close button
-            closeModalBtn.addEventListener('click', () => {
-                installModal.classList.add('hidden');
-            });
-
-            // Event listener to hide the modal by clicking on the background overlay
-            installModal.addEventListener('click', (e) => {
-                if (e.target === installModal) {
-                    installModal.classList.add('hidden');
+            // If it's an iOS device and not running in standalone mode, show the prompt.
+            if (isIOS && !isStandalone) {
+                const installPrompt = document.getElementById('ios-install-prompt');
+                if (installPrompt) {
+                    installPrompt.classList.remove('hidden');
                 }
-            });
-        });
+            }
+        })();
     </script>
 
 </body>
 </html>
-
