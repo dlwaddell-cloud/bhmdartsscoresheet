@@ -1,16 +1,17 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v5'; // Incremented cache version for update
+const CACHE_NAME = 'bar-darts-cache-v7'; // Incremented cache version for update
 const urlsToCache = [
   './',
   'bardarts.html',
-  '501Darts.html',
+  '501darts.html', // Corrected filename case
   'DartsCricket.html',
   'NSCricket.html',
   'DartsHalveIt.html',
   'DartsGolf.html',
   'KillerDarts.html',
   'icon-192x192.png',
-  'icon-512x512.png'
+  'icon-512x512.png',
+  'manifest.json' // Added manifest for better PWA behavior
 ];
 
 /**
@@ -33,7 +34,7 @@ self.addEventListener('install', event => {
 /**
  * Fetch event
  * This event is triggered for every network request made by the page.
- * It follows a robust "cache-first, then network, with offline fallback" strategy.
+ * It uses a "cache-first, then network, with an app-shell fallback" strategy.
  */
 self.addEventListener('fetch', event => {
   event.respondWith(
@@ -45,34 +46,26 @@ self.addEventListener('fetch', event => {
         }
         
         // Not in cache - fetch from the network.
-        return fetch(event.request);
+        // We clone the request because it's a stream and can only be consumed once.
+        return fetch(event.request.clone());
       })
       .catch(() => {
         // This .catch() block is triggered if the initial cache match fails AND the network fetch fails.
+        // This is the primary OFFLINE scenario.
         
-        // Handle navigation requests (i.e., loading a page) when offline.
+        // If the failed request was for a page navigation...
         if (event.request.mode === 'navigate') {
-          const url = new URL(event.request.url);
-          const path = url.pathname;
-
-          // If it's the root URL, serve the main page.
-          if (path === '/') {
-              return caches.match('bardarts.html');
-          }
-          
-          // Check if it's a "clean URL" without a file extension.
-          const hasFileExtension = path.split('/').pop().indexOf('.') > -1;
-
-          // If it is a clean URL, try to find the matching .html file in the cache.
-          if (!hasFileExtension) {
-            return caches.match(path + '.html');
-          }
+          // ...return the main app shell (the hub page) from the cache.
+          // This ensures the user always lands on a working page.
+          return caches.match('bardarts.html');
         }
 
         // For any other type of request that fails (e.g., an image not in the cache),
-        // we must return a valid Response object to avoid the Safari error.
-        // Returning a simple 404 response is a safe way to handle this.
-        return new Response('', { status: 404 });
+        // we return a valid but empty 404 response to avoid the Safari error.
+        return new Response('', {
+          status: 404,
+          statusText: 'Not Found'
+        });
       })
   );
 });
