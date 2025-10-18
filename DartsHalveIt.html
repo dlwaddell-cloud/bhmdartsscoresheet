@@ -445,7 +445,7 @@
             cancelClearBtn.addEventListener('click', () => confirmClearModal.classList.add('hidden'));
             confirmClearActionBtn.addEventListener('click', () => {
                 localStorage.removeItem(STORAGE_KEY);
-                window.location.reload();
+                window.location.href = 'BarDarts.html';
             });
             newGameBtn.addEventListener('click', resetGame);
             
