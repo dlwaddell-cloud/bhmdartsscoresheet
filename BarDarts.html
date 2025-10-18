@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bar Darts Game Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- PWA / Mobile App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -141,6 +149,19 @@
         </main>
     </div>
 
+    <script>
+        // This script registers the service worker.
+        // It should be added to all pages you want to be part of the PWA experience.
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+
 </body>
 </html>
-
