@@ -1,14 +1,13 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v10'; // Incremented cache version for update
+const CACHE_NAME = 'bar-darts-cache-v11'; // Incremented cache version for update
 const urlsToCache = [
-  './',
   'bardarts.html',
   '501darts.html',
   'DartsCricket.html',
   'NSCricket.html',
   'DartsHalveIt.html',
   'DartsGolf.html',
-  'https://bhamdartsscoresheet.netlify.app/KillerDarts.html',
+  'KillerDarts.html',
   'icon-192x192.png',
   'icon-512x512.png',
   'manifest.json'
@@ -18,16 +17,25 @@ const urlsToCache = [
  * Installation event
  * This event is triggered when the service worker is first installed.
  * It pre-caches all the essential files for the app to work offline.
+ * This version is more robust, caching files individually.
  */
 self.addEventListener('install', event => {
-  // Perform install steps
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache and caching files for offline use.');
-        return cache.addAll(urlsToCache);
+        console.log('Opened cache. Caching essential assets individually...');
+        const cachePromises = urlsToCache.map(urlToCache => {
+          return cache.add(urlToCache).catch(err => {
+            // Log the error but don't let it break the entire install
+            console.warn(`Failed to cache ${urlToCache}:`, err);
+          });
+        });
+        return Promise.all(cachePromises);
       })
-      .then(() => self.skipWaiting()) // Force the new service worker to activate immediately
+      .then(() => {
+        console.log('All available assets have been cached.');
+        return self.skipWaiting(); // Force the new service worker to activate immediately
+      })
   );
 });
 
@@ -54,7 +62,6 @@ self.addEventListener('fetch', event => {
             }
 
             // Clone the response because it's a stream and can only be consumed once.
-            // We need one for the browser and one for the cache.
             const responseToCache = networkResponse.clone();
 
             caches.open(CACHE_NAME)
@@ -68,8 +75,7 @@ self.addEventListener('fetch', event => {
         );
       })
       .catch(() => {
-        // If both the cache and the network fail (e.g., offline and page not cached),
-        // return the main hub page as a fallback for navigation requests.
+        // If both the cache and the network fail, return the main hub page as a fallback.
         if (event.request.mode === 'navigate') {
           return caches.match('bardarts.html');
         }
