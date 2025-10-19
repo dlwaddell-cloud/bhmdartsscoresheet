@@ -1,5 +1,5 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v11'; // Incremented cache version for update
+const CACHE_NAME = 'bar-darts-cache-v12'; // Incremented cache version for update
 const urlsToCache = [
   'bardarts.html',
   '501darts.html',
@@ -75,10 +75,9 @@ self.addEventListener('fetch', event => {
         );
       })
       .catch(() => {
-        // If both the cache and the network fail, return the main hub page as a fallback.
-        if (event.request.mode === 'navigate') {
-          return caches.match('bardarts.html');
-        }
+        // If both the cache and the network fail, the request will fail,
+        // resulting in the browser's default offline error page.
+        // The fallback logic has been removed as requested.
       })
   );
 });
