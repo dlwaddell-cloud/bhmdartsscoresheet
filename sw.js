@@ -1,6 +1,12 @@
 // Define the cache name and files to cache
-const CACHE_NAME = 'bar-darts-cache-v12'; // Incremented cache version for update
+const CACHE_NAME = 'bar-darts-cache-v13'; // Incremented cache version for update
+
+// The base URL of your repository, hosted via GitHub Pages.
+const GITHUB_PAGES_BASE_URL = 'https://dlwaddell-cloud.github.io/bhmdartsscoresheet/';
+
+// Create a list of full URLs to cache by prepending the base URL.
 const urlsToCache = [
+  '', // Caches the root page (the base URL itself)
   'bardarts.html',
   '501darts.html',
   'DartsCricket.html',
@@ -11,7 +17,7 @@ const urlsToCache = [
   'icon-192x192.png',
   'icon-512x512.png',
   'manifest.json'
-];
+].map(file => GITHUB_PAGES_BASE_URL + file);
 
 /**
  * Installation event
@@ -23,7 +29,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache. Caching essential assets individually...');
+        console.log('Opened cache. Caching essential assets individually from GitHub...');
         const cachePromises = urlsToCache.map(urlToCache => {
           return cache.add(urlToCache).catch(err => {
             // Log the error but don't let it break the entire install
