@@ -1,7 +1,8 @@
 // Define the cache name and files to cache
 const CACHE_NAME = 'bar-darts-cache-v1';
 const urlsToCache = [
-  'BarDarts.html',
+  'index.html',
+  'bardarts.html',
   '501Darts.html',
   'DartsCricket.html',
   'NSCricket.html',
