@@ -8,7 +8,7 @@ const GITHUB_PAGES_BASE_URL = 'https://dlwaddell-cloud.github.io/bhmdartsscoresh
 const urlsToCache = [
   '', // Caches the root page (the base URL itself)
   'bardarts.html',
-  '501darts.html',
+  '501Darts.html',
   'DartsCricket.html',
   'NSCricket.html',
   'DartsHalveIt.html',
@@ -110,4 +110,3 @@ self.addEventListener('activate', event => {
     }).then(() => self.clients.claim()) // Take control of all open pages immediately.
   );
 });
-
