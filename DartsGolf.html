@@ -52,7 +52,6 @@
 <body class="h-[100dvh] w-screen overflow-hidden flex flex-col">
 
     <!-- App Container -->
-    <!-- Removed max-w-lg to allow horizontal resizing -->
     <div id="app" class="relative w-full h-full mx-auto flex flex-col bg-gray-900 shadow-2xl">
         
         <!-- Header -->
@@ -232,6 +231,8 @@
             gameActive: false
         };
 
+        const STORAGE_KEY = 'darts_golf_state';
+
         // DOM Elements
         const views = {
             setup: document.getElementById('setup-view'),
@@ -246,21 +247,56 @@
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {
-            renderPlayerSetup();
-            switchView('setup');
+            loadState();
         });
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    state = JSON.parse(saved);
+                    if (state.gameActive) {
+                        startGame();
+                    } else {
+                        renderPlayerSetup();
+                        updateHoleButtonUI();
+                        switchView('setup');
+                    }
+                } catch (e) {
+                    console.error("Failed to load state", e);
+                    renderPlayerSetup();
+                    switchView('setup');
+                }
+            } else {
+                renderPlayerSetup();
+                switchView('setup');
+            }
+        }
+
+        function updateHoleButtonUI() {
+             document.querySelectorAll('.hole-select-btn').forEach(b => {
+                const btnHoles = parseInt(b.dataset.holes);
+                if (btnHoles === state.totalHoles) {
+                    b.classList.remove('bg-gray-800', 'text-gray-400', 'border-transparent');
+                    b.classList.add('bg-yellow-500', 'text-gray-900', 'border-yellow-500');
+                } else {
+                    b.classList.add('bg-gray-800', 'text-gray-400', 'border-transparent');
+                    b.classList.remove('bg-yellow-500', 'text-gray-900', 'border-yellow-500');
+                }
+            });
+        }
 
         // --- Setup Logic ---
 
         document.querySelectorAll('.hole-select-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 state.totalHoles = parseInt(e.target.dataset.holes);
-                document.querySelectorAll('.hole-select-btn').forEach(b => {
-                    b.classList.remove('bg-yellow-500', 'text-gray-900', 'border-yellow-500');
-                    b.classList.add('bg-gray-800', 'text-gray-400', 'border-transparent');
-                });
-                e.target.classList.remove('bg-gray-800', 'text-gray-400', 'border-transparent');
-                e.target.classList.add('bg-yellow-500', 'text-gray-900', 'border-yellow-500');
+                updateHoleButtonUI();
+                saveState();
             });
         });
 
@@ -277,12 +313,14 @@
                     total: 0
                 });
                 newPlayerInput.value = '';
+                saveState();
                 renderPlayerSetup();
             }
         }
 
         window.removePlayer = (index) => {
             state.players.splice(index, 1);
+            saveState();
             renderPlayerSetup();
         };
 
@@ -298,10 +336,6 @@
                 `;
                 playerInputsContainer.appendChild(div);
             });
-            // Initial call empty state check
-            if(state.players.length === 0 && playerInputsContainer.children.length === 0) {
-                 // Optional: add initial empty message
-            }
         }
 
         document.getElementById('start-game-btn').addEventListener('click', () => {
@@ -320,6 +354,7 @@
             state.currentPlayerIndex = 0;
             state.gameActive = true;
             
+            saveState();
             startGame();
         });
 
@@ -337,6 +372,8 @@
 
         window.resetGame = function() {
             state.gameActive = false;
+            // Optionally we can reset players scores here but we just go back to setup
+            saveState();
             switchView('setup');
         }
 
@@ -355,7 +392,6 @@
         function updateGameUI() {
             document.getElementById('current-hole-num').textContent = state.currentHole;
             document.getElementById('total-holes-display').textContent = state.totalHoles;
-            // Removed current-target update as it's replaced by leaderboard
             
             // Progress Bar
             const progress = ((state.currentHole - 1) / state.totalHoles) * 100;
@@ -481,10 +517,15 @@
                 // Game Over Check
                 if (state.currentHole > state.totalHoles) {
                     endGame();
+                    // We also save state at end game to ensure if they refresh they see results
+                    // Although logic below doesn't handle refreshing on 'results' view explicitly
+                    // It will stay on game view but with hole > total holes, which triggers endGame immediately
+                    saveState(); 
                     return;
                 }
             }
-
+            
+            saveState();
             updateGameUI();
         };
 
