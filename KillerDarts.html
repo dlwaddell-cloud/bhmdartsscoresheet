@@ -3,708 +3,632 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Killer Darts Scorer</title>
+    <title>Killer Darts</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <link rel="manifest" href="killer_manifest.json">
-    <meta name="theme-color" content="#4A1D1F">
-    <link rel="apple-touch-icon" href="killer_icon-192x192.png">
-
-    <!-- PWA / Mobile App Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f172a">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <meta name="theme-color" content="#1a202c">
     
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
         body {
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            background-color: #1a202c; /* A dark slate color */
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            overscroll-behavior: none;
         }
-        .player-card {
-            transition: all 0.3s ease-in-out;
-            border: 2px solid transparent;
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-        .player-card.is-killer {
-            background-color: #4A1D1F; /* Dark red */
-            border-color: #F87171; /* Lighter red */
-            box-shadow: 0 0 15px rgba(248, 113, 113, 0.5);
+        ::-webkit-scrollbar-track {
+            background: #2d3748; 
         }
-        .player-card.eliminated {
-            opacity: 0.5;
-            background-color: #2d3748;
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; 
+            border-radius: 4px;
         }
-        .current-player-turn {
-            border: 2px solid #FBBF24; /* Amber */
-            transform: scale(1.02);
+
+        .action-btn {
+            transition: all 0.2s;
+            touch-action: manipulation;
         }
-        .life {
-            color: #ef4444; /* Red-600 */
-        }
-        .btn:disabled {
-            background-color: #4a5568;
-            cursor: not-allowed;
-        }
-        .btn:active:not(:disabled) {
+        .action-btn:active {
             transform: scale(0.95);
         }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body class="text-white min-h-screen flex flex-col items-center p-4">
 
-    <div id="clear-storage-btn" class="fixed top-4 left-4 z-50 bg-red-600 hover:bg-red-700 p-2 rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110" title="Return to BarDarts.html">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    </div>
-    
-    <div id="app" class="w-full max-w-5xl mx-auto">
-        <header class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-red-400">Killer Darts</h1>
-            <p id="game-phase-subtitle" class="text-slate-400 mt-1">Be the last one standing.</p>
+        /* Animations */
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .killer-active {
+            animation: pulse-red 2s infinite;
+            border-color: #ef4444 !important;
+        }
+
+        .input-focus-ring:focus {
+            outline: 2px solid #f6ad55; /* Orange-400 */
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- App Container -->
+    <div id="app" class="relative w-full h-full max-w-lg mx-auto flex flex-col bg-gray-900 shadow-2xl">
+        
+        <!-- Header -->
+        <header class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-skull-crossbones text-red-500 text-xl"></i>
+                <h1 class="text-xl font-bold text-white tracking-wide">Killer Darts</h1>
+            </div>
+            <div class="flex gap-2">
+                 <button id="reset-data-btn" class="text-gray-400 hover:text-white transition-colors p-2" title="Reset Game">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <a href="bardarts.html" class="text-gray-400 hover:text-white transition-colors p-2" title="Exit">
+                    <i class="fa-solid fa-door-open"></i>
+                </a>
+            </div>
         </header>
 
-        <!-- Player Setup Section -->
-        <div id="player-setup" class="bg-slate-800 p-6 rounded-lg shadow-lg mb-6">
-            <h2 class="text-2xl font-semibold mb-4">Add Players</h2>
-            <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
-            <div class="flex gap-4">
-                <input type="text" id="new-player-name" class="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400" placeholder="Enter player name...">
-                <button id="add-player-btn" class="btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md transition-transform">Add Player</button>
-            </div>
-            <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                <button id="start-game-btn" class="btn bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-md transition-transform w-full sm:w-auto flex-grow" disabled>Start Game</button>
-                <button id="reset-data-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded-md transition-transform w-full sm:w-auto">Reset & Clear Data</button>
-            </div>
-        </div>
-        
-        <!-- Set Target Section -->
-        <div id="set-target-section" class="hidden bg-slate-800 p-6 rounded-lg shadow-lg mb-6 text-center">
-            <h2 id="set-target-title" class="text-2xl font-bold mb-2">Set Initial Target</h2>
-            <p class="mb-4 text-slate-300"><span id="target-setter-name" class="font-bold text-amber-300"></span>, set the target segment.</p>
-            <div id="target-selection-grid" class="mt-4 text-left max-h-[60vh] overflow-y-auto">
-                <!-- Buttons will be generated by JS here -->
-            </div>
-        </div>
-
-        <!-- Game Section -->
-        <div id="game-section" class="hidden">
-            <!-- Game Controls -->
-            <div id="game-controls" class="bg-slate-800 p-4 rounded-lg shadow-lg mb-6 text-center">
-                <h2 class="text-2xl font-bold mb-2"><span id="turn-player-name" class="text-amber-300"></span>'s Turn</h2>
-                <p class="text-5xl text-slate-300">Current Target: <span id="current-target-display" class="font-bold text-yellow-300"></span></p>
-                <div id="action-buttons" class="mt-4 grid grid-cols-5 gap-3">
-                     <button id="became-killer-btn" class="btn col-span-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md transition-transform">Hit Target & Became Killer</button>
-                     <button id="failed-turn-btn" class="btn col-span-2 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-md transition-transform">Failed to Hit Target (-1 Life)</button>
-                     <button id="undo-turn-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-md transition-transform flex justify-center items-center" title="Undo last action">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-                        </svg>
-                     </button>
-                </div>
-            </div>
+        <!-- Main Content Area -->
+        <main class="flex-1 relative overflow-hidden flex flex-col">
             
-            <!-- Player Status Grid -->
-            <div id="player-status-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Player cards will be generated here -->
+            <!-- VIEW: Setup -->
+            <div id="setup-view" class="absolute inset-0 z-20 bg-gray-900 flex flex-col p-6 overflow-y-auto">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-users text-3xl text-red-500"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
+                    <p class="text-gray-400 text-sm">Add players to begin the hunt.</p>
+                </div>
+
+                <div class="space-y-4 flex-1">
+                    <div id="player-inputs" class="space-y-3">
+                        <!-- Player list generated here -->
+                    </div>
+                    
+                    <div class="flex gap-2 mt-4">
+                        <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
+                        <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="start-game-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Start Game
+                </button>
             </div>
-             <!-- Eliminated Players Area -->
-            <div id="eliminated-area" class="mt-8 hidden">
-                <h3 class="text-xl font-semibold text-slate-400 border-b-2 border-slate-600 pb-2 mb-4">Eliminated</h3>
-                <div id="eliminated-players-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Eliminated player cards will be generated here -->
+
+            <!-- VIEW: Target Selection -->
+            <div id="target-view" class="absolute inset-0 z-30 bg-gray-900 flex flex-col hidden">
+                <div class="bg-gray-800 p-4 border-b border-gray-700">
+                    <h2 id="target-title" class="text-lg font-bold text-white text-center">Set Target</h2>
+                    <p class="text-center text-sm text-gray-400"><span id="target-setter-name" class="text-yellow-400 font-bold">Player</span> is choosing...</p>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4">
+                    <div id="target-grid-numbers" class="grid grid-cols-5 gap-3 mb-4">
+                        <!-- 1-20 buttons -->
+                    </div>
+                    <div id="target-grid-bull" class="grid grid-cols-2 gap-3 mb-4">
+                         <button class="target-btn bg-gray-700 p-4 rounded-xl font-bold text-white border border-gray-600" data-bull="SB">SB</button>
+                         <button class="target-btn bg-red-900/50 p-4 rounded-xl font-bold text-red-400 border border-red-800" data-bull="DB">DB</button>
+                    </div>
+
+                    <!-- Multiplier Selection (Hidden initially) -->
+                    <div id="target-multipliers" class="hidden flex flex-col gap-3 h-full">
+                         <button id="back-to-nums" class="mb-2 text-gray-400 flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Back to Numbers</button>
+                         <div class="grid grid-cols-2 gap-3 flex-1">
+                             <!-- Multipliers injected here -->
+                         </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
-        <div class="bg-slate-700 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
-            <h2 class="text-3xl font-bold text-amber-300 mb-4">Game Over!</h2>
-            <p id="winner-message" class="text-xl mb-6"></p>
-            <button id="new-game-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-md transition-colors w-full">Play Again</button>
-        </div>
+
+            <!-- VIEW: Gameplay -->
+            <div id="game-view" class="absolute inset-0 bg-gray-900 flex flex-col hidden">
+                
+                <!-- Info Banner -->
+                <div class="bg-gray-800 p-4 shadow-md z-10 border-b border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Killer</span>
+                            <div class="text-xl font-bold text-red-400 truncate max-w-[150px]" id="current-killer-name">
+                                -
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Target</span>
+                            <div class="text-3xl font-bold text-yellow-400" id="game-target-display">
+                                -
+                            </div>
+                        </div>
+                        <div class="text-right">
+                             <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Turn</span>
+                             <div class="text-xl font-bold text-white truncate max-w-[150px]" id="current-turn-name">
+                                -
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player List -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-3" id="players-container">
+                    <!-- Player Cards Injected Here -->
+                </div>
+
+                <!-- Controls -->
+                <div class="bg-gray-800 border-t border-gray-700 p-3 z-20 pb-6">
+                     <div class="grid grid-cols-5 gap-2 h-20">
+                        <button id="undo-btn" class="col-span-1 bg-gray-700 text-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-600 action-btn">
+                            <i class="fa-solid fa-rotate-left text-xl"></i>
+                        </button>
+                        <button id="miss-btn" class="col-span-2 bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl flex flex-col items-center justify-center hover:bg-red-500/20 action-btn">
+                            <span class="text-xl font-bold">MISS</span>
+                            <span class="text-xs opacity-75">Lose Life</span>
+                        </button>
+                        <button id="hit-btn" class="col-span-2 bg-green-500/10 border border-green-500/50 text-green-500 rounded-xl flex flex-col items-center justify-center hover:bg-green-500/20 action-btn">
+                            <span class="text-xl font-bold">HIT</span>
+                            <span class="text-xs opacity-75">Become Killer</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Results -->
+            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col p-6 hidden">
+                <div class="text-center mb-8 pt-10">
+                    <i class="fa-solid fa-trophy text-6xl text-yellow-400 mb-6 animate-bounce"></i>
+                    <h2 class="text-4xl font-bold text-white mb-2">Game Over!</h2>
+                    <p class="text-xl text-gray-400" id="winner-name">Player Wins</p>
+                </div>
+                
+                <div class="flex-1 flex flex-col justify-end gap-4 pb-10">
+                    <button id="new-game-btn" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all">
+                        Play Again
+                    </button>
+                    <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
+                        Return to Menu
+                    </a>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <!-- Confirm Clear Modal -->
-    <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
-            <h2 class="text-2xl font-bold text-yellow-300 mb-4">Leave Game?</h2>
-            <p class="text-slate-300 mb-6">This will clear the current game's data and return you to the main screen. This action cannot be undone.</p>
-            <div class="flex justify-center gap-4">
-                <button id="cancel-clear-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-md w-full">Cancel</button>
-                <button id="confirm-clear-action-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md w-full">Confirm</button>
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-gray-800 p-6 rounded-2xl max-w-xs w-full shadow-2xl border border-gray-700">
+            <h3 class="text-xl font-bold text-white mb-2">Reset Game?</h3>
+            <p class="text-gray-400 mb-6 text-sm">This will clear all current progress.</p>
+            <div class="flex gap-3">
+                <button id="cancel-reset" class="flex-1 py-3 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-600">Cancel</button>
+                <button id="confirm-reset" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700">Reset</button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- State Management ---
+        const STORAGE_KEY = 'killerDarts_v2_state';
+
+        let gameState = {
+            players: [], // { name, lives, isAlive }
+            phase: 'setup', // 'setup', 'target_init', 'target_new', 'playing', 'over'
+            currentPlayerIndex: 0,
+            killerPlayerIndex: 0,
+            currentTarget: null,
+            targetDraft: { number: null }, // Temp state for target selection UI
+            history: [] // For undo
+        };
+
+        // --- DOM Elements ---
+        const views = {
+            setup: document.getElementById('setup-view'),
+            target: document.getElementById('target-view'),
+            game: document.getElementById('game-view'),
+            results: document.getElementById('results-view')
+        };
+        const modals = {
+            confirm: document.getElementById('confirm-modal')
+        };
+
+        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            let previousGameState = null;
+            loadState();
+            setupTargetGrid();
+            render();
+        });
 
-            // --- STATE MANAGEMENT & PERSISTENCE ---
-            const STORAGE_KEY = 'killerDartsGameState';
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+        }
 
-            const getInitialState = () => ({
-                players: [], // { name: string, lives: int }
-                gamePhase: 'setup', // 'setup', 'set_initial_target', 'set_new_target', 'playing', 'over'
-                currentPlayerIndex: 0,
-                killerPlayerIndex: 0,
-                currentTarget: null,
-                targetSelection: {
-                    step: 'number', // 'number', 'multiplier'
-                    number: null,
-                },
-            });
-
-            const saveState = () => {
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
-                } catch (e) {
-                    console.error("Failed to save state to localStorage", e);
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    gameState = JSON.parse(saved);
                 }
-            };
+            } catch (e) {
+                console.error("Save load error", e);
+            }
+        }
 
-            const loadState = () => {
-                try {
-                    const savedState = localStorage.getItem(STORAGE_KEY);
-                    return savedState ? JSON.parse(savedState) : getInitialState();
-                } catch (e) {
-                    console.error("Failed to load state from localStorage", e);
-                    return getInitialState();
-                }
-            };
+        function pushHistory() {
+            // Keep last 5 moves
+            const stateCopy = JSON.parse(JSON.stringify(gameState));
+            stateCopy.history = []; // Don't nest history
+            gameState.history.push(stateCopy);
+            if(gameState.history.length > 5) gameState.history.shift();
+        }
 
-            let gameState = loadState();
+        function switchView(viewName) {
+            Object.values(views).forEach(el => el.classList.add('hidden'));
+            if(views[viewName]) views[viewName].classList.remove('hidden');
+        }
 
-            // --- DOM ELEMENTS ---
-            const clearStorageBtn = document.getElementById('clear-storage-btn');
-            const subtitleEl = document.getElementById('game-phase-subtitle');
-            const playerSetupEl = document.getElementById('player-setup');
-            const addPlayerBtn = document.getElementById('add-player-btn');
-            const newPlayerNameInput = document.getElementById('new-player-name');
-            const playerListEl = document.getElementById('player-list');
-            const startGameBtn = document.getElementById('start-game-btn');
-            const resetDataBtn = document.getElementById('reset-data-btn');
-            
-            const setTargetSectionEl = document.getElementById('set-target-section');
-            const setTargetTitleEl = document.getElementById('set-target-title');
-            const targetSetterNameEl = document.getElementById('target-setter-name');
-            const targetSelectionGridEl = document.getElementById('target-selection-grid');
+        function render() {
+            switchView(gameState.phase === 'target_init' || gameState.phase === 'target_new' ? 'target' : 
+                       gameState.phase === 'playing' ? 'game' : 
+                       gameState.phase === 'over' ? 'results' : 'setup');
 
-            const gameSectionEl = document.getElementById('game-section');
-            const turnPlayerNameEl = document.getElementById('turn-player-name');
-            const currentTargetDisplayEl = document.getElementById('current-target-display');
-            const playerStatusGridEl = document.getElementById('player-status-grid');
-            const eliminatedAreaEl = document.getElementById('eliminated-area');
-            const eliminatedPlayersGridEl = document.getElementById('eliminated-players-grid');
-            
-            const becameKillerBtn = document.getElementById('became-killer-btn');
-            const failedTurnBtn = document.getElementById('failed-turn-btn');
-            const undoTurnBtn = document.getElementById('undo-turn-btn');
-            
-            const winnerModal = document.getElementById('winner-modal');
-            const winnerMessage = document.getElementById('winner-message');
-            const newGameBtn = document.getElementById('new-game-btn');
-            const confirmClearModal = document.getElementById('confirm-clear-modal');
-            const cancelClearBtn = document.getElementById('cancel-clear-btn');
-            const confirmClearActionBtn = document.getElementById('confirm-clear-action-btn');
+            if (gameState.phase === 'setup') {
+                renderSetup();
+            } else if (gameState.phase.startsWith('target')) {
+                renderTargetSelection();
+            } else if (gameState.phase === 'playing') {
+                renderGame();
+            } else if (gameState.phase === 'over') {
+                renderResults();
+            }
+        }
 
-            // --- RENDER FUNCTIONS ---
-            const render = () => {
-                playerSetupEl.classList.add('hidden');
-                setTargetSectionEl.classList.add('hidden');
-                gameSectionEl.classList.add('hidden');
-                
-                switch (gameState.gamePhase) {
-                    case 'setup':
-                        subtitleEl.textContent = 'Add at least 2 players to begin.';
-                        playerSetupEl.classList.remove('hidden');
-                        renderPlayerSetupList();
-                        break;
-                    case 'set_initial_target':
-                    case 'set_new_target':
-                        subtitleEl.textContent = 'A new challenger sets the target...';
-                        setTargetSectionEl.classList.remove('hidden');
-                        renderSetTarget();
-                        break;
-                    case 'playing':
-                        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-                        subtitleEl.textContent = `Current Killer: ${gameState.players[gameState.killerPlayerIndex].name}`;
-                        gameSectionEl.classList.remove('hidden');
-                        renderGameboard();
-                        break;
-                    case 'over':
-                        subtitleEl.textContent = 'The battle is done!';
-                        gameSectionEl.classList.remove('hidden');
-                        renderGameboard(); // Show final board
-                        break;
-                }
-            };
-
-            const renderPlayerSetupList = () => {
-                playerListEl.innerHTML = '';
-                gameState.players.forEach((player, index) => {
-                    const playerTag = document.createElement('div');
-                    playerTag.className = 'bg-slate-700 rounded-full px-4 py-2 flex items-center gap-3';
-                    playerTag.innerHTML = `
-                        <span class="font-semibold">${player.name}</span>
-                        <button data-index="${index}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button>
-                    `;
-                    playerListEl.appendChild(playerTag);
-                });
-                startGameBtn.disabled = gameState.players.length < 2;
-            };
-
-            const renderSetTarget = () => {
-                const setterIndex = gameState.gamePhase === 'set_initial_target' ? 0 : gameState.currentPlayerIndex;
-                const setter = gameState.players[setterIndex];
-                setTargetTitleEl.textContent = gameState.gamePhase === 'set_initial_target' ? 'Set Initial Target' : 'Set NEW Target';
-                targetSetterNameEl.textContent = setter.name;
-                
-                targetSelectionGridEl.innerHTML = ''; // Clear previous buttons
-
-                if (gameState.targetSelection.step === 'number') {
-                    // This is the first screen for target selection
-                    const header = document.createElement('div');
-                    header.className = 'flex justify-end items-center mb-4';
-                    const backBtn = document.createElement('button');
-                    backBtn.className = 'btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-md transition-transform flex justify-center items-center';
-                    backBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>`;
-
-                    if (gameState.gamePhase === 'set_new_target') {
-                        // Add a "Back to Game" button when setting a *new* target
-                        backBtn.dataset.action = 'backToGame';
-                        backBtn.title = 'Back to Game';
-                        header.appendChild(backBtn);
-                        targetSelectionGridEl.appendChild(header);
-                    } else if (gameState.gamePhase === 'set_initial_target') {
-                        // Add a "Back to Setup" button when setting the *initial* target
-                        backBtn.dataset.action = 'backToSetup';
-                        backBtn.title = 'Back to Player Setup';
-                        header.appendChild(backBtn);
-                        targetSelectionGridEl.appendChild(header);
-                    }
-                    renderNumberSelection();
-                } else {
-                    renderMultiplierSelection(); // This one already has its own back button
-                }
-            };
-
-            const renderNumberSelection = () => {
-                const createSection = (title, elements, gridCols = 'sm:grid-cols-10') => {
-                    const sectionEl = document.createElement('div');
-                    sectionEl.className = 'mb-4';
-                    sectionEl.innerHTML = `<h3 class="text-lg font-semibold text-amber-300 mb-2">${title}</h3>`;
-                    const gridEl = document.createElement('div');
-                    gridEl.className = `grid grid-cols-7 ${gridCols} gap-2`;
-                    elements.forEach(el => gridEl.appendChild(el));
-                    sectionEl.appendChild(gridEl);
-                    return sectionEl;
-                };
-
-                const numberButtons = Array.from({length: 20}, (_, i) => {
-                    const num = 20 - i;
-                    const btn = document.createElement('button');
-                    btn.className = 'btn bg-slate-600 hover:bg-slate-500 rounded-md p-2 text-sm sm:text-base font-bold aspect-square flex items-center justify-center transition-transform text-center';
-                    btn.dataset.number = num;
-                    btn.textContent = num;
-                    return btn;
-                });
-                targetSelectionGridEl.appendChild(createSection('Numbers', numberButtons));
-
-                const bullButtons = [];
-                const sbBtn = document.createElement('button');
-                sbBtn.className = 'btn bg-slate-600 hover:bg-slate-500 rounded-md p-2 text-sm sm:text-base font-bold flex items-center justify-center transition-transform text-center';
-                sbBtn.dataset.bull = 'SB';
-                sbBtn.textContent = 'Single Bull';
-                bullButtons.push(sbBtn);
-
-                const dbBtn = document.createElement('button');
-                dbBtn.className = 'btn bg-red-600 hover:bg-red-700 rounded-md p-2 text-sm sm:text-base font-bold flex items-center justify-center transition-transform text-center';
-                dbBtn.dataset.bull = 'DB';
-                dbBtn.textContent = 'Double Bull';
-                bullButtons.push(dbBtn);
-
-                targetSelectionGridEl.appendChild(createSection('Bullseye', bullButtons, 'grid-cols-2'));
-            };
-
-            const renderMultiplierSelection = () => {
-                const selectedNum = gameState.targetSelection.number;
-                const multiplierContainer = document.createElement('div');
-
-                const header = document.createElement('div');
-                header.className = 'flex justify-between items-center mb-4';
-                header.innerHTML = `<h3 class="text-lg font-semibold text-amber-300">Select Type for <span class="text-white text-2xl">${selectedNum}</span></h3>`;
-                
-                const backBtn = document.createElement('button');
-                backBtn.className = 'btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-md transition-transform flex justify-center items-center';
-                backBtn.dataset.action = 'back';
-                backBtn.title = 'Back to number selection';
-                backBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>`;
-                header.appendChild(backBtn);
-                multiplierContainer.appendChild(header);
-
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-3';
-                multiplierContainer.appendChild(grid);
-                
-                targetSelectionGridEl.appendChild(multiplierContainer);
-
-
-                const multipliers = {
-                    'T': { label: 'Triple', style: 'border-red-500 text-red-400'},
-                    'D': { label: 'Double', style: 'border-green-500 text-green-400'},
-                    'S': { label: 'Single (Skinny)', style: 'border-slate-500 text-slate-300'},
-                    'F': { label: 'Single (Fat)', style: 'border-slate-500 text-slate-300'},
-                };
-
-                Object.entries(multipliers).forEach(([key, val]) => {
-                    const btn = document.createElement('button');
-                    btn.className = `btn bg-slate-700 hover:bg-slate-600 rounded-md p-4 text-base sm:text-lg font-bold transition-transform text-center border-2 ${val.style}`;
-                    btn.dataset.multiplier = key;
-                    btn.textContent = val.label;
-                    grid.appendChild(btn);
-                });
-
-                const NipTargets = {
-                    4: ['(.)'], 6: ['(.)'], 8: ['(.) Inner', '(.) Outer'], 9: ['(.)'], 10: ['(.)'], 14: ['(.)'], 16: ['(.)'], 18: ['(.) Inner', '(.) Outer'], 19: ['(.)'], 20: ['(.)']
-                };
-
-                if (NipTargets[selectedNum]) {
-                    NipTargets[selectedNum].forEach(nType => {
-                         const btn = document.createElement('button');
-                         btn.className = 'btn bg-slate-700 hover:bg-slate-600 rounded-md p-4 text-base sm:text-lg font-bold transition-transform text-center border-2 border-sky-500 text-sky-400';
-                         btn.dataset.multiplier = nType;
-                         btn.textContent = nType;
-                         grid.appendChild(btn);
-                    });
-                }
-            };
-
-            const createPlayerCard = (player, originalIndex) => {
-                const card = document.createElement('div');
-                card.className = 'player-card bg-slate-700 p-4 rounded-lg shadow-md flex flex-col items-center';
-                
-                if (originalIndex === gameState.killerPlayerIndex) card.classList.add('is-killer');
-                if (player.lives <= 0) card.classList.add('eliminated');
-                if (gameState.gamePhase === 'playing' && originalIndex === gameState.currentPlayerIndex) {
-                    card.classList.add('current-player-turn');
-                }
-
-                const livesHTML = Array(5).fill(0).map((_, i) =>
-                    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 ${i < player.lives ? 'life' : 'text-slate-600'}">
-                      <path d="M11.645 20.91a.75.75 0 0 1-1.29 0C8.633 16.53 3.75 12.25 3.75 8.25 3.75 5.58 5.58 3.75 8.25 3.75c1.74 0 3.32.81 4.25 2.08 1.03-1.27 2.51-2.08 4.25-2.08 2.67 0 4.5 1.83 4.5 4.5 0 4-4.883 8.28-6.605 12.66Z" />
-                    </svg>`).join('');
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between w-full">
-                       <span class="text-xl font-bold">${player.name}</span>
-                    </div>
-                    <div class="text-base font-semibold mt-2">${originalIndex === gameState.killerPlayerIndex ? 'KILLER' : 'Hunter'}</div>
-                    <div class="flex gap-1 mt-3">${livesHTML}</div>
+        // --- Setup Logic ---
+        const playerInputsContainer = document.getElementById('player-inputs');
+        const newPlayerInput = document.getElementById('new-player-name');
+        
+        function renderSetup() {
+            playerInputsContainer.innerHTML = '';
+            gameState.players.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700";
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-400">${i+1}</div>
+                    <span class="flex-1 font-semibold text-white">${p.name}</span>
+                    <button onclick="removePlayer(${i})" class="text-red-400 hover:text-red-300 p-2"><i class="fa-solid fa-trash"></i></button>
                 `;
-                return card;
-            };
+                playerInputsContainer.appendChild(div);
+            });
+            document.getElementById('start-game-btn').disabled = gameState.players.length < 2;
+        }
 
-            const renderGameboard = () => {
-                playerStatusGridEl.innerHTML = '';
-                eliminatedPlayersGridEl.innerHTML = '';
+        document.getElementById('add-player-btn').addEventListener('click', addPlayer);
+        newPlayerInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addPlayer() });
 
-                const activePlayerInfos = [];
-                const eliminatedPlayerInfos = [];
-                gameState.players.forEach((player, originalIndex) => {
-                    const info = { player, originalIndex };
-                    if (player.lives > 0) {
-                        activePlayerInfos.push(info);
-                    } else {
-                        eliminatedPlayerInfos.push(info);
-                    }
-                });
-
-                eliminatedAreaEl.classList.toggle('hidden', eliminatedPlayerInfos.length === 0);
-                eliminatedPlayerInfos.forEach(info => {
-                    eliminatedPlayersGridEl.appendChild(createPlayerCard(info.player, info.originalIndex));
-                });
-
-                const numActivePlayers = activePlayerInfos.length;
-                if (numActivePlayers > 0) {
-                     const currentActivePlayerIndex = activePlayerInfos.findIndex(info => info.originalIndex === gameState.currentPlayerIndex);
-                    const startIndex = currentActivePlayerIndex === -1 ? 0 : currentActivePlayerIndex;
-
-                    for (let i = 0; i < numActivePlayers; i++) {
-                        const activeIndex = (startIndex + i) % numActivePlayers;
-                        const info = activePlayerInfos[activeIndex];
-                        playerStatusGridEl.appendChild(createPlayerCard(info.player, info.originalIndex));
-                    }
-                }
-                
-                if (gameState.gamePhase === 'playing') {
-                    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-                    if (currentPlayer) {
-                        turnPlayerNameEl.textContent = currentPlayer.name;
-                        currentTargetDisplayEl.textContent = gameState.currentTarget;
-                        const isKiller = gameState.currentPlayerIndex === gameState.killerPlayerIndex;
-                        document.getElementById('action-buttons').classList.toggle('hidden', isKiller);
-                        undoTurnBtn.disabled = !previousGameState;
-                    }
-                }
-            };
-
-            // --- GAME LOGIC ---
-            const addPlayer = () => {
-                const name = newPlayerNameInput.value.trim();
-                if (name && gameState.gamePhase === 'setup') {
-                    gameState.players.push({ name, lives: 5 });
-                    newPlayerNameInput.value = '';
-                    saveState();
-                    render();
-                }
-            };
-
-            const removePlayer = (index) => {
-                if (gameState.gamePhase === 'setup') {
-                    gameState.players.splice(index, 1);
-                    saveState();
-                    render();
-                }
-            };
-            
-            const selectTarget = (target) => {
-                if (gameState.gamePhase === 'set_new_target') {
-                    previousGameState = JSON.parse(JSON.stringify(gameState));
-                } else {
-                    previousGameState = null;
-                }
-                // If we are setting a new target, the current player officially becomes the new killer.
-                if (gameState.gamePhase === 'set_new_target') {
-                    gameState.killerPlayerIndex = gameState.currentPlayerIndex;
-                }
-                gameState.currentTarget = target;
-                gameState.gamePhase = 'playing';
-                gameState.targetSelection = { step: 'number', number: null }; // Reset for next time
-                nextTurn(false); // don't save here, will be saved below
-                saveState();
-                render();
-            };
-
-            const nextTurn = (shouldSave = true) => {
-                let nextIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
-                let loops = 0; // safety break
-                while (gameState.players[nextIndex].lives <= 0 && loops < gameState.players.length) {
-                    nextIndex = (nextIndex + 1) % gameState.players.length;
-                    loops++;
-                }
-                gameState.currentPlayerIndex = nextIndex;
-
-                const playersWithLives = gameState.players.filter(p => p.lives > 0);
-                if (playersWithLives.length <= 1) {
-                    endGame();
-                } else {
-                    if (gameState.currentPlayerIndex === gameState.killerPlayerIndex) {
-                        nextTurn(false); // Recursively find the next non-killer player
-                        return;
-                    }
-                    if (shouldSave) saveState();
-                    render();
-                }
-            };
-            
-            const undoTurn = () => {
-                if (previousGameState) {
-                    gameState = JSON.parse(JSON.stringify(previousGameState));
-                    previousGameState = null;
-                    saveState();
-                    render();
-                }
-            };
-
-            const handleBecameKiller = () => {
-                gameState.gamePhase = 'set_new_target';
-                saveState();
-                render();
-            };
-
-            const handleFailedTurn = () => {
-                previousGameState = JSON.parse(JSON.stringify(gameState));
-                const player = gameState.players[gameState.currentPlayerIndex];
-                player.lives--;
-                if (player.lives <= 0) {
-                    const playersWithLives = gameState.players.filter(p => p.lives > 0);
-                    if (playersWithLives.length <= 1) {
-                        endGame();
-                        return;
-                    }
-                }
-                nextTurn();
-            };
-
-            const endGame = () => {
-                gameState.gamePhase = 'over';
-                document.getElementById('game-controls').classList.add('hidden');
-                const winner = gameState.players.find(p => p.lives > 0);
-                winnerMessage.textContent = winner ? `${winner.name} is the Killer Champion!` : "It's a draw!";
-                winnerModal.classList.remove('hidden');
-                saveState();
-                render();
-            };
-            
-            const newGame = () => {
-                previousGameState = null;
-                // Keep players, reset scores and state
-                gameState.players.forEach(p => p.lives = 5);
-                gameState.gamePhase = 'set_initial_target';
-                gameState.currentPlayerIndex = 0;
-                gameState.killerPlayerIndex = 0;
-                gameState.currentTarget = null;
-                gameState.targetSelection = { step: 'number', number: null };
-                winnerModal.classList.add('hidden');
-                document.getElementById('action-buttons').classList.remove('hidden');
-                saveState();
-                render();
-            };
-
-            const resetAndClearData = () => {
-                previousGameState = null;
-                gameState = getInitialState();
+        function addPlayer() {
+            const name = newPlayerInput.value.trim();
+            if (name) {
+                gameState.players.push({ name, lives: 5, isAlive: true });
+                newPlayerInput.value = '';
                 saveState();
                 render();
             }
+        }
 
-            // --- EVENT LISTENERS ---
-            addPlayerBtn.addEventListener('click', addPlayer);
-            newPlayerNameInput.addEventListener('keypress', e => e.key === 'Enter' && addPlayer());
-            playerListEl.addEventListener('click', e => {
-                if (e.target.classList.contains('remove-player-btn')) {
-                    removePlayer(parseInt(e.target.dataset.index, 10));
-                }
-            });
+        window.removePlayer = (index) => {
+            gameState.players.splice(index, 1);
+            saveState();
+            render();
+        };
 
-            startGameBtn.addEventListener('click', () => {
-                gameState.gamePhase = 'set_initial_target';
-                gameState.killerPlayerIndex = 0;
-                gameState.currentPlayerIndex = 0;
-                gameState.targetSelection = { step: 'number', number: null };
-                saveState();
-                render();
-            });
-
-            targetSelectionGridEl.addEventListener('click', (e) => {
-                const button = e.target.closest('button');
-                if (!button) return;
-
-                const { number, bull, multiplier, action } = button.dataset;
-
-                if (action === 'back') {
-                    gameState.targetSelection.step = 'number';
-                    gameState.targetSelection.number = null;
-                    saveState();
-                    renderSetTarget();
-                    return;
-                }
-                
-                if (action === 'backToGame') {
-                    gameState.gamePhase = 'playing';
-                    saveState();
-                    render();
-                    return;
-                }
-
-                if (action === 'backToSetup') {
-                    gameState.gamePhase = 'setup';
-                    saveState();
-                    render();
-                    return;
-                }
-
-                if (bull) {
-                    selectTarget(bull);
-                    return;
-                }
-
-                if (number) {
-                    gameState.targetSelection.step = 'multiplier';
-                    gameState.targetSelection.number = number;
-                    saveState();
-                    renderSetTarget();
-                    return;
-                }
-
-                if (multiplier) {
-                    const num = gameState.targetSelection.number;
-                    let target;
-                    if (multiplier.startsWith('(.)')) {
-                        const parts = multiplier.split(' ');
-                        if (parts.length > 1) {
-                             target = `${parts[0]}${num} ${parts.slice(1).join(' ')}`;
-                        } else {
-                             target = `${parts[0]}${num}`;
-                        }
-                    } else {
-                        target = `${multiplier}${num}`;
-                    }
-                    selectTarget(target);
-                }
-            });
-
-            becameKillerBtn.addEventListener('click', handleBecameKiller);
-            failedTurnBtn.addEventListener('click', handleFailedTurn);
-            undoTurnBtn.addEventListener('click', undoTurn);
-            newGameBtn.addEventListener('click', newGame);
-
-            // Modal Logic
-            let onConfirmAction = null;
-
-            const showConfirmModal = (action) => {
-                onConfirmAction = action;
-                confirmClearModal.classList.remove('hidden');
-            };
-
-            const hideConfirmModal = () => {
-                onConfirmAction = null;
-                confirmClearModal.classList.add('hidden');
-            };
-
-            confirmClearActionBtn.addEventListener('click', () => {
-                if (typeof onConfirmAction === 'function') {
-                    onConfirmAction();
-                }
-                hideConfirmModal();
-            });
-
-            cancelClearBtn.addEventListener('click', hideConfirmModal);
-
-            resetDataBtn.addEventListener('click', () => {
-                showConfirmModal(() => {
-                    resetAndClearData();
-                });
-            });
-
-            clearStorageBtn.addEventListener('click', () => {
-                showConfirmModal(() => {
-                    resetAndClearData();
-                    window.location.href = 'bardarts.html';
-                });
-            });
-
-            // Initial Render on Load
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            gameState.phase = 'target_init';
+            gameState.currentPlayerIndex = 0;
+            gameState.killerPlayerIndex = 0;
+            gameState.history = [];
+            saveState();
             render();
         });
-    </script>
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(registration => {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, err => {
-                console.log('ServiceWorker registration failed: ', err);
+
+        // --- Target Selection Logic ---
+        function setupTargetGrid() {
+            const grid = document.getElementById('target-grid-numbers');
+            for(let i=20; i>=1; i--) {
+                const btn = document.createElement('button');
+                btn.className = "target-btn bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg p-2 aspect-square flex items-center justify-center border border-gray-600";
+                btn.textContent = i;
+                btn.onclick = () => selectNumber(i);
+                grid.appendChild(btn);
+            }
+
+            document.querySelectorAll('[data-bull]').forEach(btn => {
+                btn.addEventListener('click', (e) => selectBull(e.target.dataset.bull));
             });
+
+            document.getElementById('back-to-nums').addEventListener('click', () => {
+                gameState.targetDraft.number = null;
+                renderTargetSelection();
+            });
+        }
+
+        function renderTargetSelection() {
+            const title = document.getElementById('target-title');
+            const setterName = document.getElementById('target-setter-name');
+            const numGrid = document.getElementById('target-grid-numbers');
+            const bullGrid = document.getElementById('target-grid-bull');
+            const multipliers = document.getElementById('target-multipliers');
+
+            const setterIndex = gameState.phase === 'target_init' ? 0 : gameState.currentPlayerIndex;
+            setterName.textContent = gameState.players[setterIndex].name;
+            title.textContent = gameState.phase === 'target_init' ? 'Set Initial Target' : 'New Killer Target';
+
+            if (gameState.targetDraft.number === null) {
+                // Show Numbers
+                numGrid.classList.remove('hidden');
+                bullGrid.classList.remove('hidden');
+                multipliers.classList.add('hidden');
+            } else {
+                // Show Multipliers
+                numGrid.classList.add('hidden');
+                bullGrid.classList.add('hidden');
+                multipliers.classList.remove('hidden');
+                renderMultipliers(gameState.targetDraft.number);
+            }
+        }
+
+        function selectNumber(num) {
+            gameState.targetDraft.number = num;
+            renderTargetSelection();
+        }
+
+        function selectBull(type) {
+            confirmTarget(type === 'SB' ? 'Single Bull' : 'Double Bull');
+        }
+
+        function renderMultipliers(num) {
+            const container = document.querySelector('#target-multipliers .grid');
+            container.innerHTML = '';
+            
+            const options = [
+                { l: 'Single', v: `S${num}`, c: 'bg-gray-700 text-white' },
+                { l: 'Double', v: `D${num}`, c: 'bg-green-900/40 text-green-400 border border-green-800' },
+                { l: 'Treble', v: `T${num}`, c: 'bg-orange-900/40 text-orange-400 border border-orange-800' }
+            ];
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = `${opt.c} p-6 rounded-xl font-bold text-xl hover:opacity-80 transition-opacity`;
+                btn.innerHTML = `<div>${opt.v}</div><div class="text-xs opacity-60 font-normal uppercase">${opt.l}</div>`;
+                btn.onclick = () => confirmTarget(opt.v);
+                container.appendChild(btn);
+            });
+        }
+
+        function confirmTarget(target) {
+            if(gameState.phase === 'target_new') {
+                // The current player becomes the killer
+                gameState.killerPlayerIndex = gameState.currentPlayerIndex;
+            }
+            
+            gameState.currentTarget = target;
+            gameState.targetDraft.number = null;
+            gameState.phase = 'playing';
+            
+            // If it was initial setup, we don't advance turn yet, just start playing
+            if(gameState.phase !== 'target_init') {
+                advanceTurn(false); // don't recursively skip here, logic handles it
+            } else {
+                // Just started
+                gameState.phase = 'playing';
+            }
+            
+            saveState();
+            render();
+        }
+
+        // --- Game Logic ---
+        function renderGame() {
+            document.getElementById('game-target-display').textContent = gameState.currentTarget;
+            document.getElementById('current-killer-name').textContent = gameState.players[gameState.killerPlayerIndex].name;
+            document.getElementById('current-turn-name').textContent = gameState.players[gameState.currentPlayerIndex].name;
+
+            const container = document.getElementById('players-container');
+            container.innerHTML = '';
+
+            gameState.players.forEach((p, i) => {
+                const isKiller = i === gameState.killerPlayerIndex;
+                const isTurn = i === gameState.currentPlayerIndex;
+                const isDead = p.lives <= 0;
+
+                let borderClass = "border-gray-700";
+                let bgClass = "bg-gray-800";
+                let opacityClass = "opacity-100";
+                let shadowClass = "";
+
+                if (isDead) {
+                    opacityClass = "opacity-40";
+                    bgClass = "bg-gray-900";
+                } else if (isTurn) {
+                    borderClass = "border-yellow-500";
+                    bgClass = "bg-gray-750";
+                    shadowClass = "shadow-[0_0_15px_rgba(234,179,8,0.15)]";
+                }
+
+                if (isKiller && !isDead) {
+                    // Killer specific styling override or addition
+                    bgClass = isTurn ? "bg-red-900/20" : "bg-red-900/10";
+                    if(isTurn) borderClass = "border-red-500";
+                }
+
+                const livesHtml = Array(5).fill(0).map((_, idx) => {
+                    return `<i class="fa-solid fa-heart text-sm ${idx < p.lives ? 'text-red-500' : 'text-gray-700'}"></i>`;
+                }).join('');
+
+                const html = `
+                    <div class="${bgClass} border ${borderClass} ${shadowClass} ${opacityClass} rounded-xl p-4 transition-all relative overflow-hidden">
+                         ${isKiller ? '<div class="absolute top-0 right-0 p-2"><i class="fa-solid fa-skull text-red-500/50 text-4xl transform rotate-12"></i></div>' : ''}
+                        <div class="flex justify-between items-center relative z-10">
+                            <div>
+                                <h3 class="font-bold text-lg text-white">${p.name}</h3>
+                                <div class="text-xs text-gray-400 font-mono mt-1">${isKiller ? 'KILLER' : isDead ? 'ELIMINATED' : 'HUNTER'}</div>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <div class="flex gap-1 bg-gray-900/50 p-2 rounded-lg border border-gray-700/50">
+                                    ${livesHtml}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+
+            // Update Undo Button state
+            const undoBtn = document.getElementById('undo-btn');
+            if(gameState.history.length > 0) {
+                undoBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                undoBtn.disabled = false;
+            } else {
+                undoBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                undoBtn.disabled = true;
+            }
+            
+            // Hide Hit button if player is already killer
+            const hitBtn = document.getElementById('hit-btn');
+            const isCurrentKiller = gameState.currentPlayerIndex === gameState.killerPlayerIndex;
+            
+            if(isCurrentKiller) {
+                 hitBtn.classList.add('opacity-0', 'pointer-events-none');
+            } else {
+                 hitBtn.classList.remove('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        document.getElementById('hit-btn').addEventListener('click', () => {
+            pushHistory();
+            // Become new killer -> Set new target
+            gameState.phase = 'target_new';
+            saveState();
+            render();
         });
-    }
+
+        document.getElementById('miss-btn').addEventListener('click', () => {
+            pushHistory();
+            const player = gameState.players[gameState.currentPlayerIndex];
+            player.lives--;
+            
+            if (player.lives <= 0) {
+                player.isAlive = false;
+                checkWinCondition();
+            } else {
+                advanceTurn();
+                saveState();
+                render();
+            }
+        });
+
+        document.getElementById('undo-btn').addEventListener('click', () => {
+            if (gameState.history.length > 0) {
+                gameState = gameState.history.pop();
+                saveState();
+                render();
+            }
+        });
+
+        function advanceTurn(skipChecks = false) {
+            let loops = 0;
+            const total = gameState.players.length;
+            
+            do {
+                gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % total;
+                loops++;
+            } while (
+                (!gameState.players[gameState.currentPlayerIndex].isAlive || 
+                 gameState.currentPlayerIndex === gameState.killerPlayerIndex) && 
+                loops < total * 2
+            );
+
+            // Special case: If only the killer is left alive (handled in checkWinCondition), or logic stuck
+            // This loop skips dead players AND the killer himself (since killer doesn't shoot at himself usually, 
+            // but in some variations they do. Assuming Standard Killer: Killer waits for others to fail)
+            
+            // If we looped back to killer because everyone else is dead, the killer wins.
+            if(gameState.currentPlayerIndex === gameState.killerPlayerIndex) {
+                 // Check if anyone else is alive
+                 const othersAlive = gameState.players.filter((p,i) => i !== gameState.killerPlayerIndex && p.isAlive).length;
+                 if(othersAlive === 0) {
+                     checkWinCondition();
+                 }
+            }
+        }
+
+        function checkWinCondition() {
+            const alive = gameState.players.filter(p => p.isAlive);
+            if (alive.length === 1) {
+                gameState.phase = 'over';
+                saveState();
+                render();
+            } else if (alive.length === 0) {
+                // Should not happen, but fallback
+                gameState.phase = 'over';
+                saveState();
+                render();
+            } else {
+                // Game continues
+                advanceTurn();
+                saveState();
+                render();
+            }
+        }
+
+        // --- Results Logic ---
+        function renderResults() {
+            const winner = gameState.players.find(p => p.isAlive);
+            document.getElementById('winner-name').textContent = winner ? winner.name : "No Winner";
+        }
+
+        document.getElementById('new-game-btn').addEventListener('click', () => {
+            resetGame();
+        });
+
+        // --- Reset / Modals ---
+        const resetBtn = document.getElementById('reset-data-btn');
+        const confirmBtn = document.getElementById('confirm-reset');
+        const cancelBtn = document.getElementById('cancel-reset');
+
+        resetBtn.addEventListener('click', () => modals.confirm.classList.remove('hidden'));
+        cancelBtn.addEventListener('click', () => modals.confirm.classList.add('hidden'));
+        confirmBtn.addEventListener('click', () => {
+            resetGame();
+            modals.confirm.classList.add('hidden');
+        });
+
+        function resetGame() {
+            // Keep players but reset lives
+            gameState.players.forEach(p => {
+                p.lives = 5;
+                p.isAlive = true;
+            });
+            gameState.phase = 'setup';
+            gameState.history = [];
+            gameState.currentPlayerIndex = 0;
+            gameState.killerPlayerIndex = 0;
+            gameState.currentTarget = null;
+            saveState();
+            render();
+        }
+
     </script>
 </body>
 </html>

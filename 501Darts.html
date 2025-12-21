@@ -5,415 +5,412 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>501 Scorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <meta name="theme-color" content="#1E3A8A">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a202c">
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
         body {
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            overscroll-behavior: none;
         }
-        .player-card {
-            transition: all 0.3s ease-in-out;
-            border: 2px solid transparent;
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-        .current-player-turn {
-            border-color: #3B82F6; /* blue-500 */
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-            transform: scale(1.02);
+        ::-webkit-scrollbar-track {
+            background: #2d3748; 
         }
-        .btn {
-            transition: all 0.15s ease-in-out;
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; 
+            border-radius: 4px;
         }
-        .btn:disabled {
-            background-color: #4b5563;
-            cursor: not-allowed;
-            opacity: 0.7;
+
+        .action-btn {
+            transition: all 0.2s;
+            touch-action: manipulation;
         }
-        .btn:active:not(:disabled) {
+        .action-btn:active {
             transform: scale(0.95);
         }
-        .winner-highlight {
-            animation: winner-pulse 2s infinite;
+
+        .input-focus-ring:focus {
+            outline: 2px solid #60a5fa; /* Blue-400 */
+            outline-offset: 2px;
         }
-        @keyframes winner-pulse {
-            0% { background-color: #22c55e; } /* green-500 */
-            50% { background-color: #4ade80; } /* green-400 */
-            100% { background-color: #22c55e; } /* green-500 */
+
+        .numpad-btn {
+            touch-action: manipulation;
         }
-        /* Custom scrollbar for better look in dark mode */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        .numpad-btn:active {
+            background-color: #4b5563;
+        }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+<body class="h-screen w-screen overflow-hidden flex flex-col">
 
-    <div id="clear-storage-btn" class="hidden fixed top-4 left-4 z-50 bg-red-600 hover:bg-red-700 p-2 rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110" title="Clear data & return home">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    </div>
-
-    <!-- App container now controls padding and vertical growth -->
-    <div id="app" class="w-full max-w-6xl mx-auto flex flex-col flex-grow p-4 sm:p-6">
-        <header class="text-center mb-6">
-            <h1 class="text-4xl sm:text-5xl font-bold text-blue-400">501</h1>
-            <p class="text-slate-400 mt-1">First to zero with a double-out wins!</p>
+    <!-- App Container -->
+    <div id="app" class="relative w-full h-full max-w-lg mx-auto flex flex-col bg-gray-900 shadow-2xl">
+        
+        <!-- Header -->
+        <header class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-hashtag text-blue-500 text-xl"></i>
+                <h1 class="text-xl font-bold text-white tracking-wide">501 Darts</h1>
+            </div>
+            <div class="flex gap-2">
+                 <button id="reset-data-btn" class="text-gray-400 hover:text-white transition-colors p-2" title="Reset Game">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <a href="bardarts.html" class="text-gray-400 hover:text-white transition-colors p-2" title="Exit">
+                    <i class="fa-solid fa-door-open"></i>
+                </a>
+            </div>
         </header>
 
-        <!-- Player Setup Section -->
-        <div id="player-setup" class="bg-slate-800 p-6 rounded-lg shadow-lg mb-6">
-            <h2 class="text-2xl font-semibold mb-4">Add Players</h2>
-            <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
-            <div class="flex flex-col sm:flex-row gap-4">
-                <input type="text" id="new-player-name" class="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Enter player name...">
-                <button id="add-player-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">Add Player</button>
-            </div>
-            <div class="mt-6 text-center">
-                <button id="start-game-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-md text-lg w-full sm:w-auto" disabled>Start Game</button>
-            </div>
-        </div>
-        
-        <!-- Game Section: Uses flex-row for all screen sizes -->
-        <div id="game-section" class="hidden flex-grow flex flex-row gap-4">
-            <!-- Player cards on the left (narrow) -->
-            <div id="player-cards-container" class="w-1/3 grid grid-cols-1 gap-2 content-start">
-                <!-- Player cards generated here -->
-            </div>
+        <!-- Main Content Area -->
+        <main class="flex-1 relative overflow-hidden flex flex-col">
             
-            <!-- Scoring panel on the right (wide) -->
-            <div id="scoring-panel" class="w-2/3 bg-slate-800 p-2 sm:p-4 rounded-lg shadow-lg">
-                <h2 class="text-xl sm:text-2xl font-bold text-center mb-2"><span id="turn-player-name"></span>'s Turn</h2>
-                <div class="bg-slate-900 text-center rounded-lg p-2 sm:p-3 my-3">
-                    <div class="text-slate-400 text-xs sm:text-sm">Score Entered</div>
-                    <div id="current-score-display" class="text-4xl sm:text-6xl font-mono font-bold min-h-[4rem] sm:min-h-[5rem] flex items-center justify-center">0</div>
+            <!-- VIEW: Setup -->
+            <div id="setup-view" class="absolute inset-0 z-20 bg-gray-900 flex flex-col p-6 overflow-y-auto">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-users text-3xl text-blue-500"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
+                    <p class="text-gray-400 text-sm">Race to zero. Double out!</p>
                 </div>
 
-                <div class="grid grid-cols-3 gap-2">
-                    <!-- Numpad with responsive padding and text -->
-                    <button data-num="1" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">1</button>
-                    <button data-num="2" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">2</button>
-                    <button data-num="3" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">3</button>
-                    <button data-num="4" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">4</button>
-                    <button data-num="5" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">5</button>
-                    <button data-num="6" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">6</button>
-                    <button data-num="7" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">7</button>
-                    <button data-num="8" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">8</button>
-                    <button data-num="9" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">9</button>
-                    <button id="del-btn" class="btn bg-slate-600 hover:bg-slate-500 p-2 sm:p-4 rounded-lg text-base sm:text-xl font-bold">DEL</button>
-                    <button data-num="0" class="btn numpad bg-slate-700 hover:bg-slate-600 p-2 sm:p-4 rounded-lg text-lg sm:text-2xl font-bold">0</button>
-                    <button id="enter-score-btn" class="btn bg-green-600 hover:bg-green-500 p-2 sm:p-4 rounded-lg text-base sm:text-xl font-bold">Enter</button>
+                <div class="space-y-4 flex-1">
+                    <div id="player-inputs" class="space-y-3">
+                        <!-- Player list generated here -->
+                    </div>
+                    
+                    <div class="flex gap-2 mt-4">
+                        <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
+                        <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <button id="start-game-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Start Game
+                </button>
+            </div>
+
+            <!-- VIEW: Gameplay -->
+            <div id="game-view" class="absolute inset-0 bg-gray-900 flex flex-col hidden">
                 
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                     <button id="bust-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-md w-full">BUST</button>
-                     <button id="undo-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 rounded-md flex justify-center items-center w-full" title="Undo last action">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-                        </svg>
-                     </button>
+                <!-- Info Banner -->
+                <div class="bg-gray-800 p-4 shadow-md z-10 border-b border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Turn</span>
+                            <div class="text-xl font-bold text-white truncate max-w-[150px]" id="current-turn-name">
+                                Player 1
+                            </div>
+                        </div>
+                        <div class="text-right">
+                             <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Input</span>
+                             <div class="text-3xl font-bold text-blue-400 font-mono" id="current-input-display">
+                                0
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player List -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-3" id="players-container">
+                    <!-- Player Cards Injected Here -->
+                </div>
+
+                <!-- Controls (Numpad) -->
+                <div class="bg-gray-800 border-t border-gray-700 p-3 z-20 pb-6">
+                     <div class="grid grid-cols-4 gap-2 h-48">
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(1)">1</button>
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(2)">2</button>
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(3)">3</button>
+                        <button class="action-btn bg-red-900/50 text-red-400 font-bold rounded-lg border border-red-800" onclick="handleUndo()"><i class="fa-solid fa-rotate-left"></i></button>
+
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(4)">4</button>
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(5)">5</button>
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(6)">6</button>
+                        <button class="action-btn bg-gray-600 text-white font-bold rounded-lg" onclick="handleDelete()"><i class="fa-solid fa-delete-left"></i></button>
+
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(7)">7</button>
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(8)">8</button>
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(9)">9</button>
+                        <button class="action-btn bg-green-600 text-white text-xl font-bold rounded-lg row-span-2 flex items-center justify-center" onclick="submitScore()">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+
+                        <button class="action-btn bg-gray-600 text-gray-300 font-bold rounded-lg text-sm" onclick="submitScore(true)">BUST</button>
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg" onclick="handleNum(0)">0</button>
+                        <button class="numpad-btn bg-gray-700 text-white text-xl font-bold rounded-lg opacity-0 pointer-events-none"></button> <!-- Spacer -->
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- VIEW: Results -->
+            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col p-6 hidden">
+                <div class="text-center mb-8 pt-10">
+                    <i class="fa-solid fa-trophy text-6xl text-yellow-400 mb-6 animate-bounce"></i>
+                    <h2 class="text-4xl font-bold text-white mb-2">Game Shot!</h2>
+                    <p class="text-xl text-gray-400" id="winner-name">Player Wins</p>
+                </div>
+                
+                <div class="flex-1 flex flex-col justify-end gap-4 pb-10">
+                    <button id="new-game-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all">
+                        Play Again
+                    </button>
+                    <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
+                        Return to Menu
+                    </a>
+                </div>
+            </div>
+
+        </main>
     </div>
-    
-    <!-- Winner Modal -->
-    <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-700 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
-            <h2 class="text-3xl font-bold text-blue-300 mb-4">GAME SHOT!</h2>
-            <p id="winner-message" class="text-xl mb-6"></p>
-            <button id="new-game-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-md w-full">Play Again</button>
-        </div>
-    </div>
-    
-    <!-- Confirm Clear Modal -->
-    <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
-            <h2 class="text-2xl font-bold text-yellow-300 mb-4">Leave Game?</h2>
-            <p class="text-slate-300 mb-6">This will clear the current game's data and return you to the main screen. This action cannot be undone.</p>
-            <div class="flex justify-center gap-4">
-                <button id="cancel-clear-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-md w-full">Cancel</button>
-                <button id="confirm-clear-action-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md w-full">Confirm</button>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-gray-800 p-6 rounded-2xl max-w-xs w-full shadow-2xl border border-gray-700">
+            <h3 class="text-xl font-bold text-white mb-2">Reset Game?</h3>
+            <p class="text-gray-400 mb-6 text-sm">This will clear all current progress.</p>
+            <div class="flex gap-3">
+                <button id="cancel-reset" class="flex-1 py-3 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-600">Cancel</button>
+                <button id="confirm-reset" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700">Reset</button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- State ---
+        const STORAGE_KEY = '501Darts_v2_state';
+        
+        let gameState = {
+            players: [], // { name, score, history: [] }
+            phase: 'setup',
+            currentPlayerIdx: 0,
+            currentInput: 0,
+            history: [] // Global history for Undo
+        };
+
+        // --- DOM ---
+        const views = {
+            setup: document.getElementById('setup-view'),
+            game: document.getElementById('game-view'),
+            results: document.getElementById('results-view')
+        };
+        const modals = {
+            confirm: document.getElementById('confirm-modal')
+        };
+
+        // --- Init ---
         document.addEventListener('DOMContentLoaded', () => {
-            const STORAGE_KEY = 'darts501GameState';
-            let previousGameState = null;
-
-            // --- STATE ---
-            let gameState = {
-                players: [], // { name: string, score: 501, history: [] }
-                gameStarted: false,
-                currentPlayerIndex: 0,
-                currentTurnScore: 0
-            };
-
-            // --- DOM ELEMENTS ---
-            const clearStorageBtn = document.getElementById('clear-storage-btn');
-            const playerSetupEl = document.getElementById('player-setup');
-            const addPlayerBtn = document.getElementById('add-player-btn');
-            const newPlayerNameInput = document.getElementById('new-player-name');
-            const playerListEl = document.getElementById('player-list');
-            const startGameBtn = document.getElementById('start-game-btn');
-            
-            const gameSectionEl = document.getElementById('game-section');
-            const playerCardsContainer = document.getElementById('player-cards-container');
-            const turnPlayerNameEl = document.getElementById('turn-player-name');
-            const currentScoreDisplay = document.getElementById('current-score-display');
-            const scoringPanel = document.getElementById('scoring-panel');
-            const enterScoreBtn = document.getElementById('enter-score-btn');
-            const bustBtn = document.getElementById('bust-btn');
-            const undoBtn = document.getElementById('undo-btn');
-            const delBtn = document.getElementById('del-btn');
-            
-            const winnerModal = document.getElementById('winner-modal');
-            const winnerMessage = document.getElementById('winner-message');
-            const newGameBtn = document.getElementById('new-game-btn');
-            
-            const confirmClearModal = document.getElementById('confirm-clear-modal');
-            const cancelClearBtn = document.getElementById('cancel-clear-btn');
-            const confirmClearActionBtn = document.getElementById('confirm-clear-action-btn');
-            
-            // --- PERSISTENCE ---
-            const saveState = () => {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
-                updateClearButtonVisibility();
-            };
-            
-            const loadState = () => {
-                const savedState = localStorage.getItem(STORAGE_KEY);
-                if (savedState) {
-                    gameState = JSON.parse(savedState);
-                }
-            };
-            
-            const updateClearButtonVisibility = () => {
-                if (localStorage.getItem(STORAGE_KEY)) {
-                    clearStorageBtn.classList.remove('hidden');
-                } else {
-                    clearStorageBtn.classList.add('hidden');
-                }
-            };
-
-            // --- RENDER ---
-            const render = () => {
-                if (gameState.gameStarted) {
-                    playerSetupEl.classList.add('hidden');
-                    gameSectionEl.classList.remove('hidden');
-                    renderPlayerCards();
-                    updateTurnUI();
-                } else {
-                    playerSetupEl.classList.remove('hidden');
-                    gameSectionEl.classList.add('hidden');
-                    renderPlayerSetupList();
-                }
-                saveState();
-            };
-
-            const renderPlayerSetupList = () => {
-                playerListEl.innerHTML = '';
-                gameState.players.forEach((player, index) => {
-                    const tag = document.createElement('div');
-                    tag.className = 'bg-slate-700 rounded-full px-4 py-2 flex items-center gap-3';
-                    tag.innerHTML = `<span class="font-semibold">${player.name}</span><button data-index="${index}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button>`;
-                    playerListEl.appendChild(tag);
-                });
-                startGameBtn.disabled = gameState.players.length < 1;
-            };
-
-            const renderPlayerCards = () => {
-                playerCardsContainer.innerHTML = '';
-                gameState.players.forEach((player, index) => {
-                    const card = document.createElement('div');
-                    // Compacted for side-by-side mobile view
-                    card.className = 'player-card bg-slate-800 p-2 sm:p-3 rounded-lg shadow-md';
-                    if (index === gameState.currentPlayerIndex) {
-                        card.classList.add('current-player-turn');
-                    }
-                    
-                    const lastScore = player.history.length > 0 ? player.history[player.history.length-1] : '-';
-
-                    // Made font sizes and margins responsive for smaller card
-                    card.innerHTML = `
-                        <div class="flex flex-col sm:flex-row justify-between items-baseline">
-                            <h3 class="text-lg sm:text-xl font-bold truncate" title="${player.name}">${player.name}</h3>
-                            <span class="text-slate-400 text-xs sm:text-sm">Last: ${lastScore}</span>
-                        </div>
-                        <p class="text-3xl sm:text-5xl font-bold text-center my-2 sm:my-3">${player.score}</p>
-                    `;
-                    playerCardsContainer.appendChild(card);
-                });
-            };
-
-            const updateTurnUI = () => {
-                if (gameState.players.length === 0) return;
-                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-                turnPlayerNameEl.textContent = currentPlayer.name;
-                currentScoreDisplay.textContent = gameState.currentTurnScore;
-                undoBtn.disabled = !previousGameState;
-            };
-
-            // --- GAME LOGIC ---
-            const addPlayer = () => {
-                const name = newPlayerNameInput.value.trim();
-                if (name) {
-                    gameState.players.push({ name, score: 501, history: [] });
-                    newPlayerNameInput.value = '';
-                    render();
-                }
-            };
-            
-            const removePlayer = index => {
-                gameState.players.splice(index, 1);
-                render();
-            };
-
-            const startGame = () => {
-                previousGameState = null;
-                gameState.gameStarted = true;
-                gameState.currentPlayerIndex = 0;
-                gameState.currentTurnScore = 0;
-                gameState.players.forEach(p => {
-                    p.score = 501;
-                    p.history = [];
-                });
-                render();
-            };
-
-            const undoTurn = () => {
-                if (previousGameState) {
-                    gameState = JSON.parse(JSON.stringify(previousGameState));
-                    previousGameState = null; // Prevent multiple undos
-                    render();
-                }
-            };
-            
-            const handleNumpad = (num) => {
-                const currentVal = gameState.currentTurnScore.toString();
-                const newVal = parseInt(currentVal + num, 10);
-                if (newVal <= 180) {
-                    gameState.currentTurnScore = newVal;
-                    updateTurnUI();
-                }
-            };
-
-            const handleDelete = () => {
-                const currentVal = gameState.currentTurnScore.toString();
-                gameState.currentTurnScore = parseInt(currentVal.slice(0, -1) || '0', 10);
-                updateTurnUI();
-            };
-
-            const submitScore = (isBust = false) => {
-                previousGameState = JSON.parse(JSON.stringify(gameState)); // Save state before action
-                const player = gameState.players[gameState.currentPlayerIndex];
-                const turnScore = gameState.currentTurnScore;
-                const scoreAfterTurn = player.score - turnScore;
-
-                let wasBust = isBust || scoreAfterTurn < 2;
-
-                if (wasBust) {
-                    player.history.push('BUST');
-                } else {
-                    player.score = scoreAfterTurn;
-                    player.history.push(turnScore);
-                }
-                
-                // Check for winner
-                if (player.score === 0) {
-                   // In a real game, we'd need to verify the last throw was a double.
-                   // For this scorer, we'll trust the user to only enter a winning score if it was a valid double-out.
-                   endGame(player);
-                   return;
-                }
-
-                nextTurn();
-            };
-            
-            const nextTurn = () => {
-                gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
-                gameState.currentTurnScore = 0;
-                render();
-            };
-
-            const endGame = (winner) => {
-                winnerMessage.textContent = `${winner.name} wins the game!`;
-                winnerModal.classList.remove('hidden');
-                
-                // Highlight winner card
-                document.querySelectorAll('.player-card').forEach((card, index) => {
-                    if (index === gameState.players.findIndex(p => p.name === winner.name)) {
-                        card.classList.add('winner-highlight');
-                    }
-                    card.classList.remove('current-player-turn');
-                });
-                
-                scoringPanel.classList.add('hidden'); // Hide scoring panel
-                localStorage.removeItem(STORAGE_KEY);
-                updateClearButtonVisibility();
-            };
-
-            const resetGame = () => {
-                previousGameState = null;
-                gameState = { players: [], gameStarted: false, currentPlayerIndex: 0, currentTurnScore: 0 };
-                winnerModal.classList.add('hidden');
-                scoringPanel.classList.remove('hidden');
-                render();
-            };
-
-            // --- EVENT LISTENERS ---
-            clearStorageBtn.addEventListener('click', () => {
-                confirmClearModal.classList.remove('hidden');
-            });
-            
-            cancelClearBtn.addEventListener('click', () => {
-                confirmClearModal.classList.add('hidden');
-            });
-
-            confirmClearActionBtn.addEventListener('click', () => {
-                localStorage.removeItem(STORAGE_KEY);
-                window.location.href = 'BarDarts.html'; 
-            });
-
-            addPlayerBtn.addEventListener('click', addPlayer);
-            newPlayerNameInput.addEventListener('keypress', e => e.key === 'Enter' && addPlayer());
-            playerListEl.addEventListener('click', e => {
-                if (e.target.classList.contains('remove-player-btn')) {
-                    removePlayer(parseInt(e.target.dataset.index, 10));
-                }
-            });
-            startGameBtn.addEventListener('click', startGame);
-            
-            scoringPanel.addEventListener('click', e => {
-                const target = e.target.closest('button');
-                if (!target) return;
-                
-                if (target.matches('.numpad')) {
-                    handleNumpad(target.dataset.num);
-                } else if (target.id === 'del-btn') {
-                    handleDelete();
-                } else if (target.id === 'enter-score-btn') {
-                    submitScore(false);
-                } else if (target.id === 'bust-btn') {
-                    submitScore(true);
-                } else if (target.id === 'undo-btn') {
-                    undoTurn();
-                }
-            });
-
-            newGameBtn.addEventListener('click', resetGame);
-
-            // --- INITIALIZE ---
             loadState();
-            updateClearButtonVisibility();
             render();
         });
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) gameState = JSON.parse(saved);
+            } catch(e) {}
+        }
+
+        function pushHistory() {
+            const copy = JSON.parse(JSON.stringify(gameState));
+            copy.history = []; // Avoid deep nesting
+            gameState.history.push(copy);
+            if(gameState.history.length > 5) gameState.history.shift();
+        }
+
+        function render() {
+            Object.values(views).forEach(el => el.classList.add('hidden'));
+            if(gameState.phase === 'setup') {
+                views.setup.classList.remove('hidden');
+                renderSetup();
+            } else if(gameState.phase === 'playing') {
+                views.game.classList.remove('hidden');
+                renderGame();
+            } else {
+                views.results.classList.remove('hidden');
+                renderResults();
+            }
+        }
+
+        // --- Setup ---
+        const playerInput = document.getElementById('new-player-name');
+        
+        function renderSetup() {
+            const list = document.getElementById('player-inputs');
+            list.innerHTML = '';
+            gameState.players.forEach((p, i) => {
+                list.innerHTML += `
+                    <div class="flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                        <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-400">${i+1}</div>
+                        <span class="flex-1 font-semibold text-white">${p.name}</span>
+                        <button onclick="removePlayer(${i})" class="text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            });
+            document.getElementById('start-game-btn').disabled = gameState.players.length < 1;
+        }
+
+        document.getElementById('add-player-btn').addEventListener('click', addPlayer);
+        playerInput.addEventListener('keypress', e => { if(e.key === 'Enter') addPlayer() });
+
+        function addPlayer() {
+            const name = playerInput.value.trim();
+            if(name) {
+                gameState.players.push({ name, score: 501, history: [] });
+                playerInput.value = '';
+                saveState();
+                render();
+            }
+        }
+
+        window.removePlayer = (i) => {
+            gameState.players.splice(i, 1);
+            saveState();
+            render();
+        };
+
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            gameState.phase = 'playing';
+            gameState.currentPlayerIdx = 0;
+            gameState.currentInput = 0;
+            gameState.history = [];
+            // Reset scores
+            gameState.players.forEach(p => { p.score = 501; p.history = []; });
+            saveState();
+            render();
+        });
+
+        // --- Game ---
+        function renderGame() {
+            const player = gameState.players[gameState.currentPlayerIdx];
+            document.getElementById('current-turn-name').textContent = player.name;
+            document.getElementById('current-input-display').textContent = gameState.currentInput;
+
+            const container = document.getElementById('players-container');
+            container.innerHTML = '';
+            
+            gameState.players.forEach((p, i) => {
+                const isTurn = i === gameState.currentPlayerIdx;
+                const lastScore = p.history.length ? p.history[p.history.length-1] : '-';
+                const bgClass = isTurn ? "bg-gray-700 border border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.2)]" : "bg-gray-800 border border-gray-700 opacity-80";
+
+                container.innerHTML += `
+                    <div class="${bgClass} rounded-xl p-4 flex justify-between items-center transition-all" id="card-${i}">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">${p.name}</h3>
+                            <div class="text-xs text-gray-400">Last: <span class="text-gray-300 font-mono">${lastScore}</span></div>
+                        </div>
+                        <div class="text-4xl font-mono font-bold text-white">${p.score}</div>
+                    </div>
+                `;
+            });
+
+            const activeCard = document.getElementById(`card-${gameState.currentPlayerIdx}`);
+            if(activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        window.handleNum = (num) => {
+            const newVal = parseInt(gameState.currentInput.toString() + num);
+            if (newVal <= 180) {
+                gameState.currentInput = newVal;
+                renderGame(); // Just re-render game view parts
+                // Optimize: direct update
+                document.getElementById('current-input-display').textContent = gameState.currentInput;
+            }
+        };
+
+        window.handleDelete = () => {
+            const str = gameState.currentInput.toString();
+            gameState.currentInput = parseInt(str.slice(0, -1) || 0);
+            document.getElementById('current-input-display').textContent = gameState.currentInput;
+        };
+
+        window.submitScore = (isBust = false) => {
+            pushHistory();
+            const player = gameState.players[gameState.currentPlayerIdx];
+            const input = gameState.currentInput;
+            
+            let points = input;
+            let bust = isBust;
+
+            if (!bust) {
+                if (player.score - points === 0) {
+                    // Winning condition (Assume valid double out for app simplicity)
+                    player.score = 0;
+                    gameState.phase = 'over';
+                    saveState();
+                    render();
+                    return;
+                } else if (player.score - points <= 1) {
+                    // Bust (Leaves 1 or less without hitting 0 exactly implies invalid out usually, standard rules: cannot leave 1)
+                    bust = true;
+                }
+            }
+
+            if (bust) {
+                player.history.push("BUST");
+            } else {
+                player.score -= points;
+                player.history.push(points);
+            }
+
+            gameState.currentInput = 0;
+            gameState.currentPlayerIdx = (gameState.currentPlayerIdx + 1) % gameState.players.length;
+            saveState();
+            render();
+        };
+
+        window.handleUndo = () => {
+            if(gameState.history.length > 0) {
+                gameState = gameState.history.pop();
+                saveState();
+                render();
+            }
+        };
+
+        // --- Results ---
+        function renderResults() {
+            const winner = gameState.players.find(p => p.score === 0);
+            document.getElementById('winner-name').textContent = winner ? winner.name : "Winner";
+        }
+
+        document.getElementById('new-game-btn').addEventListener('click', () => {
+            // Full reset
+            gameState.phase = 'setup';
+            gameState.players.forEach(p => { p.score = 501; p.history = []; });
+            gameState.history = [];
+            saveState();
+            render();
+        });
+
+        // --- Modals ---
+        document.getElementById('reset-data-btn').addEventListener('click', () => modals.confirm.classList.remove('hidden'));
+        document.getElementById('cancel-reset').addEventListener('click', () => modals.confirm.classList.add('hidden'));
+        document.getElementById('confirm-reset').addEventListener('click', () => {
+            // Hard reset
+            gameState = { players: [], phase: 'setup', currentPlayerIdx: 0, currentInput: 0, history: [] };
+            saveState();
+            render();
+            modals.confirm.classList.add('hidden');
+        });
+
     </script>
 </body>
 </html>
-

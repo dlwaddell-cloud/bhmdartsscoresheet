@@ -5,149 +5,212 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bar Darts Game Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a202c">
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c; /* Matches the apps */
+            color: #e2e8f0;
             -webkit-tap-highlight-color: transparent;
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; 
+            border-radius: 4px;
+        }
+
         .game-card {
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .game-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .action-btn {
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        .action-btn:active {
+            transform: scale(0.95);
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-6 bg-gray-900">
 
-    <div class="text-center w-full max-w-6xl relative">
-        <div class="absolute top-0 right-0 z-10">
-            <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 text-sm rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-sky-500">
-                Donate
-            </a>
-        </div>
-
-        <header class="mb-8 pt-12 sm:pt-0">
-            <h1 class="text-4xl sm:text-5xl font-extrabold mb-2">Bar Darts Game Hub</h1>
-            <p class="text-lg sm:text-xl text-slate-400">Choose a game to score. Except for Killer, all games can be played solo.</p>
+    <div class="w-full max-w-6xl relative flex flex-col gap-8">
+        
+        <!-- Header Section -->
+        <header class="text-center pt-8 sm:pt-4 relative">
+            <div class="absolute top-0 right-0 sm:top-4 sm:right-0">
+                <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-sky-400 border border-gray-700 font-semibold py-2 px-4 text-sm rounded-lg transition-all shadow-lg hover:shadow-sky-900/20">
+                    <i class="fa-solid fa-heart"></i> Donate
+                </a>
+            </div>
+            <h1 class="text-4xl sm:text-5xl font-bold mb-3 text-white tracking-tight">Bar Darts Hub</h1>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">Choose a game to score.</p>
         </header>
 
-        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Games Grid -->
+        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
+            
             <!-- 501 Card -->
-            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
-                 <div>
-                    <div class="mb-4">
-                        <h2 class="text-2xl font-bold text-blue-400">501</h2>
+            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-hashtag text-6xl text-blue-500"></i>
+                </div>
+                <div class="mb-4 z-10">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-hashtag text-blue-500 text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">501 Darts</h2>
                     </div>
-                    <p class="text-slate-300">
-                        The classic game of darts. Be the first player to reach exactly zero from 501, finishing on a double.
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        The classic game. Race to zero from 501. Finish on a double to win the leg.
                     </p>
                 </div>
-                 <div class="mt-auto pt-6 flex gap-4 items-center">
-                    <a href="501Darts.html" class="w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-5 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-blue-500">
-                        Play Game
+                <div class="mt-auto pt-4 z-10">
+                    <a href="501Darts.html" class="action-btn block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-blue-900/30">
+                        Play 501
                     </a>
                 </div>
             </div>
 
             <!-- Cricket Card -->
-            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
-                 <div>
-                    <div class="mb-4">
-                        <h2 class="text-2xl font-bold text-green-400">Cricket</h2>
+            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-bullseye text-6xl text-green-500"></i>
+                </div>
+                <div class="mb-4 z-10">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-bullseye text-green-500 text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Cricket</h2>
                     </div>
-                    <p class="text-slate-300">
-                        Close out numbers 15-20 and the bullseye. Score points on closed numbers if your opponents haven't caught up.
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Close numbers 15-20 & Bull. Score points on closed numbers to bury your opponents.
                     </p>
                 </div>
-                 <div class="mt-auto pt-6 flex gap-4 items-center">
-                    <a href="DartsCricket.html" class="w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-green-600">
-                        Play Game
+                <div class="mt-auto pt-4 z-10">
+                    <a href="DartsCricket.html" class="action-btn block w-full text-center bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-green-900/30">
+                        Play Cricket
                     </a>
                 </div>
             </div>
 
             <!-- No Score Cricket Card -->
-            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
-                <div>
-                    <div class="mb-4">
-                        <h2 class="text-2xl font-bold text-teal-400">No Score Cricket</h2>
+            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-ban text-6xl text-teal-500"></i>
+                </div>
+                <div class="mb-4 z-10">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-ban text-teal-500 text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">NS Cricket</h2>
                     </div>
-                    <p class="text-slate-300">
-                        A simpler version of Cricket. Be the first to close all the numbers (15-20 and Bull) to win. No points are scored.
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Race to close all numbers (15-20 & Bull). No points, just speed and accuracy.
                     </p>
                 </div>
-                <div class="mt-auto pt-6 flex gap-4 items-center">
-                    <a href="NSCricket.html" class="w-full text-center bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-5 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-teal-500">
-                        Play Game
+                <div class="mt-auto pt-4 z-10">
+                    <a href="NSCricket.html" class="action-btn block w-full text-center bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-teal-900/30">
+                        Play NS Cricket
                     </a>
                 </div>
             </div>
 
             <!-- Halve It Card -->
-            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
-                <div>
-                    <div class="mb-4">
-                        <h2 class="text-2xl font-bold text-orange-400">Halve It</h2>
+            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-divide text-6xl text-orange-500"></i>
+                </div>
+                <div class="mb-4 z-10">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-divide text-orange-500 text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Halve It</h2>
                     </div>
-                    <p class="text-slate-300">
-                        Score on the target each round. If you miss with all three darts, your current score is halved! Highest score wins.
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Hit the target or lose half your score! High stakes, high pressure, high reward.
                     </p>
                 </div>
-                <div class="mt-auto pt-6 flex gap-4 items-center">
-                    <a href="DartsHalveIt.html" class="w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-5 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-orange-500">
-                        Play Game
+                <div class="mt-auto pt-4 z-10">
+                    <a href="DartsHalveIt.html" class="action-btn block w-full text-center bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-orange-900/30">
+                        Play Halve It
                     </a>
                 </div>
             </div>
             
             <!-- Darts Golf Card -->
-            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
-                 <div>
-                    <div class="mb-4">
-                        <h2 class="text-2xl font-bold text-yellow-300">Golf</h2>
+            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-golf-ball-tee text-6xl text-yellow-400"></i>
+                </div>
+                <div class="mb-4 z-10">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-golf-ball-tee text-yellow-400 text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Golf</h2>
                     </div>
-                    <p class="text-slate-300">
-                        Play 18 "holes" and aim for the lowest score possible. Lowest score wins.
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Play 9 or 18 holes. Aim for the lowest score by hitting the target segment.
                     </p>
                 </div>
-                 <div class="mt-auto pt-6 flex gap-4 items-center">
-                    <a href="DartsGolf.html" class="w-full text-center bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-3 px-5 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-yellow-400">
-                        Play Game
+                <div class="mt-auto pt-4 z-10">
+                    <a href="DartsGolf.html" class="action-btn block w-full text-center bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-5 rounded-xl shadow-lg shadow-yellow-900/30">
+                        Play Golf
                     </a>
                 </div>
             </div>
 
             <!-- Killer Darts Card -->
-            <div class="game-card bg-slate-800 p-6 rounded-xl shadow-lg flex flex-col">
-                <div>
-                    <div class="mb-4">
-                        <h2 class="text-2xl font-bold text-red-400">Killer</h2>
+            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-skull-crossbones text-6xl text-red-500"></i>
+                </div>
+                <div class="mb-4 z-10">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-skull-crossbones text-red-500 text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Killer</h2>
                     </div>
-                    <p class="text-slate-300">
-                        Become the "Killer" and hunt down your opponents. Be the last player with lives remaining to win.
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Hunt down your opponents. Hit their number to take a life. Last player standing wins.
                     </p>
                 </div>
-                <div class="mt-auto pt-6 flex gap-4 items-center">
-                    <a href="KillerDarts.html" class="w-full text-center bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-5 rounded-lg transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-red-500">
-                        Play Game
+                <div class="mt-auto pt-4 z-10">
+                    <a href="KillerDarts.html" class="action-btn block w-full text-center bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-red-900/30">
+                        Play Killer
                     </a>
                 </div>
             </div>
         </main>
+
+        <footer>
+            <p class="text-center pb-6"> Version 3.0, 20.12.2025
+            </p>
+        </footer>
     </div>
 
 </body>
 </html>
-    </div>
-            </div>
-        </main>
-    </div>
-    <a href="index.html" class="text-slate-900 block w-full text-center">Go to Index</a>
-</body>
-</html>
-
