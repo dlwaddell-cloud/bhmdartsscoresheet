@@ -49,24 +49,27 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex flex-col">
+<body class="h-[100dvh] w-screen overflow-hidden flex flex-col">
 
     <!-- App Container -->
-    <div id="app" class="relative w-full h-full max-w-lg mx-auto flex flex-col bg-gray-900 shadow-2xl">
+    <!-- Removed max-w-lg to allow horizontal resizing -->
+    <div id="app" class="relative w-full h-full mx-auto flex flex-col bg-gray-900 shadow-2xl">
         
         <!-- Header -->
-        <header class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-golf-ball-tee text-yellow-400 text-xl"></i>
-                <h1 class="text-xl font-bold text-white tracking-wide">Darts Golf</h1>
-            </div>
-            <div class="flex gap-2">
-                 <button id="reset-data-btn" class="text-gray-400 hover:text-white transition-colors p-2" title="Reset Game">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
-                <a href="bardarts.html" class="text-gray-400 hover:text-white transition-colors p-2" title="Exit">
-                    <i class="fa-solid fa-door-open"></i>
-                </a>
+        <header class="bg-gray-800 border-b border-gray-700 z-10">
+            <div class="max-w-5xl mx-auto w-full p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-golf-ball-tee text-yellow-400 text-xl"></i>
+                    <h1 class="text-xl font-bold text-white tracking-wide">Darts Golf</h1>
+                </div>
+                <div class="flex gap-2">
+                     <button id="reset-data-btn" class="text-gray-400 hover:text-white transition-colors p-2" title="Reset Game">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                    <a href="bardarts.html" class="text-gray-400 hover:text-white transition-colors p-2" title="Exit">
+                        <i class="fa-solid fa-door-open"></i>
+                    </a>
+                </div>
             </div>
         </header>
 
@@ -74,123 +77,133 @@
         <main class="flex-1 relative overflow-hidden flex flex-col">
             
             <!-- VIEW: Setup -->
-            <div id="setup-view" class="absolute inset-0 z-20 bg-gray-900 flex flex-col p-6 overflow-y-auto">
-                <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa-solid fa-users text-3xl text-yellow-400"></i>
+            <div id="setup-view" class="absolute inset-0 z-20 bg-gray-900 flex flex-col overflow-y-auto">
+                <div class="w-full max-w-3xl mx-auto p-6 flex flex-col min-h-full">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-users text-3xl text-yellow-400"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
+                        <p class="text-gray-400 text-sm">Add players to begin the round.</p>
                     </div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
-                    <p class="text-gray-400 text-sm">Add players to begin the round.</p>
-                </div>
 
-                <div class="space-y-4 mb-8">
-                    <label class="block text-sm font-medium text-gray-300">Number of Holes</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button class="hole-select-btn bg-yellow-500 text-gray-900 p-3 rounded-lg font-bold border-2 border-yellow-500 transition-all" data-holes="9">9 Holes</button>
-                        <button class="hole-select-btn bg-gray-800 text-gray-400 p-3 rounded-lg font-bold border-2 border-transparent hover:bg-gray-700 transition-all" data-holes="18">18 Holes</button>
+                    <div class="space-y-4 mb-8">
+                        <label class="block text-sm font-medium text-gray-300">Number of Holes</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button class="hole-select-btn bg-yellow-500 text-gray-900 p-3 rounded-lg font-bold border-2 border-yellow-500 transition-all" data-holes="9">9 Holes</button>
+                            <button class="hole-select-btn bg-gray-800 text-gray-400 p-3 rounded-lg font-bold border-2 border-transparent hover:bg-gray-700 transition-all" data-holes="18">18 Holes</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="space-y-4 flex-1">
-                    <label class="block text-sm font-medium text-gray-300">Players</label>
-                    <div id="player-inputs" class="space-y-3">
-                        <!-- Player inputs generated here -->
+                    <div class="space-y-4 flex-1">
+                        <label class="block text-sm font-medium text-gray-300">Players</label>
+                        <div id="player-inputs" class="space-y-3">
+                            <!-- Player inputs generated here -->
+                        </div>
+                        
+                        <div class="flex gap-2 mt-4">
+                            <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
+                            <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div class="flex gap-2 mt-4">
-                        <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
-                        <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
 
-                <button id="start-game-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1">
-                    Tee Off
-                </button>
+                    <button id="start-game-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1">
+                        Tee Off
+                    </button>
+                </div>
             </div>
 
             <!-- VIEW: Scoreboard / Gameplay -->
             <div id="game-view" class="absolute inset-0 bg-gray-900 flex flex-col hidden">
                 
                 <!-- Hole Info Banner -->
-                <div class="bg-gray-800 p-4 shadow-md z-10 border-b border-gray-700">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Current Hole</span>
-                            <!-- Increased font size for hole number -->
-                            <div class="text-6xl font-bold text-white flex items-baseline">
-                                <span id="current-hole-num" class="text-yellow-400">1</span>
-                                <span class="text-lg text-gray-500 ml-2">/ <span id="total-holes-display">9</span></span>
+                <div class="bg-gray-800 shadow-md z-10 border-b border-gray-700">
+                    <div class="max-w-5xl mx-auto w-full p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Current Hole</span>
+                                <!-- Increased font size for hole number -->
+                                <div class="text-6xl font-bold text-white flex items-baseline">
+                                    <span id="current-hole-num" class="text-yellow-400">1</span>
+                                    <span class="text-lg text-gray-500 ml-2">/ <span id="total-holes-display">9</span></span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Leaderboard</span>
+                                <div id="mini-leaderboard" class="flex flex-col items-end mt-1 space-y-1 min-h-[3rem]">
+                                    <!-- Leaderboard injected here -->
+                                    <span class="text-gray-500 text-xs italic">Tee Off</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Leaderboard</span>
-                            <div id="mini-leaderboard" class="flex flex-col items-end mt-1 space-y-1 min-h-[3rem]">
-                                <!-- Leaderboard injected here -->
-                                <span class="text-gray-500 text-xs italic">Tee Off</span>
-                            </div>
+                        <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-yellow-500 transition-all duration-500" style="width: 0%"></div>
                         </div>
-                    </div>
-                    <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
-                        <div id="progress-bar" class="h-full bg-yellow-500 transition-all duration-500" style="width: 0%"></div>
                     </div>
                 </div>
 
                 <!-- Active Player Card -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-4" id="players-container">
-                    <!-- Player Cards Injected Here -->
+                <div class="flex-1 overflow-y-auto p-4 w-full">
+                    <div id="players-container" class="max-w-5xl mx-auto space-y-4">
+                        <!-- Player Cards Injected Here -->
+                    </div>
                 </div>
 
                 <!-- Input Controls (Fixed Bottom) -->
-                <div class="bg-gray-800 border-t border-gray-700 p-2 pb-6 z-20">
-                    <div class="text-center mb-2">
-                        <p class="text-xs text-gray-400">Select Score for <span id="active-player-name" class="text-white font-bold">Player</span></p>
-                    </div>
-                    <!-- Decreased button height to h-14 and reduced inner text size slightly -->
-                    <div class="grid grid-cols-5 gap-2">
-                        <button class="score-btn bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-3)">
-                            <span class="text-xl font-bold">-3</span>
-                            <span class="text-[9px] uppercase">Double</span>
-                        </button>
-                        <button class="score-btn bg-orange-500/20 border border-orange-500/50 text-orange-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-2)">
-                            <span class="text-xl font-bold">-2</span>
-                            <span class="text-[9px] uppercase">Treble</span>
-                        </button>
-                        <button class="score-btn bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-1)">
-                            <span class="text-xl font-bold">-1</span>
-                            <span class="text-[9px] uppercase">Small</span>
-                        </button>
-                        <button class="score-btn bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(0)">
-                            <span class="text-xl font-bold">0</span>
-                            <span class="text-[9px] uppercase">Large</span>
-                        </button>
-                        <button class="score-btn bg-gray-600/20 border border-gray-600/50 text-gray-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(2)">
-                            <span class="text-xl font-bold">+2</span>
-                            <span class="text-[9px] uppercase">Miss</span>
-                        </button>
+                <div class="bg-gray-800 border-t border-gray-700 z-20">
+                    <div class="max-w-5xl mx-auto w-full p-2 pb-6">
+                        <div class="text-center mb-2">
+                            <p class="text-xs text-gray-400">Select Score for <span id="active-player-name" class="text-white font-bold">Player</span></p>
+                        </div>
+                        <!-- Decreased button height to h-14 and reduced inner text size slightly -->
+                        <div class="grid grid-cols-5 gap-2">
+                            <button class="score-btn bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-3)">
+                                <span class="text-xl font-bold">-3</span>
+                                <span class="text-[9px] uppercase">Double</span>
+                            </button>
+                            <button class="score-btn bg-orange-500/20 border border-orange-500/50 text-orange-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-2)">
+                                <span class="text-xl font-bold">-2</span>
+                                <span class="text-[9px] uppercase">Treble</span>
+                            </button>
+                            <button class="score-btn bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-1)">
+                                <span class="text-xl font-bold">-1</span>
+                                <span class="text-[9px] uppercase">Small</span>
+                            </button>
+                            <button class="score-btn bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(0)">
+                                <span class="text-xl font-bold">0</span>
+                                <span class="text-[9px] uppercase">Large</span>
+                            </button>
+                            <button class="score-btn bg-gray-600/20 border border-gray-600/50 text-gray-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(2)">
+                                <span class="text-xl font-bold">+2</span>
+                                <span class="text-[9px] uppercase">Miss</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- VIEW: Results -->
-            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col p-6 hidden">
-                <div class="text-center mb-8 pt-10">
-                    <i class="fa-solid fa-trophy text-5xl text-yellow-400 mb-4 animate-bounce"></i>
-                    <h2 class="text-3xl font-bold text-white">Final Scores</h2>
-                </div>
-                
-                <div id="leaderboard" class="space-y-3 flex-1 overflow-y-auto">
-                    <!-- Leaderboard items -->
-                </div>
+            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col overflow-y-auto hidden">
+                <div class="w-full max-w-3xl mx-auto p-6 flex flex-col min-h-full">
+                    <div class="text-center mb-8 pt-10">
+                        <i class="fa-solid fa-trophy text-5xl text-yellow-400 mb-4 animate-bounce"></i>
+                        <h2 class="text-3xl font-bold text-white">Final Scores</h2>
+                    </div>
+                    
+                    <div id="leaderboard" class="space-y-3 flex-1 overflow-y-auto">
+                        <!-- Leaderboard items -->
+                    </div>
 
-                <div class="flex flex-col gap-4 pb-10 mt-6">
-                    <button onclick="resetGame()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl shadow-lg">
-                        Play Again
-                    </button>
-                    <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
-                        Return to Menu
-                    </a>
+                    <div class="flex flex-col gap-4 pb-10 mt-6">
+                        <button onclick="resetGame()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl shadow-lg">
+                            Play Again
+                        </button>
+                        <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
+                            Return to Menu
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -198,7 +211,7 @@
     </div>
 
     <!-- Confirm Modal -->
-    <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div class="bg-gray-800 p-6 rounded-2xl max-w-xs w-full shadow-2xl border border-gray-700">
             <h3 class="text-xl font-bold text-white mb-2">Reset Game?</h3>
             <p class="text-gray-400 mb-6 text-sm">This will clear all current progress.</p>
@@ -234,6 +247,7 @@
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             renderPlayerSetup();
+            switchView('setup');
         });
 
         // --- Setup Logic ---
