@@ -5,488 +5,468 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Darts Golf</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- PWA / Mobile App Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f172a">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <meta name="theme-color" content="#1a202c">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
         body {
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            overscroll-behavior: none;
         }
-        .score-cell {
-            min-width: 40px;
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .sticky-player {
-            position: sticky;
-            left: 0;
-            z-index: 10;
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-        .sticky-total {
-            position: sticky;
-            /* This value is a default and will be dynamically adjusted by JavaScript */
-            left: 8rem; 
-            z-index: 10;
+        ::-webkit-scrollbar-track {
+            background: #2d3748; 
         }
-        .total-score {
-            font-weight: 800;
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; 
+            border-radius: 4px;
         }
-        .btn-score:active {
+
+        .score-btn {
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        .score-btn:active {
             transform: scale(0.95);
         }
-        .current-player-highlight {
-            background-color: rgba(253, 224, 71, 0.4); /* semi-transparent yellow-300 */
-        }
-         .winner-highlight {
-            animation: winner-pulse 2s infinite;
-        }
-        @keyframes winner-pulse {
-            0% { background-color: #4ade80; }
-            50% { background-color: #86efac; }
-            100% { background-color: #4ade80; }
+
+        .input-focus-ring:focus {
+            outline: 2px solid #facc15; /* Yellow-400 */
+            outline-offset: 2px;
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-800 text-white min-h-screen flex flex-col items-center p-4">
+<body class="h-screen w-screen overflow-hidden flex flex-col">
 
-    <div id="clear-storage-btn" class="hidden fixed top-4 left-4 z-50 bg-red-600 hover:bg-red-700 p-2 rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110" title="Clear data & return home">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    </div>
-
-    <div id="app" class="w-full max-w-4xl mx-auto">
-        <header class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-yellow-300">Darts Golf</h1>
-            <p class="text-slate-400">Lowest score after 18 holes wins!</p>
+    <!-- App Container -->
+    <div id="app" class="relative w-full h-full max-w-lg mx-auto flex flex-col bg-gray-900 shadow-2xl">
+        
+        <!-- Header -->
+        <header class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-golf-ball-tee text-yellow-400 text-xl"></i>
+                <h1 class="text-xl font-bold text-white tracking-wide">Darts Golf</h1>
+            </div>
+            <div class="flex gap-2">
+                 <button id="reset-data-btn" class="text-gray-400 hover:text-white transition-colors p-2" title="Reset Game">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <a href="bardarts.html" class="text-gray-400 hover:text-white transition-colors p-2" title="Exit">
+                    <i class="fa-solid fa-door-open"></i>
+                </a>
+            </div>
         </header>
 
-        <!-- Player Setup Section -->
-        <div id="player-setup" class="bg-slate-700 p-6 rounded-lg shadow-lg mb-6">
-            <h2 class="text-2xl font-semibold mb-4">Players</h2>
-            <div id="player-list" class="flex flex-wrap gap-4 mb-4"></div>
-            <div class="flex gap-4">
-                <input type="text" id="new-player-name" class="flex-grow bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Enter player name...">
-                <button id="add-player-btn" class="bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-2 px-4 rounded-md transition-colors">Add Player</button>
-            </div>
-            <div class="mt-4 text-center">
-                <button id="start-game-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-md transition-colors w-full sm:w-auto disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>Start Game</button>
-            </div>
-        </div>
-
-        <!-- Game Section -->
-        <div id="game-section" class="hidden">
-            <!-- Current Turn Info -->
-            <div class="bg-slate-700 p-4 rounded-lg shadow-lg mb-6 text-center">
-                 <h2 class="text-3xl font-bold"><span id="current-player-name"></span>'s Turn</h2>
-                 <p class="text-5xl text-slate-300">Hole: <span id="current-hole" class="font-bold text-yellow-300">1</span></p>
-                 <div id="current-throws" class="mt-2 text-lg">Throws: <span class="font-mono"></span></div>
-            </div>
-
-            <!-- Scoring Controls -->
-            <div id="scoring-controls" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-                <button data-score="-3" class="btn-score bg-green-600 hover:bg-green-700 p-4 rounded-lg text-center">
-                    <span class="font-bold text-xl">Double</span><br><span class="text-lg">-3</span>
-                </button>
-                <button data-score="-2" class="btn-score bg-green-500 hover:bg-green-600 p-4 rounded-lg text-center">
-                    <span class="font-bold text-xl">Triple</span><br><span class="text-lg">-2</span>
-                </button>
-                <button data-score="-1" class="btn-score bg-sky-500 hover:bg-sky-600 p-4 rounded-lg text-center">
-                    <span class="font-bold text-xl">Single (Narrow)</span><br><span class="text-lg">-1</span>
-                </button>
-                <button data-score="0" class="btn-score bg-slate-500 hover:bg-slate-600 p-4 rounded-lg text-center">
-                    <span class="font-bold text-xl">Single (Wide)</span><br><span class="text-lg">0</span>
-                </button>
-                <button data-score="2" class="btn-score bg-red-500 hover:bg-red-600 p-4 rounded-lg text-center">
-                    <span class="font-bold text-xl">Miss</span><br><span class="text-lg">+2</span>
-                </button>
-                <button id="lock-in-btn" class="btn-score bg-yellow-400 hover:bg-yellow-500 text-slate-900 p-4 rounded-lg text-center font-bold text-xl disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>
-                    Lock In Score
-                </button>
-            </div>
-
-            <!-- Scorecard -->
-            <div id="scorecard-container" class="bg-slate-900 p-2 rounded-lg shadow-lg overflow-x-auto">
-                <table class="w-full text-center border-collapse">
-                    <thead id="scorecard-head" class="text-slate-300">
-                    </thead>
-                    <tbody id="scorecard-body" class="divide-y divide-slate-700">
-                    </tbody>
-                </table>
-            </div>
-             <div class="mt-6 text-center">
-                <button id="new-game-btn" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-md transition-colors">Start New Game</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Winner Modal -->
-    <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
-        <div class="bg-slate-700 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
-            <h2 class="text-3xl font-bold text-yellow-300 mb-4">Game Over!</h2>
-            <p id="winner-message" class="text-xl mb-6"></p>
-            <button id="modal-new-game-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-md transition-colors w-full">Play Again</button>
-        </div>
-    </div>
-
-    <!-- Confirm Clear Modal -->
-    <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
-            <h2 class="text-2xl font-bold text-yellow-300 mb-4">Leave Game?</h2>
-            <p class="text-slate-300 mb-6">This will clear the current game's data and return you to the main screen. This action cannot be undone.</p>
-            <div class="flex justify-center gap-4">
-                <button id="cancel-clear-btn" class="btn bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-md w-full">Cancel</button>
-                <button id="confirm-clear-action-btn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md w-full">Confirm</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const STORAGE_KEY = 'dartsGolfGameState';
-
-            // --- STATE MANAGEMENT ---
-            let gameState = {
-                players: [],
-                currentHole: 1,
-                currentPlayerIndex: 0, // Will always be 0 after game starts, but needed for setup
-                gameStarted: false,
-                currentTurnThrows: [],
-                turnsThisHole: 0,
-            };
-
-            // --- DOM ELEMENTS ---
-            const clearStorageBtn = document.getElementById('clear-storage-btn');
-            const playerSetupEl = document.getElementById('player-setup');
-            const gameSectionEl = document.getElementById('game-section');
-            const addPlayerBtn = document.getElementById('add-player-btn');
-            const newPlayerNameInput = document.getElementById('new-player-name');
-            const playerListEl = document.getElementById('player-list');
-            const startGameBtn = document.getElementById('start-game-btn');
-            const currentPlayerNameEl = document.getElementById('current-player-name');
-            const currentHoleEl = document.getElementById('current-hole');
-            const currentThrowsEl = document.querySelector('#current-throws span');
-            const scoringControlsEl = document.getElementById('scoring-controls');
-            const lockInBtn = document.getElementById('lock-in-btn');
-            const scorecardContainer = document.getElementById('scorecard-container');
-            const scorecardHeadEl = document.getElementById('scorecard-head');
-            const scorecardBodyEl = document.getElementById('scorecard-body');
-            const newGameBtn = document.getElementById('new-game-btn');
-            const winnerModal = document.getElementById('winner-modal');
-            const winnerMessage = document.getElementById('winner-message');
-            const modalNewGameBtn = document.getElementById('modal-new-game-btn');
-            const confirmClearModal = document.getElementById('confirm-clear-modal');
-            const cancelClearBtn = document.getElementById('cancel-clear-btn');
-            const confirmClearActionBtn = document.getElementById('confirm-clear-action-btn');
-
-            // --- PERSISTENCE ---
-            const saveState = () => {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
-                updateClearButtonVisibility();
-            };
-
-            const loadState = () => {
-                const savedState = localStorage.getItem(STORAGE_KEY);
-                if (savedState) {
-                    gameState = JSON.parse(savedState);
-                    // Backwards compatibility for saves without IDs
-                    gameState.players.forEach(p => {
-                        if (!p.id) {
-                            p.id = crypto.randomUUID();
-                        }
-                    });
-                }
-            };
+        <!-- Main Content Area -->
+        <main class="flex-1 relative overflow-hidden flex flex-col">
             
-            const updateClearButtonVisibility = () => {
-                if (localStorage.getItem(STORAGE_KEY)) {
-                    clearStorageBtn.classList.remove('hidden');
-                } else {
-                    clearStorageBtn.classList.add('hidden');
-                }
-            };
-            
-            // --- LAYOUT ADJUSTMENT ---
-            const adjustStickyColumns = () => {
-                requestAnimationFrame(() => {
-                    const playerHeader = document.querySelector('#scorecard-head .sticky-player');
-                    if (!playerHeader) return;
+            <!-- VIEW: Setup -->
+            <div id="setup-view" class="absolute inset-0 z-20 bg-gray-900 flex flex-col p-6 overflow-y-auto">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-users text-3xl text-yellow-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
+                    <p class="text-gray-400 text-sm">Add players to begin the round.</p>
+                </div>
 
-                    const playerColumnWidth = playerHeader.offsetWidth;
-                    const totalCells = document.querySelectorAll('.sticky-total');
+                <div class="space-y-4 mb-8">
+                    <label class="block text-sm font-medium text-gray-300">Number of Holes</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button class="hole-select-btn bg-yellow-500 text-gray-900 p-3 rounded-lg font-bold border-2 border-yellow-500 transition-all" data-holes="9">9 Holes</button>
+                        <button class="hole-select-btn bg-gray-800 text-gray-400 p-3 rounded-lg font-bold border-2 border-transparent hover:bg-gray-700 transition-all" data-holes="18">18 Holes</button>
+                    </div>
+                </div>
+
+                <div class="space-y-4 flex-1">
+                    <label class="block text-sm font-medium text-gray-300">Players</label>
+                    <div id="player-inputs" class="space-y-3">
+                        <!-- Player inputs generated here -->
+                    </div>
                     
-                    totalCells.forEach(cell => {
-                        cell.style.left = `${playerColumnWidth}px`;
-                    });
-                });
-            };
+                    <div class="flex gap-2 mt-4">
+                        <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
+                        <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
 
-            // --- RENDER FUNCTIONS ---
-            const render = () => {
-                 if (gameState.gameStarted) {
-                    playerSetupEl.classList.add('hidden');
-                    gameSectionEl.classList.remove('hidden');
-                    renderScorecard();
-                    updateUIForTurn();
-                    adjustStickyColumns();
-                } else {
-                    playerSetupEl.classList.remove('hidden');
-                    gameSectionEl.classList.add('hidden');
-                    renderPlayers();
-                }
-                saveState();
-            };
+                <button id="start-game-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1">
+                    Tee Off
+                </button>
+            </div>
 
-            const renderPlayers = () => {
-                playerListEl.innerHTML = '';
-                gameState.players.forEach((player) => {
-                    const playerTag = document.createElement('div');
-                    playerTag.className = 'bg-slate-800 rounded-full px-4 py-2 flex items-center gap-3';
-                    playerTag.innerHTML = `
-                        <span class="font-semibold">${player.name}</span>
-                        <button data-id="${player.id}" class="remove-player-btn text-red-400 hover:text-red-600 font-bold">X</button>
-                    `;
-                    playerListEl.appendChild(playerTag);
-                });
-                startGameBtn.disabled = gameState.players.length < 1;
-            };
-
-            const renderScorecard = () => {
-                scorecardHeadEl.innerHTML = `
-                    <tr>
-                        <th class="p-2 text-left sticky-player bg-slate-900">Player</th>
-                        <th class="p-2 sticky-total bg-slate-900">Total</th>
-                        ${Array.from({ length: 18 }, (_, i) => `<th class="p-2 score-cell">${i + 1}</th>`).join('')}
-                    </tr>
-                `;
-
-                scorecardBodyEl.innerHTML = '';
-                gameState.players.forEach((player) => {
-                    const totalScore = player.scores.reduce((sum, score) => sum + (score === null ? 0 : score), 0);
-                    const row = document.createElement('tr');
-                    row.id = `player-row-${player.id}`;
-                    row.className = 'transition-colors';
-                    row.innerHTML = `
-                        <td class="p-2 text-left font-semibold sticky-player bg-slate-900 truncate" title="${player.name}">${player.name}</td>
-                        <td class="p-2 total-score text-yellow-300 sticky-total bg-slate-900">${totalScore}</td>
-                        ${player.scores.map(score => `<td class="p-2 score-cell">${score !== null ? score : ''}</td>`).join('')}
-                    `;
-                    scorecardBodyEl.appendChild(row);
-                });
-                 updateCurrentPlayerHighlight();
-            };
-            
-            const updateUIForTurn = () => {
-                if (!gameState.gameStarted || gameState.players.length === 0) return;
+            <!-- VIEW: Scoreboard / Gameplay -->
+            <div id="game-view" class="absolute inset-0 bg-gray-900 flex flex-col hidden">
                 
-                // The current player is always the first one in the array.
-                const currentPlayer = gameState.players[0];
-                currentPlayerNameEl.textContent = currentPlayer.name;
-                currentHoleEl.textContent = gameState.currentHole;
-                currentThrowsEl.textContent = gameState.currentTurnThrows.join(', ');
+                <!-- Hole Info Banner -->
+                <div class="bg-gray-800 p-4 shadow-md z-10 border-b border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Current Hole</span>
+                            <div class="text-3xl font-bold text-white flex items-baseline">
+                                <span id="current-hole-num" class="text-yellow-400">1</span>
+                                <span class="text-sm text-gray-500 ml-2">/ <span id="total-holes-display">9</span></span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Target</span>
+                            <div class="text-3xl font-bold text-white">
+                                <span id="current-target" class="text-yellow-400">1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="h-full bg-yellow-500 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Active Player Card -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-4" id="players-container">
+                    <!-- Player Cards Injected Here -->
+                </div>
+
+                <!-- Input Controls (Fixed Bottom) -->
+                <div class="bg-gray-800 border-t border-gray-700 p-2 pb-6 z-20">
+                    <div class="text-center mb-2">
+                        <p class="text-xs text-gray-400">Select Score for <span id="active-player-name" class="text-white font-bold">Player</span></p>
+                    </div>
+                    <div class="grid grid-cols-5 gap-2">
+                        <button class="score-btn bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg p-2 flex flex-col items-center justify-center h-20" onclick="recordScore(1)">
+                            <span class="text-2xl font-bold">1</span>
+                            <span class="text-[10px] uppercase">Double</span>
+                        </button>
+                        <button class="score-btn bg-orange-500/20 border border-orange-500/50 text-orange-400 rounded-lg p-2 flex flex-col items-center justify-center h-20" onclick="recordScore(2)">
+                            <span class="text-2xl font-bold">2</span>
+                            <span class="text-[10px] uppercase">Treble</span>
+                        </button>
+                        <button class="score-btn bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 rounded-lg p-2 flex flex-col items-center justify-center h-20" onclick="recordScore(3)">
+                            <span class="text-2xl font-bold">3</span>
+                            <span class="text-[10px] uppercase">Small</span>
+                        </button>
+                        <button class="score-btn bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-lg p-2 flex flex-col items-center justify-center h-20" onclick="recordScore(4)">
+                            <span class="text-2xl font-bold">4</span>
+                            <span class="text-[10px] uppercase">Large</span>
+                        </button>
+                        <button class="score-btn bg-gray-600/20 border border-gray-600/50 text-gray-400 rounded-lg p-2 flex flex-col items-center justify-center h-20" onclick="recordScore(5)">
+                            <span class="text-2xl font-bold">5</span>
+                            <span class="text-[10px] uppercase">Miss</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Results -->
+            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col p-6 hidden">
+                <div class="text-center mb-8 pt-10">
+                    <i class="fa-solid fa-trophy text-5xl text-yellow-400 mb-4 animate-bounce"></i>
+                    <h2 class="text-3xl font-bold text-white">Final Scores</h2>
+                </div>
                 
-                const throwsCount = gameState.currentTurnThrows.length;
-                lockInBtn.disabled = throwsCount === 0;
-                document.querySelectorAll('.btn-score[data-score]').forEach(btn => {
-                    btn.disabled = throwsCount >= 3;
-                });
-                
-                updateCurrentPlayerHighlight();
-            };
+                <div id="leaderboard" class="space-y-3 flex-1 overflow-y-auto">
+                    <!-- Leaderboard items -->
+                </div>
 
-            const updateCurrentPlayerHighlight = () => {
-                 document.querySelectorAll('#scorecard-body tr').forEach(row => {
-                    row.classList.remove('current-player-highlight');
-                 });
-                 if (gameState.gameStarted && !isGameOver() && gameState.players.length > 0) {
-                    const currentPlayerRow = document.getElementById(`player-row-${gameState.players[0].id}`);
-                    if (currentPlayerRow) {
-                        currentPlayerRow.classList.add('current-player-highlight');
-                    }
-                 }
-            };
+                <div class="flex flex-col gap-4 pb-10 mt-6">
+                    <button onclick="resetGame()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl shadow-lg">
+                        Play Again
+                    </button>
+                    <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
+                        Return to Menu
+                    </a>
+                </div>
+            </div>
 
-            // --- GAME LOGIC FUNCTIONS ---
-            const addPlayer = () => {
-                const name = newPlayerNameInput.value.trim();
-                if (name) {
-                    gameState.players.push({
-                        id: crypto.randomUUID(),
-                        name: name,
-                        scores: Array(18).fill(null)
-                    });
-                    newPlayerNameInput.value = '';
-                    renderPlayers();
-                    saveState();
-                }
-            };
-            
-            const removePlayer = (playerId) => {
-                gameState.players = gameState.players.filter(p => p.id !== playerId);
-                renderPlayers();
-                saveState();
-            };
-            
-            const startGame = () => {
-                if(gameState.players.length > 0) {
-                    gameState.gameStarted = true;
-                    gameState.currentPlayerIndex = 0;
-                    gameState.turnsThisHole = 0;
-                    render();
-                }
-            };
-            
-            const recordScore = (score) => {
-                if (gameState.currentTurnThrows.length < 3) {
-                    gameState.currentTurnThrows.push(score);
-                    if (gameState.currentTurnThrows.length === 3) {
-                        setTimeout(() => lockInScore(), 200);
-                    } else {
-                       updateUIForTurn();
-                    }
-                }
-            };
-            
-            const lockInScore = () => {
-                if (gameState.currentTurnThrows.length === 0) return;
-                const holeIndex = gameState.currentHole - 1;
-                const scoreForHole = Math.min(...gameState.currentTurnThrows);
-                // Current player is always at index 0
-                gameState.players[0].scores[holeIndex] = scoreForHole;
-                nextTurn();
-            };
-            
-            const nextTurn = () => {
-                gameState.currentTurnThrows = [];
-                gameState.turnsThisHole++;
+        </main>
+    </div>
 
-                if (gameState.turnsThisHole >= gameState.players.length) {
-                    gameState.currentHole++;
-                    gameState.turnsThisHole = 0;
-                }
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-gray-800 p-6 rounded-2xl max-w-xs w-full shadow-2xl border border-gray-700">
+            <h3 class="text-xl font-bold text-white mb-2">Reset Game?</h3>
+            <p class="text-gray-400 mb-6 text-sm">This will clear all current progress.</p>
+            <div class="flex gap-3">
+                <button id="cancel-reset" class="flex-1 py-3 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-600">Cancel</button>
+                <button id="confirm-reset" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700">Reset</button>
+            </div>
+        </div>
+    </div>
 
-                // Rotate the players array: move the first player to the end.
-                if (gameState.players.length > 1) {
-                    const finishedPlayer = gameState.players.shift();
-                    gameState.players.push(finishedPlayer);
-                }
-                
-                if(isGameOver()){
-                    endGame();
-                } else {
-                    render();
-                    if (gameState.currentHole > 3) {
-                        const cellToView = scorecardContainer.querySelector(`th:nth-child(${gameState.currentHole + 2})`);
-                        if (cellToView) {
-                            cellToView.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                        }
-                    }
-                }
-            };
-            
-            const isGameOver = () => gameState.currentHole > 18;
-
-            const endGame = () => {
-                scoringControlsEl.classList.add('hidden');
-                document.querySelector('#game-section h2').textContent = "Final Scores";
-                document.querySelector('#game-section p').classList.add('hidden');
-                newGameBtn.classList.remove('hidden');
-
-                const finalScores = gameState.players.map(p => ({
-                    name: p.name,
-                    id: p.id,
-                    score: p.scores.reduce((sum, s) => sum + s, 0)
-                }));
-                finalScores.sort((a, b) => a.score - b.score);
-                const winners = finalScores.filter(p => p.score === finalScores[0].score);
-                
-                gameState.players.forEach((player) => {
-                    if (winners.some(w => w.name === player.name)) {
-                        document.getElementById(`player-row-${player.id}`).classList.add('winner-highlight');
-                    }
-                });
-                
-                let winMsg = winners.length > 1 
-                    ? `It's a tie between ${winners.map(w => w.name).join(' & ')} with a score of ${winners[0].score}!`
-                    : `${winners[0].name} wins with a score of ${winners[0].score}!`;
-
-                winnerMessage.textContent = winMsg;
-                winnerModal.classList.remove('hidden');
-                localStorage.removeItem(STORAGE_KEY);
-                updateClearButtonVisibility();
-            };
-
-            const resetGame = () => {
-                // Keep players, but reset scores and game state
-                gameState.players.forEach(p => p.scores.fill(null));
-                gameState.currentHole = 1;
-                gameState.currentPlayerIndex = 0;
-                gameState.currentTurnThrows = [];
-                gameState.turnsThisHole = 0;
-                
-                winnerModal.classList.add('hidden');
-                scoringControlsEl.classList.remove('hidden');
-                document.querySelector('#game-section h2').innerHTML = `<span id="current-player-name"></span>'s Turn`;
-                document.querySelector('#game-section p').classList.remove('hidden');
-                newGameBtn.classList.add('hidden');
-                render();
-            };
-
-            // --- EVENT LISTENERS ---
-            window.addEventListener('resize', adjustStickyColumns);
-
-            clearStorageBtn.addEventListener('click', () => {
-                confirmClearModal.classList.remove('hidden');
-            });
-            
-            cancelClearBtn.addEventListener('click', () => {
-                confirmClearModal.classList.add('hidden');
-            });
-
-            confirmClearActionBtn.addEventListener('click', () => {
-                localStorage.removeItem(STORAGE_KEY);
-                window.location.href = 'bardarts.html';
-            });
-
-            addPlayerBtn.addEventListener('click', addPlayer);
-            newPlayerNameInput.addEventListener('keypress', (e) => e.key === 'Enter' && addPlayer());
-            playerListEl.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove-player-btn')) {
-                    removePlayer(e.target.dataset.id);
-                }
-            });
-            startGameBtn.addEventListener('click', startGame);
-            scoringControlsEl.addEventListener('click', (e) => {
-                const button = e.target.closest('button[data-score]');
-                if (button) recordScore(parseInt(button.dataset.score, 10));
-            });
-            lockInBtn.addEventListener('click', lockInScore);
-            newGameBtn.addEventListener('click', resetGame);
-            modalNewGameBtn.addEventListener('click', resetGame);
-            
-            // --- INITIALIZE ---
-            loadState();
-            updateClearButtonVisibility();
-            render();
-        });
-    </script>
     <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(registration => {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, err => {
-                console.log('ServiceWorker registration failed: ', err);
+        // State
+        let state = {
+            players: [], // { id, name, scores: [], total: 0 }
+            totalHoles: 9,
+            currentHole: 1,
+            currentPlayerIndex: 0,
+            gameActive: false
+        };
+
+        // DOM Elements
+        const views = {
+            setup: document.getElementById('setup-view'),
+            game: document.getElementById('game-view'),
+            results: document.getElementById('results-view')
+        };
+        const modals = {
+            confirm: document.getElementById('confirm-modal')
+        };
+        const playerInputsContainer = document.getElementById('player-inputs');
+        const newPlayerInput = document.getElementById('new-player-name');
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPlayerSetup();
+        });
+
+        // --- Setup Logic ---
+
+        document.querySelectorAll('.hole-select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                state.totalHoles = parseInt(e.target.dataset.holes);
+                document.querySelectorAll('.hole-select-btn').forEach(b => {
+                    b.classList.remove('bg-yellow-500', 'text-gray-900', 'border-yellow-500');
+                    b.classList.add('bg-gray-800', 'text-gray-400', 'border-transparent');
+                });
+                e.target.classList.remove('bg-gray-800', 'text-gray-400', 'border-transparent');
+                e.target.classList.add('bg-yellow-500', 'text-gray-900', 'border-yellow-500');
             });
         });
-    }
+
+        document.getElementById('add-player-btn').addEventListener('click', addPlayer);
+        newPlayerInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addPlayer() });
+
+        function addPlayer() {
+            const name = newPlayerInput.value.trim();
+            if (name) {
+                state.players.push({
+                    id: Date.now(),
+                    name: name,
+                    scores: [],
+                    total: 0
+                });
+                newPlayerInput.value = '';
+                renderPlayerSetup();
+            }
+        }
+
+        window.removePlayer = (index) => {
+            state.players.splice(index, 1);
+            renderPlayerSetup();
+        };
+
+        function renderPlayerSetup() {
+            playerInputsContainer.innerHTML = '';
+            state.players.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700";
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-400">${i+1}</div>
+                    <span class="flex-1 font-semibold text-white">${p.name}</span>
+                    <button onclick="removePlayer(${i})" class="text-red-400 hover:text-red-300 p-2"><i class="fa-solid fa-trash"></i></button>
+                `;
+                playerInputsContainer.appendChild(div);
+            });
+            // Initial call empty state check
+            if(state.players.length === 0 && playerInputsContainer.children.length === 0) {
+                 // Optional: add initial empty message
+            }
+        }
+
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            if (state.players.length === 0) {
+                alert("Add at least one player!"); // Basic validation
+                return;
+            }
+
+            // Init empty scores
+            state.players.forEach(p => {
+                p.scores = Array(state.totalHoles).fill(null);
+                p.total = 0;
+            });
+
+            state.currentHole = 1;
+            state.currentPlayerIndex = 0;
+            state.gameActive = true;
+            
+            startGame();
+        });
+
+        // --- Reset Logic & Modals ---
+        const resetBtn = document.getElementById('reset-data-btn');
+        const confirmBtn = document.getElementById('confirm-reset');
+        const cancelBtn = document.getElementById('cancel-reset');
+
+        resetBtn.addEventListener('click', () => modals.confirm.classList.remove('hidden'));
+        cancelBtn.addEventListener('click', () => modals.confirm.classList.add('hidden'));
+        confirmBtn.addEventListener('click', () => {
+            resetGame();
+            modals.confirm.classList.add('hidden');
+        });
+
+        window.resetGame = function() {
+            state.gameActive = false;
+            switchView('setup');
+        }
+
+        function switchView(viewName) {
+            Object.values(views).forEach(el => el.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+        }
+
+        // --- Game Logic ---
+
+        function startGame() {
+            updateGameUI();
+            switchView('game');
+        }
+
+        function updateGameUI() {
+            document.getElementById('current-hole-num').textContent = state.currentHole;
+            document.getElementById('total-holes-display').textContent = state.totalHoles;
+            document.getElementById('current-target').textContent = state.currentHole;
+            
+            // Progress Bar
+            const progress = ((state.currentHole - 1) / state.totalHoles) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            // Active Player Name
+            const currentPlayer = state.players[state.currentPlayerIndex];
+            document.getElementById('active-player-name').textContent = currentPlayer.name;
+
+            renderPlayerCards();
+        }
+
+        function renderPlayerCards() {
+            const container = document.getElementById('players-container');
+            container.innerHTML = '';
+
+            state.players.forEach((player, index) => {
+                const isActive = index === state.currentPlayerIndex;
+                const isDone = player.scores[state.currentHole - 1] !== null;
+                
+                let cardClass = isActive 
+                    ? "bg-gray-700 border-2 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]" 
+                    : "bg-gray-800 border border-gray-700 opacity-60";
+
+                if (isDone) {
+                     cardClass = "bg-gray-800 border border-gray-600 opacity-40";
+                }
+
+                const lastScore = state.currentHole > 1 ? player.scores[state.currentHole - 2] : '-';
+                
+                const html = `
+                    <div class="${cardClass} rounded-xl p-4 transition-all duration-300 relative overflow-hidden">
+                        ${isActive ? '<div class="absolute top-0 right-0 p-2"><span class="flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span></span></div>' : ''}
+                        
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-lg text-white truncate max-w-[70%]">${player.name}</h3>
+                            <span class="text-2xl font-mono font-bold ${player.total < (state.currentHole-1)*3 ? 'text-yellow-400' : 'text-white'}">${player.total}</span>
+                        </div>
+                        
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <div>Last Hole: <span class="text-white font-bold">${lastScore !== null ? lastScore : '-'}</span></div>
+                            <div class="flex gap-1">
+                                ${getScoreHistory(player)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+            
+            const activeCard = container.children[state.currentPlayerIndex];
+            if(activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function getScoreHistory(player) {
+            // Show last 5 holes
+            const history = player.scores.slice(0, state.currentHole - 1).slice(-5);
+            return history.map(s => {
+                let color = 'text-gray-500';
+                if(s === 1) color = 'text-red-400';
+                if(s === 2) color = 'text-orange-400';
+                if(s === 3) color = 'text-yellow-400';
+                return `<span class="${color}">${s}</span>`;
+            }).join(' ');
+        }
+
+        window.recordScore = function(score) {
+            const player = state.players[state.currentPlayerIndex];
+            player.scores[state.currentHole - 1] = score;
+            player.total += score;
+
+            // Move to next player
+            state.currentPlayerIndex++;
+
+            // If all players have played this hole
+            if (state.currentPlayerIndex >= state.players.length) {
+                state.currentPlayerIndex = 0;
+                state.currentHole++;
+
+                // Game Over Check
+                if (state.currentHole > state.totalHoles) {
+                    endGame();
+                    return;
+                }
+            }
+
+            updateGameUI();
+        };
+
+        function endGame() {
+            switchView('results');
+            const leaderboard = document.getElementById('leaderboard');
+            
+            // Sort players by score (ascending)
+            const sortedPlayers = [...state.players].sort((a, b) => a.total - b.total);
+            
+            leaderboard.innerHTML = sortedPlayers.map((p, i) => {
+                let rankColor = "text-gray-400";
+                let rankIcon = `<span class="font-mono text-gray-500">#${i+1}</span>`;
+                let bgClass = "bg-gray-800";
+                
+                if (i === 0) {
+                    rankColor = "text-yellow-400";
+                    rankIcon = '<i class="fa-solid fa-crown text-yellow-400"></i>';
+                    bgClass = "bg-gradient-to-r from-yellow-900/20 to-gray-800 border-yellow-500/30 border";
+                } else if (i === 1) {
+                    rankColor = "text-gray-300";
+                    bgClass = "bg-gray-800 border-gray-600 border";
+                } else if (i === 2) {
+                    rankColor = "text-orange-400";
+                    bgClass = "bg-gray-800 border-orange-900/30 border";
+                }
+
+                return `
+                    <div class="${bgClass} p-4 rounded-xl flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-8 text-center text-xl">${rankIcon}</div>
+                            <div>
+                                <div class="font-bold text-white text-lg">${p.name}</div>
+                                <div class="text-xs text-gray-500">Avg: ${(p.total / state.totalHoles).toFixed(1)}</div>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-mono font-bold ${rankColor}">${p.total}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
     </script>
 </body>
 </html>
