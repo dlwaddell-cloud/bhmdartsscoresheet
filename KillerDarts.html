@@ -60,10 +60,11 @@
 <body class="h-screen w-screen overflow-hidden flex flex-col">
 
     <!-- App Container -->
-    <div id="app" class="relative w-full h-full max-w-lg mx-auto flex flex-col bg-gray-900 shadow-2xl">
+    <!-- Changed: Removed max-w-lg to allow horizontal resizing -->
+    <div id="app" class="relative w-full h-full mx-auto flex flex-col bg-gray-900 shadow-2xl">
         
         <!-- Header -->
-        <header class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10">
+        <header class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10 shrink-0">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-skull-crossbones text-red-500 text-xl"></i>
                 <h1 class="text-xl font-bold text-white tracking-wide">Killer Darts</h1>
@@ -111,7 +112,7 @@
 
             <!-- VIEW: Target Selection -->
             <div id="target-view" class="absolute inset-0 z-30 bg-gray-900 flex flex-col hidden">
-                <div class="bg-gray-800 p-4 border-b border-gray-700">
+                <div class="bg-gray-800 p-4 border-b border-gray-700 shrink-0">
                     <h2 id="target-title" class="text-lg font-bold text-white text-center">Set Target</h2>
                     <p class="text-center text-sm text-gray-400"><span id="target-setter-name" class="text-yellow-400 font-bold">Player</span> is choosing...</p>
                 </div>
@@ -139,7 +140,7 @@
             <div id="game-view" class="absolute inset-0 bg-gray-900 flex flex-col hidden">
                 
                 <!-- Info Banner -->
-                <div class="bg-gray-800 p-4 shadow-md z-10 border-b border-gray-700">
+                <div class="bg-gray-800 p-4 shadow-md z-10 border-b border-gray-700 shrink-0">
                     <div class="flex justify-between items-center">
                         <div>
                             <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Killer</span>
@@ -149,7 +150,8 @@
                         </div>
                         <div class="text-center">
                             <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Target</span>
-                            <div class="text-3xl font-bold text-yellow-400" id="game-target-display">
+                            <!-- Changed: Increased font size for current target from text-3xl to text-6xl -->
+                            <div class="text-6xl font-bold text-yellow-400" id="game-target-display">
                                 -
                             </div>
                         </div>
@@ -168,18 +170,20 @@
                 </div>
 
                 <!-- Controls -->
-                <div class="bg-gray-800 border-t border-gray-700 p-3 z-20 pb-6">
-                     <div class="grid grid-cols-5 gap-2 h-20">
+                <div class="bg-gray-800 border-t border-gray-700 p-3 z-20 pb-6 shrink-0">
+                     <!-- Changed: Decreased button container height from h-20 to h-14 -->
+                     <div class="grid grid-cols-5 gap-2 h-14">
                         <button id="undo-btn" class="col-span-1 bg-gray-700 text-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-600 action-btn">
                             <i class="fa-solid fa-rotate-left text-xl"></i>
                         </button>
                         <button id="miss-btn" class="col-span-2 bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl flex flex-col items-center justify-center hover:bg-red-500/20 action-btn">
-                            <span class="text-xl font-bold">MISS</span>
-                            <span class="text-xs opacity-75">Lose Life</span>
+                            <!-- Changed: Adjusted text size to fit new button height -->
+                            <span class="text-lg font-bold">MISS</span>
+                            <span class="text-[10px] opacity-75 leading-none">Lose Life</span>
                         </button>
                         <button id="hit-btn" class="col-span-2 bg-green-500/10 border border-green-500/50 text-green-500 rounded-xl flex flex-col items-center justify-center hover:bg-green-500/20 action-btn">
-                            <span class="text-xl font-bold">HIT</span>
-                            <span class="text-xs opacity-75">Become Killer</span>
+                            <span class="text-lg font-bold">HIT</span>
+                            <span class="text-[10px] opacity-75 leading-none">Become Killer</span>
                         </button>
                     </div>
                 </div>
@@ -446,7 +450,16 @@
             const container = document.getElementById('players-container');
             container.innerHTML = '';
 
-            gameState.players.forEach((p, i) => {
+            // Changed: Rotation logic
+            // Create an array of indices starting from the current player
+            const totalPlayers = gameState.players.length;
+            const startIdx = gameState.currentPlayerIndex;
+            
+            // We iterate through all players, but offset the index so current player is first
+            for (let offset = 0; offset < totalPlayers; offset++) {
+                const i = (startIdx + offset) % totalPlayers;
+                const p = gameState.players[i];
+
                 const isKiller = i === gameState.killerPlayerIndex;
                 const isTurn = i === gameState.currentPlayerIndex;
                 const isDead = p.lives <= 0;
@@ -471,8 +484,9 @@
                     if(isTurn) borderClass = "border-red-500";
                 }
 
+                // Changed: Increased heart icon size to text-2xl
                 const livesHtml = Array(5).fill(0).map((_, idx) => {
-                    return `<i class="fa-solid fa-heart text-sm ${idx < p.lives ? 'text-red-500' : 'text-gray-700'}"></i>`;
+                    return `<i class="fa-solid fa-heart text-2xl ${idx < p.lives ? 'text-red-500' : 'text-gray-700'}"></i>`;
                 }).join('');
 
                 const html = `
@@ -480,7 +494,8 @@
                          ${isKiller ? '<div class="absolute top-0 right-0 p-2"><i class="fa-solid fa-skull text-red-500/50 text-4xl transform rotate-12"></i></div>' : ''}
                         <div class="flex justify-between items-center relative z-10">
                             <div>
-                                <h3 class="font-bold text-lg text-white">${p.name}</h3>
+                                <!-- Changed: Increased player name font size to text-3xl -->
+                                <h3 class="font-bold text-3xl text-white">${p.name}</h3>
                                 <div class="text-xs text-gray-400 font-mono mt-1">${isKiller ? 'KILLER' : isDead ? 'ELIMINATED' : 'HUNTER'}</div>
                             </div>
                             <div class="flex flex-col items-end gap-1">
@@ -492,7 +507,10 @@
                     </div>
                 `;
                 container.innerHTML += html;
-            });
+            }
+
+            // Ensure the list is scrolled to the top so the current player is visible
+            container.scrollTop = 0;
 
             // Update Undo Button state
             const undoBtn = document.getElementById('undo-btn');
@@ -560,8 +578,7 @@
             );
 
             // Special case: If only the killer is left alive (handled in checkWinCondition), or logic stuck
-            // This loop skips dead players AND the killer himself (since killer doesn't shoot at himself usually, 
-            // but in some variations they do. Assuming Standard Killer: Killer waits for others to fail)
+            // This loop skips dead players AND the killer himself (since killer doesn't shoot at himself usually)
             
             // If we looped back to killer because everyone else is dead, the killer wins.
             if(gameState.currentPlayerIndex === gameState.killerPlayerIndex) {
