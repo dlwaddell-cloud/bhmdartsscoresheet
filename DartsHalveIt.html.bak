@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halve It</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="manifest" href="halveit_manifest.json">
+    <meta name="theme-color" content="#1a202c">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            overscroll-behavior: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; 
+            border-radius: 4px;
+        }
+
+        .action-btn {
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .input-focus-ring:focus {
+            outline: 2px solid #f97316; /* Orange-500 */
+            outline-offset: 2px;
+        }
+
+        .score-btn-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        @keyframes halving-flash {
+            0%, 100% { background-color: rgba(239, 68, 68, 0); }
+            50% { background-color: rgba(239, 68, 68, 0.3); }
+        }
+        .halved-anim {
+            animation: halving-flash 1s ease-in-out;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- App Container -->
+    <div id="app" class="relative w-full h-full max-w-lg mx-auto flex flex-col bg-gray-900 shadow-2xl">
+        
+        <!-- Header -->
+        <header class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-divide text-orange-500 text-xl"></i>
+                <h1 class="text-xl font-bold text-white tracking-wide">Halve It</h1>
+            </div>
+            <div class="flex gap-2">
+                 <button id="reset-data-btn" class="text-gray-400 hover:text-white transition-colors p-2" title="Reset Game">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <a href="bardarts.html" class="text-gray-400 hover:text-white transition-colors p-2" title="Exit">
+                    <i class="fa-solid fa-door-open"></i>
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 relative overflow-hidden flex flex-col">
+            
+            <!-- VIEW: Setup -->
+            <div id="setup-view" class="absolute inset-0 z-20 bg-gray-900 flex flex-col p-6 overflow-y-auto">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-users text-3xl text-orange-500"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
+                    <p class="text-gray-400 text-sm">Don't miss, or your score gets halved!</p>
+                </div>
+
+                <div class="space-y-4 flex-1">
+                    <div id="player-inputs" class="space-y-3">
+                        <!-- Player list generated here -->
+                    </div>
+                    
+                    <div class="flex gap-2 mt-4">
+                        <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
+                        <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="start-game-btn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Start Game
+                </button>
+            </div>
+
+            <!-- VIEW: Gameplay -->
+            <div id="game-view" class="absolute inset-0 bg-gray-900 flex flex-col hidden">
+                
+                <!-- Info Banner -->
+                <div class="bg-gray-800 p-4 shadow-md z-10 border-b border-gray-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="text-left">
+                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Round</span>
+                            <div class="text-xl font-bold text-white">
+                                <span id="current-round-num" class="text-orange-400">1</span>
+                                <span class="text-sm text-gray-500">/ 9</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Target</span>
+                            <div class="text-3xl font-bold text-orange-400" id="current-target-display">
+                                20
+                            </div>
+                        </div>
+                        <div class="text-right">
+                             <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Turn</span>
+                             <div class="text-xl font-bold text-white truncate max-w-[100px]" id="current-player-name">
+                                Player
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Throw Tracker -->
+                    <div class="flex justify-center gap-2 mt-1">
+                        <div id="throw-1" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
+                        <div id="throw-2" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
+                        <div id="throw-3" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
+                    </div>
+                </div>
+
+                <!-- Player List -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-3" id="players-container">
+                    <!-- Player Cards Injected Here -->
+                </div>
+
+                <!-- Controls -->
+                <div class="bg-gray-800 border-t border-gray-700 p-3 z-20 pb-6 flex flex-col">
+                    
+                    <!-- Dynamic Score Controls -->
+                    <div id="controls-specific" class="hidden flex-1 grid grid-cols-3 gap-2 mb-2">
+                        <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl p-4 flex flex-col items-center justify-center" data-mult="1">
+                            <span class="text-2xl">Single</span>
+                            <span class="text-xs text-gray-400" id="btn-label-s">20</span>
+                        </button>
+                        <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl p-4 flex flex-col items-center justify-center" data-mult="2">
+                            <span class="text-2xl text-green-400">Double</span>
+                            <span class="text-xs text-gray-400" id="btn-label-d">40</span>
+                        </button>
+                        <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl p-4 flex flex-col items-center justify-center" data-mult="3">
+                            <span class="text-2xl text-orange-400">Treble</span>
+                            <span class="text-xs text-gray-400" id="btn-label-t">60</span>
+                        </button>
+                    </div>
+
+                    <div id="controls-any" class="hidden flex-1 overflow-y-auto max-h-[160px] mb-2">
+                        <div class="score-btn-grid" id="any-grid">
+                            <!-- 1-20 buttons injected here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Bottom Action Bar -->
+                     <div class="grid grid-cols-4 gap-2 h-16">
+                        <button id="undo-btn" class="col-span-1 bg-gray-700 text-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-600 action-btn">
+                            <i class="fa-solid fa-rotate-left text-xl"></i>
+                        </button>
+                        <button id="miss-btn" class="col-span-1 bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl flex flex-col items-center justify-center hover:bg-red-500/20 action-btn">
+                            <span class="text-lg font-bold">MISS</span>
+                        </button>
+                         <button id="next-btn" class="col-span-2 bg-orange-600 text-white rounded-xl flex items-center justify-center hover:bg-orange-500 action-btn font-bold text-lg">
+                            NEXT <i class="fa-solid fa-chevron-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Results -->
+            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col p-6 hidden">
+                <div class="text-center mb-8 pt-10">
+                    <i class="fa-solid fa-trophy text-6xl text-yellow-400 mb-6 animate-bounce"></i>
+                    <h2 class="text-4xl font-bold text-white mb-2">Game Over!</h2>
+                    <p class="text-xl text-gray-400" id="winner-name">Player Wins</p>
+                </div>
+                
+                <div id="final-scores-list" class="flex-1 overflow-y-auto space-y-3 mb-4">
+                    <!-- Final scores -->
+                </div>
+
+                <div class="flex flex-col gap-4 pb-10">
+                    <button id="new-game-btn" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all">
+                        Play Again
+                    </button>
+                    <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
+                        Return to Menu
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-gray-800 p-6 rounded-2xl max-w-xs w-full shadow-2xl border border-gray-700">
+            <h3 class="text-xl font-bold text-white mb-2">Reset Game?</h3>
+            <p class="text-gray-400 mb-6 text-sm">This will clear all current progress.</p>
+            <div class="flex gap-3">
+                <button id="cancel-reset" class="flex-1 py-3 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-600">Cancel</button>
+                <button id="confirm-reset" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const STORAGE_KEY = 'halveIt_v2_state';
+        
+        const TARGETS = [
+            { id: '20', label: '20', type: 'specific', val: 20 },
+            { id: '19', label: '19', type: 'specific', val: 19 },
+            { id: 'D',  label: 'Any Double', type: 'any_double' },
+            { id: '18', label: '18', type: 'specific', val: 18 },
+            { id: '17', label: '17', type: 'specific', val: 17 },
+            { id: 'T',  label: 'Any Treble', type: 'any_treble' },
+            { id: '16', label: '16', type: 'specific', val: 16 },
+            { id: '15', label: '15', type: 'specific', val: 15 },
+            { id: 'B',  label: 'Bull', type: 'specific', val: 25, isBull: true }
+        ];
+
+        let gameState = {
+            players: [], // { name, score, history: [] }
+            phase: 'setup', // 'setup', 'playing', 'over'
+            currentRoundIdx: 0,
+            currentPlayerIdx: 0,
+            turnThrows: [], // { points, hit }
+            history: [] // For undo
+        };
+
+        // --- DOM Elements ---
+        const views = {
+            setup: document.getElementById('setup-view'),
+            game: document.getElementById('game-view'),
+            results: document.getElementById('results-view')
+        };
+        const modals = {
+            confirm: document.getElementById('confirm-modal')
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            setupAnyGrid();
+            render();
+        });
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    gameState = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.error("Save load error", e);
+            }
+        }
+
+        function pushHistory() {
+            // Keep last 5 moves
+            const stateCopy = JSON.parse(JSON.stringify(gameState));
+            stateCopy.history = []; 
+            gameState.history.push(stateCopy);
+            if(gameState.history.length > 5) gameState.history.shift();
+        }
+
+        function switchView(viewName) {
+            Object.values(views).forEach(el => el.classList.add('hidden'));
+            if(views[viewName]) views[viewName].classList.remove('hidden');
+        }
+
+        function render() {
+            switchView(gameState.phase === 'playing' ? 'game' : 
+                       gameState.phase === 'over' ? 'results' : 'setup');
+
+            if (gameState.phase === 'setup') {
+                renderSetup();
+            } else if (gameState.phase === 'playing') {
+                renderGame();
+            } else if (gameState.phase === 'over') {
+                renderResults();
+            }
+        }
+
+        // --- Setup Logic ---
+        const playerInputsContainer = document.getElementById('player-inputs');
+        const newPlayerInput = document.getElementById('new-player-name');
+        
+        function renderSetup() {
+            playerInputsContainer.innerHTML = '';
+            gameState.players.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700";
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-400">${i+1}</div>
+                    <span class="flex-1 font-semibold text-white">${p.name}</span>
+                    <button onclick="removePlayer(${i})" class="text-red-400 hover:text-red-300 p-2"><i class="fa-solid fa-trash"></i></button>
+                `;
+                playerInputsContainer.appendChild(div);
+            });
+            document.getElementById('start-game-btn').disabled = gameState.players.length < 1;
+        }
+
+        document.getElementById('add-player-btn').addEventListener('click', addPlayer);
+        newPlayerInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addPlayer() });
+
+        function addPlayer() {
+            const name = newPlayerInput.value.trim();
+            if (name) {
+                gameState.players.push({ name, score: 0 });
+                newPlayerInput.value = '';
+                saveState();
+                render();
+            }
+        }
+
+        window.removePlayer = (index) => {
+            gameState.players.splice(index, 1);
+            saveState();
+            render();
+        };
+
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            gameState.phase = 'playing';
+            gameState.currentRoundIdx = 0;
+            gameState.currentPlayerIdx = 0;
+            gameState.turnThrows = [];
+            gameState.history = [];
+            // Reset scores
+            gameState.players.forEach(p => p.score = 40); // Start with 40 or 0? Usually 0 or a base. Let's start with 0 as per uploaded file logic
+            gameState.players.forEach(p => p.score = 0);
+            
+            saveState();
+            render();
+        });
+
+        // --- Game Logic ---
+        function renderGame() {
+            const target = TARGETS[gameState.currentRoundIdx];
+            const player = gameState.players[gameState.currentPlayerIdx];
+
+            // Header Info
+            document.getElementById('current-round-num').textContent = gameState.currentRoundIdx + 1;
+            document.getElementById('current-target-display').textContent = target.label;
+            document.getElementById('current-player-name').textContent = player.name;
+
+            // Throw Dots
+            for(let i=1; i<=3; i++) {
+                const dot = document.getElementById(`throw-${i}`);
+                if(gameState.turnThrows.length >= i) {
+                    dot.className = "w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]";
+                } else {
+                    dot.className = "w-3 h-3 rounded-full bg-gray-700";
+                }
+            }
+
+            // Controls Visibility
+            const specificControls = document.getElementById('controls-specific');
+            const anyControls = document.getElementById('controls-any');
+            
+            if (target.type === 'specific') {
+                specificControls.classList.remove('hidden');
+                anyControls.classList.add('hidden');
+                updateSpecificButtons(target);
+            } else {
+                specificControls.classList.add('hidden');
+                anyControls.classList.remove('hidden');
+            }
+
+            // Buttons State
+            const turnComplete = gameState.turnThrows.length >= 3;
+            document.getElementById('next-btn').disabled = !turnComplete;
+            document.getElementById('next-btn').classList.toggle('opacity-50', !turnComplete);
+            
+            document.querySelectorAll('.score-btn, #miss-btn').forEach(btn => {
+                btn.disabled = turnComplete;
+                btn.classList.toggle('opacity-50', turnComplete);
+            });
+            
+            document.getElementById('undo-btn').disabled = (gameState.history.length === 0 && gameState.turnThrows.length === 0);
+            document.getElementById('undo-btn').classList.toggle('opacity-50', (gameState.history.length === 0 && gameState.turnThrows.length === 0));
+
+
+            // Render Players
+            renderPlayerList();
+        }
+
+        function renderPlayerList() {
+            const container = document.getElementById('players-container');
+            container.innerHTML = '';
+            
+            gameState.players.forEach((p, i) => {
+                const isTurn = i === gameState.currentPlayerIdx;
+                let bgClass = isTurn ? "bg-gray-700 border border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.2)]" : "bg-gray-800 border border-gray-700 opacity-80";
+                
+                // Calculate potential current turn score to preview
+                let currentScore = p.score;
+                let roundScore = 0;
+                let hitTarget = false;
+                
+                if (isTurn) {
+                    gameState.turnThrows.forEach(t => {
+                        roundScore += t.points;
+                        if(t.hit) hitTarget = true;
+                    });
+                    currentScore += roundScore;
+                }
+
+                const html = `
+                    <div class="${bgClass} rounded-xl p-4 transition-all flex justify-between items-center relative overflow-hidden" id="card-player-${i}">
+                        <div class="flex items-center gap-3 z-10">
+                            <div class="w-8 h-8 rounded-full ${isTurn ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400'} flex items-center justify-center font-bold text-sm">
+                                ${i+1}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-lg leading-tight">${p.name}</h3>
+                                ${isTurn ? `<div class="text-xs text-orange-400 font-mono">Current Turn: +${roundScore}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="z-10 text-right">
+                             <div class="text-3xl font-bold text-white font-mono">${currentScore}</div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+
+            // Scroll to active
+            const activeCard = document.getElementById(`card-player-${gameState.currentPlayerIdx}`);
+            if(activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function updateSpecificButtons(target) {
+            const btnS = document.querySelector('[data-mult="1"]');
+            const btnD = document.querySelector('[data-mult="2"]');
+            const btnT = document.querySelector('[data-mult="3"]');
+
+            if (target.isBull) {
+                // Bull Layout
+                document.getElementById('btn-label-s').textContent = "25";
+                btnS.querySelector('span:first-child').textContent = "Single Bull";
+                
+                document.getElementById('btn-label-d').textContent = "50";
+                btnD.querySelector('span:first-child').textContent = "Double Bull";
+                
+                btnT.classList.add('hidden'); // No Triple Bull
+                btnS.parentElement.classList.remove('grid-cols-3');
+                btnS.parentElement.classList.add('grid-cols-2');
+            } else {
+                // Normal Layout
+                btnT.classList.remove('hidden');
+                btnS.parentElement.classList.remove('grid-cols-2');
+                btnS.parentElement.classList.add('grid-cols-3');
+
+                document.getElementById('btn-label-s').textContent = target.val;
+                btnS.querySelector('span:first-child').textContent = "Single";
+
+                document.getElementById('btn-label-d').textContent = target.val * 2;
+                btnD.querySelector('span:first-child').textContent = "Double";
+
+                document.getElementById('btn-label-t').textContent = target.val * 3;
+                btnT.querySelector('span:first-child').textContent = "Treble";
+            }
+        }
+
+        function setupAnyGrid() {
+            const grid = document.getElementById('any-grid');
+            grid.innerHTML = '';
+            
+            // 1-20
+            for(let i=1; i<=20; i++) {
+                const btn = document.createElement('button');
+                btn.className = "score-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg border border-gray-600";
+                btn.textContent = i;
+                btn.onclick = () => handleAnyHit(i);
+                grid.appendChild(btn);
+            }
+            // Bull
+            const bullBtn = document.createElement('button');
+            bullBtn.className = "score-btn bg-red-900/50 hover:bg-red-800/50 text-red-400 font-bold py-3 rounded-lg border border-red-800 col-span-5";
+            bullBtn.textContent = "BULL";
+            bullBtn.onclick = () => handleAnyHit(25);
+            grid.appendChild(bullBtn);
+        }
+
+        // --- Action Handlers ---
+
+        // Specific Round Hits
+        document.querySelectorAll('#controls-specific .score-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = TARGETS[gameState.currentRoundIdx];
+                const mult = parseInt(btn.dataset.mult);
+                const points = target.val * mult;
+                recordThrow(points, true);
+            });
+        });
+
+        // Any Round Hits
+        function handleAnyHit(val) {
+            const target = TARGETS[gameState.currentRoundIdx];
+            const multiplier = target.type === 'any_double' ? 2 : 3;
+            const points = val * multiplier;
+            recordThrow(points, true);
+        }
+
+        // Miss
+        document.getElementById('miss-btn').addEventListener('click', () => {
+            recordThrow(0, false);
+        });
+
+        function recordThrow(points, hit) {
+            if (gameState.turnThrows.length >= 3) return;
+            // No history push here, we just modify local turn state. 
+            // We push history only when turn ends or if we want granular undo.
+            // Let's do granular undo for better UX.
+            pushHistory();
+            gameState.turnThrows.push({ points, hit });
+            render();
+        }
+
+        // Undo
+        document.getElementById('undo-btn').addEventListener('click', () => {
+            if (gameState.history.length > 0) {
+                gameState = gameState.history.pop();
+                saveState();
+                render();
+            } else if (gameState.turnThrows.length > 0) {
+                 // Should be covered by history, but fallback just in case
+                 gameState.turnThrows.pop();
+                 render();
+            }
+        });
+
+        // Next Player / End Turn
+        document.getElementById('next-btn').addEventListener('click', () => {
+            pushHistory(); // Save state before committing turn
+            
+            const player = gameState.players[gameState.currentPlayerIdx];
+            const anyHit = gameState.turnThrows.some(t => t.hit);
+            
+            if (anyHit) {
+                // Add points
+                const turnTotal = gameState.turnThrows.reduce((sum, t) => sum + t.points, 0);
+                player.score += turnTotal;
+            } else {
+                // Halve Score
+                player.score = Math.floor(player.score / 2);
+                // Visual feedback? handled by render, maybe add a toast later
+            }
+
+            gameState.turnThrows = [];
+            
+            // Advance
+            if (gameState.currentPlayerIdx >= gameState.players.length - 1) {
+                gameState.currentPlayerIdx = 0;
+                gameState.currentRoundIdx++;
+                
+                if (gameState.currentRoundIdx >= TARGETS.length) {
+                    endGame();
+                    return;
+                }
+            } else {
+                gameState.currentPlayerIdx++;
+            }
+
+            saveState();
+            render();
+        });
+
+        function endGame() {
+            gameState.phase = 'over';
+            
+            // Sort winners
+            const winners = [...gameState.players].sort((a,b) => b.score - a.score);
+            document.getElementById('winner-name').textContent = `${winners[0].name} (${winners[0].score})`;
+            
+            const list = document.getElementById('final-scores-list');
+            list.innerHTML = winners.map((p, i) => `
+                <div class="flex justify-between items-center bg-gray-800 p-4 rounded-xl border border-gray-700">
+                    <div class="flex items-center gap-3">
+                        <span class="text-gray-500 font-mono">#${i+1}</span>
+                        <span class="font-bold text-white">${p.name}</span>
+                    </div>
+                    <span class="text-orange-400 font-bold text-xl">${p.score}</span>
+                </div>
+            `).join('');
+
+            saveState();
+            render();
+        }
+
+        // --- Reset / Modals ---
+        const resetBtn = document.getElementById('reset-data-btn');
+        const confirmBtn = document.getElementById('confirm-reset');
+        const cancelBtn = document.getElementById('cancel-reset');
+        const newGameBtn = document.getElementById('new-game-btn');
+
+        resetBtn.addEventListener('click', () => modals.confirm.classList.remove('hidden'));
+        cancelBtn.addEventListener('click', () => modals.confirm.classList.add('hidden'));
+        
+        confirmBtn.addEventListener('click', () => {
+            fullReset();
+            modals.confirm.classList.add('hidden');
+        });
+        
+        newGameBtn.addEventListener('click', () => {
+            fullReset();
+        });
+
+        function fullReset() {
+            gameState.phase = 'setup';
+            gameState.players = [];
+            gameState.history = [];
+            gameState.currentRoundIdx = 0;
+            gameState.currentPlayerIdx = 0;
+            saveState();
+            render();
+        }
+
+    </script>
+</body>
+</html>
