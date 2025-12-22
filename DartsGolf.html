@@ -35,11 +35,11 @@
             border-radius: 4px;
         }
 
-        .score-btn {
+        .score-btn, .action-btn {
             transition: all 0.2s;
             touch-action: manipulation;
         }
-        .score-btn:active {
+        .score-btn:active, .action-btn:active {
             transform: scale(0.95);
         }
 
@@ -153,9 +153,21 @@
                 <!-- Input Controls (Fixed Bottom) -->
                 <div class="bg-gray-800 border-t border-gray-700 z-20">
                     <div class="max-w-5xl mx-auto w-full p-2 pb-6">
-                        <div class="text-center mb-2">
-                            <p class="text-xs text-gray-400">Select Score for <span id="active-player-name" class="text-white font-bold">Player</span></p>
+                        <div class="flex justify-between items-center mb-2 px-1 gap-2">
+                            <!-- Undo Button -->
+                            <button id="undo-btn" class="action-btn bg-gray-700 text-gray-300 rounded-xl w-12 h-10 flex items-center justify-center hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed" onclick="undoLastShot()" title="Undo Last Shot">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                            
+                            <!-- Instruction Text -->
+                            <div class="text-center flex-1">
+                                <p class="text-xs text-gray-400">Select Score for <span id="active-player-name" class="text-white font-bold">Player</span></p>
+                            </div>
+
+                            <!-- Spacer to balance the layout -->
+                            <div class="w-12"></div>
                         </div>
+
                         <!-- Decreased button height to h-14 and reduced inner text size slightly -->
                         <div class="grid grid-cols-5 gap-2">
                             <button class="score-btn bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-3)">
@@ -228,7 +240,8 @@
             totalHoles: 9,
             currentHole: 1,
             currentPlayerIndex: 0,
-            gameActive: false
+            gameActive: false,
+            history: [] // For undo functionality
         };
 
         const STORAGE_KEY = 'darts_golf_state';
@@ -259,6 +272,9 @@
             if (saved) {
                 try {
                     state = JSON.parse(saved);
+                    // Ensure history exists if loading from old state
+                    if (!state.history) state.history = [];
+                    
                     if (state.gameActive) {
                         startGame();
                     } else {
@@ -353,6 +369,7 @@
             state.currentHole = 1;
             state.currentPlayerIndex = 0;
             state.gameActive = true;
+            state.history = []; // Clear history on new game
             
             saveState();
             startGame();
@@ -400,6 +417,16 @@
             // Active Player Name
             const currentPlayer = state.players[state.currentPlayerIndex];
             document.getElementById('active-player-name').textContent = currentPlayer.name;
+
+            // Undo Button State
+            const undoBtn = document.getElementById('undo-btn');
+            if (state.history.length > 0) {
+                undoBtn.disabled = false;
+                undoBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                undoBtn.disabled = true;
+                undoBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
 
             updateMiniLeaderboard();
             renderPlayerCards();
@@ -501,7 +528,42 @@
             }).join(' ');
         }
 
+        // --- History Logic ---
+
+        function pushHistory() {
+            // Create a deep copy of the state excluding the history array itself
+            // to prevent infinite nesting and memory bloat
+            const stateSnapshot = JSON.parse(JSON.stringify(state));
+            delete stateSnapshot.history;
+            
+            state.history.push(stateSnapshot);
+            
+            // Optional: Limit history to last 50 moves to save memory
+            if (state.history.length > 50) {
+                state.history.shift();
+            }
+        }
+
+        window.undoLastShot = function() {
+            if (state.history.length === 0) return;
+            
+            const prev = state.history.pop();
+            
+            // Restore state properties
+            state.players = prev.players;
+            state.currentHole = prev.currentHole;
+            state.currentPlayerIndex = prev.currentPlayerIndex;
+            state.gameActive = prev.gameActive;
+            state.totalHoles = prev.totalHoles;
+            
+            saveState();
+            updateGameUI();
+        }
+
         window.recordScore = function(score) {
+            // Save state before modifying
+            pushHistory();
+
             const player = state.players[state.currentPlayerIndex];
             player.scores[state.currentHole - 1] = score;
             player.total += score;
@@ -517,9 +579,6 @@
                 // Game Over Check
                 if (state.currentHole > state.totalHoles) {
                     endGame();
-                    // We also save state at end game to ensure if they refresh they see results
-                    // Although logic below doesn't handle refreshing on 'results' view explicitly
-                    // It will stay on game view but with hole > total holes, which triggers endGame immediately
                     saveState(); 
                     return;
                 }
