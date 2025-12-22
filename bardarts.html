@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bar Darts Game Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -14,14 +14,19 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #1a202c; /* Matches the apps */
+            background-color: #1a202c;
             color: #e2e8f0;
             -webkit-tap-highlight-color: transparent;
+            /* Prevent scrolling on the body */
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: fixed; /* Lock body in place */
         }
 
-        /* Custom Scrollbar */
+        /* Custom Scrollbar for internal card content if needed */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         ::-webkit-scrollbar-track {
             background: #2d3748; 
@@ -35,9 +40,10 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+            z-index: 10;
         }
 
         .action-btn {
@@ -49,152 +55,152 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4 sm:p-6 bg-gray-900">
+<body class="flex flex-col bg-gray-900">
 
-    <div class="w-full max-w-6xl relative flex flex-col gap-8">
+    <!-- Main Layout Container -->
+    <div class="flex-1 flex flex-col w-full max-w-7xl mx-auto p-2 sm:p-4 h-full">
         
         <!-- Header Section -->
-        <header class="text-center pt-8 sm:pt-4 relative">
+        <header class="flex-none text-center py-2 sm:py-4 relative">
             <!-- Install Button (Top Left) -->
-            <div class="absolute top-0 left-0 sm:top-4 sm:left-0">
-                <button onclick="document.getElementById('installModal').classList.remove('hidden')" class="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-green-400 border border-gray-700 font-semibold py-2 px-4 text-sm rounded-lg transition-all shadow-lg hover:shadow-green-900/20">
-                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Install</span>
+            <div class="absolute top-2 left-2 sm:top-4 sm:left-4">
+                <button onclick="document.getElementById('installModal').classList.remove('hidden')" class="inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-1.5 bg-gray-800 hover:bg-gray-700 text-green-400 border border-gray-700 font-semibold text-xs sm:text-sm rounded-lg transition-all shadow-lg hover:shadow-green-900/20">
+                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline ml-2">Install</span>
                 </button>
             </div>
 
             <!-- Donate Button (Top Right) -->
-            <div class="absolute top-0 right-0 sm:top-4 sm:right-0">
-                <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-sky-400 border border-gray-700 font-semibold py-2 px-4 text-sm rounded-lg transition-all shadow-lg hover:shadow-sky-900/20">
-                    <i class="fa-solid fa-heart"></i> Donate
+            <div class="absolute top-2 right-2 sm:top-4 sm:right-4">
+                <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-1.5 bg-gray-800 hover:bg-gray-700 text-sky-400 border border-gray-700 font-semibold text-xs sm:text-sm rounded-lg transition-all shadow-lg hover:shadow-sky-900/20">
+                    <i class="fa-solid fa-heart"></i> <span class="hidden sm:inline ml-2">Donate</span>
                 </a>
             </div>
             
-            <h1 class="text-4xl sm:text-5xl font-bold mb-3 text-white tracking-tight">Bar Darts Hub</h1>
-            <p class="text-lg text-gray-400 max-w-2xl mx-auto">Choose a game to score.</p>
+            <h1 class="text-2xl sm:text-4xl font-bold text-white tracking-tight">Bar Darts Hub</h1>
+            <p class="text-xs sm:text-sm text-gray-400 max-w-2xl mx-auto mt-1">Choose a game to score.</p>
         </header>
 
-        <!-- Games Grid -->
-        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
-            
+        <!-- Games Grid (Flex-1 to fill available space, min-h-0 to allow shrinking) -->
+        <!-- Switch to 2 columns on mobile (grid-cols-2) and 4 on desktop (lg:grid-cols-4) to best fit viewport -->
+        <main class="flex-1 min-h-0 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 pb-2">
             
             <!-- Halve It Card -->
-            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="fa-solid fa-divide text-6xl text-orange-500"></i>
+            <div class="game-card bg-gray-800 border border-gray-700 p-3 sm:p-5 rounded-xl shadow-xl flex flex-col relative overflow-hidden group h-full justify-between">
+                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                    <i class="fa-solid fa-divide text-4xl sm:text-6xl text-orange-500"></i>
                 </div>
-                <div class="mb-4 z-10">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                            <i class="fa-solid fa-divide text-orange-500 text-xl"></i>
+                <div class="z-10 flex-1 flex flex-col overflow-hidden">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-500/10 flex-shrink-0 flex items-center justify-center">
+                            <i class="fa-solid fa-divide text-orange-500 text-sm sm:text-xl"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-white">Halve It</h2>
+                        <h2 class="text-sm sm:text-xl font-bold text-white leading-tight">Halve It</h2>
                     </div>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Hit the target or lose half your score! High stakes, high pressure, high reward.
+                    <p class="text-gray-400 text-xs sm:text-sm leading-snug overflow-y-auto pr-1">
+                        Hit the target or lose half your score! High stakes, high reward.
                     </p>
                 </div>
-                <div class="mt-auto pt-4 z-10">
-                    <a href="DartsHalveIt.html" class="action-btn block w-full text-center bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-orange-900/30">
-                        Play Halve It
+                <div class="mt-2 z-10 pt-2 border-t border-gray-700/50">
+                    <a href="DartsHalveIt.html" class="action-btn flex items-center justify-center w-full bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs sm:text-sm py-2 sm:py-3 px-2 rounded-lg shadow-lg shadow-orange-900/30">
+                        Play
                     </a>
                 </div>
             </div>
             
             <!-- Darts Golf Card -->
-            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="fa-solid fa-golf-ball-tee text-6xl text-yellow-400"></i>
+            <div class="game-card bg-gray-800 border border-gray-700 p-3 sm:p-5 rounded-xl shadow-xl flex flex-col relative overflow-hidden group h-full justify-between">
+                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                    <i class="fa-solid fa-golf-ball-tee text-4xl sm:text-6xl text-yellow-400"></i>
                 </div>
-                <div class="mb-4 z-10">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-                            <i class="fa-solid fa-golf-ball-tee text-yellow-400 text-xl"></i>
+                <div class="z-10 flex-1 flex flex-col overflow-hidden">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-yellow-500/10 flex-shrink-0 flex items-center justify-center">
+                            <i class="fa-solid fa-golf-ball-tee text-yellow-400 text-sm sm:text-xl"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-white">Golf</h2>
+                        <h2 class="text-sm sm:text-xl font-bold text-white leading-tight">Golf</h2>
                     </div>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Play 9 or 18 holes. Aim for the lowest score by hitting the target segment.
+                    <p class="text-gray-400 text-xs sm:text-sm leading-snug overflow-y-auto pr-1">
+                        Play 9 or 18 holes. Lowest score wins. Hit the target segment!
                     </p>
                 </div>
-                <div class="mt-auto pt-4 z-10">
-                    <a href="DartsGolf.html" class="action-btn block w-full text-center bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-5 rounded-xl shadow-lg shadow-yellow-900/30">
-                        Play Golf
+                <div class="mt-2 z-10 pt-2 border-t border-gray-700/50">
+                    <a href="DartsGolf.html" class="action-btn flex items-center justify-center w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs sm:text-sm py-2 sm:py-3 px-2 rounded-lg shadow-lg shadow-yellow-900/30">
+                        Play
                     </a>
                 </div>
             </div>
 
             <!-- Killer Darts Card -->
-            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="fa-solid fa-skull-crossbones text-6xl text-red-500"></i>
+            <div class="game-card bg-gray-800 border border-gray-700 p-3 sm:p-5 rounded-xl shadow-xl flex flex-col relative overflow-hidden group h-full justify-between">
+                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                    <i class="fa-solid fa-skull-crossbones text-4xl sm:text-6xl text-red-500"></i>
                 </div>
-                <div class="mb-4 z-10">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
-                            <i class="fa-solid fa-skull-crossbones text-red-500 text-xl"></i>
+                <div class="z-10 flex-1 flex flex-col overflow-hidden">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-red-500/10 flex-shrink-0 flex items-center justify-center">
+                            <i class="fa-solid fa-skull-crossbones text-red-500 text-sm sm:text-xl"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-white">Killer</h2>
+                        <h2 class="text-sm sm:text-xl font-bold text-white leading-tight">Killer</h2>
                     </div>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Hunt down your opponents. Hit their number to take a life. Last player standing wins.
+                    <p class="text-gray-400 text-xs sm:text-sm leading-snug overflow-y-auto pr-1">
+                        Hunt opponents. Hit their number to take a life. Last one standing.
                     </p>
                 </div>
-                <div class="mt-auto pt-4 z-10">
-                    <a href="KillerDarts.html" class="action-btn block w-full text-center bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-red-900/30">
-                        Play Killer
+                <div class="mt-2 z-10 pt-2 border-t border-gray-700/50">
+                    <a href="KillerDarts.html" class="action-btn flex items-center justify-center w-full bg-red-600 hover:bg-red-500 text-white font-bold text-xs sm:text-sm py-2 sm:py-3 px-2 rounded-lg shadow-lg shadow-red-900/30">
+                        Play
                     </a>
                 </div>
             </div>
 
             <!-- Check Out Card -->
-            <div class="game-card bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="fa-solid fa-check text-6xl text-blue-500"></i>
+            <div class="game-card bg-gray-800 border border-gray-700 p-3 sm:p-5 rounded-xl shadow-xl flex flex-col relative overflow-hidden group h-full justify-between">
+                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                    <i class="fa-solid fa-check text-4xl sm:text-6xl text-blue-500"></i>
                 </div>
-                <div class="mb-4 z-10">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                            <i class="fa-solid fa-check text-blue-500 text-xl"></i>
+                <div class="z-10 flex-1 flex flex-col overflow-hidden">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/10 flex-shrink-0 flex items-center justify-center">
+                            <i class="fa-solid fa-check text-blue-500 text-sm sm:text-xl"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-white">Check Out</h2>
+                        <h2 class="text-sm sm:text-xl font-bold text-white leading-tight">Check Out</h2>
                     </div>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Practice your finishes. Calculate the best route and hit the double to win.
+                    <p class="text-gray-400 text-xs sm:text-sm leading-snug overflow-y-auto pr-1">
+                        Practice finishes. Calculate the route and hit the double.
                     </p>
                 </div>
-                <div class="mt-auto pt-4 z-10">
-                    <a href="CheckOut.html" class="action-btn block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-blue-900/30">
-                        Play Check Out
+                <div class="mt-2 z-10 pt-2 border-t border-gray-700/50">
+                    <a href="CheckOut.html" class="action-btn flex items-center justify-center w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm py-2 sm:py-3 px-2 rounded-lg shadow-lg shadow-blue-900/30">
+                        Play
                     </a>
                 </div>
             </div>
 
         </main>
 
-        <footer>
-            <p class="text-center pb-6"> Version 3.1, 21.12.2025
-            </p>
+        <footer class="flex-none">
+            <p class="text-center text-xs text-gray-500">Version 3.1, 21.12.2025</p>
         </footer>
     </div>
 
     <!-- Install Modal -->
     <div id="installModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4" onclick="if(event.target === this) this.classList.add('hidden')">
-        <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-md w-full relative shadow-2xl">
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-md w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="document.getElementById('installModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
             
-            <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <h3 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-3">
                 <i class="fa-solid fa-mobile-screen-button text-sky-500"></i> Install App
             </h3>
 
-            <div class="space-y-6">
+            <div class="space-y-4 sm:space-y-6">
                 <!-- iOS Instructions -->
                 <div class="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
-                    <h4 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                    <h4 class="text-base sm:text-lg font-semibold text-white mb-2 flex items-center gap-2">
                         <i class="fa-brands fa-apple text-gray-300"></i> iOS (Safari)
                     </h4>
-                    <ol class="list-decimal list-inside text-gray-300 space-y-2 text-sm">
+                    <ol class="list-decimal list-inside text-gray-300 space-y-2 text-xs sm:text-sm">
                         <li>Tap the <span class="text-sky-400 font-bold"><i class="fa-solid fa-arrow-up-from-bracket"></i> Share</span> button in the toolbar.</li>
                         <li>Scroll down and tap <span class="font-bold text-white">Add to Home Screen</span>.</li>
                         <li>Tap <span class="font-bold text-sky-400">Add</span> in the top right.</li>
@@ -203,10 +209,10 @@
 
                 <!-- Android Instructions -->
                 <div class="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
-                    <h4 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                    <h4 class="text-base sm:text-lg font-semibold text-white mb-2 flex items-center gap-2">
                         <i class="fa-brands fa-android text-green-400"></i> Android (Chrome)
                     </h4>
-                    <ol class="list-decimal list-inside text-gray-300 space-y-2 text-sm">
+                    <ol class="list-decimal list-inside text-gray-300 space-y-2 text-xs sm:text-sm">
                         <li>Tap the <span class="text-gray-300 font-bold"><i class="fa-solid fa-ellipsis-vertical"></i> Menu</span> (three dots) icon.</li>
                         <li>Tap <span class="font-bold text-white">Install App</span> or <span class="font-bold text-white">Add to Home screen</span>.</li>
                         <li>Follow the on-screen prompts.</li>
@@ -215,7 +221,7 @@
             </div>
             
             <div class="mt-6 text-center">
-                <button onclick="document.getElementById('installModal').classList.add('hidden')" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                <button onclick="document.getElementById('installModal').classList.add('hidden')" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2 px-6 rounded-lg transition-colors text-sm">
                     Got it
                 </button>
             </div>
