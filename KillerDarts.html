@@ -118,12 +118,20 @@
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-4">
-                    <div id="target-grid-numbers" class="grid grid-cols-5 gap-3 mb-4">
+                    <!-- Standard 1-20 Grid -->
+                    <div id="target-grid-numbers" class="grid grid-cols-5 gap-2 mb-4">
                         <!-- 1-20 buttons -->
                     </div>
-                    <div id="target-grid-bull" class="grid grid-cols-2 gap-3 mb-4">
-                         <button class="target-btn bg-gray-700 p-4 rounded-xl font-bold text-white border border-gray-600" data-bull="SB">SB</button>
-                         <button class="target-btn bg-red-900/50 p-4 rounded-xl font-bold text-red-400 border border-red-800" data-bull="DB">DB</button>
+                    <!-- Bullseye Grid -->
+                    <div id="target-grid-bull" class="grid grid-cols-2 gap-2 mb-4">
+                         <button class="target-btn bg-gray-700 h-12 rounded-xl font-bold text-2xl text-white border border-gray-600 flex items-center justify-center" data-bull="SB">SB</button>
+                         <button class="target-btn bg-red-900/50 h-12 rounded-xl font-bold text-2xl text-red-400 border border-red-800 flex items-center justify-center" data-bull="DB">DB</button>
+                    </div>
+                    
+                    <!-- NEW: Custom Segments Grid -->
+                    <!-- Changed: grid-cols-4 to match the density of the number grid -->
+                    <div id="target-grid-custom" class="grid grid-cols-4 gap-2 mb-4">
+                        <!-- Custom buttons injected here -->
                     </div>
 
                     <!-- Multiplier Selection (Hidden initially) -->
@@ -148,10 +156,10 @@
                                 -
                             </div>
                         </div>
-                        <div class="text-center">
+                        <div class="text-center flex flex-col items-center">
                             <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Target</span>
-                            <!-- Changed: Increased font size for current target from text-3xl to text-6xl -->
-                            <div class="text-6xl font-bold text-yellow-400" id="game-target-display">
+                            <!-- Changed: Default class will be manipulated in JS for sizing -->
+                            <div class="font-bold text-yellow-400 transition-all duration-300" id="game-target-display">
                                 -
                             </div>
                         </div>
@@ -348,16 +356,34 @@
         // --- Target Selection Logic ---
         function setupTargetGrid() {
             const grid = document.getElementById('target-grid-numbers');
+            // 1-20
             for(let i=20; i>=1; i--) {
                 const btn = document.createElement('button');
-                btn.className = "target-btn bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg p-2 aspect-square flex items-center justify-center border border-gray-600";
+                btn.className = "target-btn bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg h-12 w-full flex items-center justify-center border border-gray-600 text-2xl shadow-sm";
                 btn.textContent = i;
                 btn.onclick = () => selectNumber(i);
                 grid.appendChild(btn);
             }
 
+            // Bull
             document.querySelectorAll('[data-bull]').forEach(btn => {
                 btn.addEventListener('click', (e) => selectBull(e.target.dataset.bull));
+            });
+            
+            // Custom Segments
+            const customGrid = document.getElementById('target-grid-custom');
+            const customSegments = [
+                "N4", "N6", "N8 Outer", "N8 Inner", "N9", "N10",
+                "N14", "N16", "N18 Outer", "N18 Inner", "N19", "N20"
+            ];
+            
+            customSegments.forEach(seg => {
+                const btn = document.createElement('button');
+                // Changed: text-lg -> text-xl to match 1-20 buttons closer
+                btn.className = "target-btn bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg h-12 w-full flex items-center justify-center border border-gray-600 text-xl shadow-sm";
+                btn.textContent = seg;
+                btn.onclick = () => confirmTarget(seg);
+                customGrid.appendChild(btn);
             });
 
             document.getElementById('back-to-nums').addEventListener('click', () => {
@@ -371,6 +397,7 @@
             const setterName = document.getElementById('target-setter-name');
             const numGrid = document.getElementById('target-grid-numbers');
             const bullGrid = document.getElementById('target-grid-bull');
+            const customGrid = document.getElementById('target-grid-custom');
             const multipliers = document.getElementById('target-multipliers');
 
             const setterIndex = gameState.phase === 'target_init' ? 0 : gameState.currentPlayerIndex;
@@ -378,14 +405,16 @@
             title.textContent = gameState.phase === 'target_init' ? 'Set Initial Target' : 'New Killer Target';
 
             if (gameState.targetDraft.number === null) {
-                // Show Numbers
+                // Show Numbers & Custom
                 numGrid.classList.remove('hidden');
                 bullGrid.classList.remove('hidden');
+                customGrid.classList.remove('hidden');
                 multipliers.classList.add('hidden');
             } else {
                 // Show Multipliers
                 numGrid.classList.add('hidden');
                 bullGrid.classList.add('hidden');
+                customGrid.classList.add('hidden');
                 multipliers.classList.remove('hidden');
                 renderMultipliers(gameState.targetDraft.number);
             }
@@ -443,7 +472,18 @@
 
         // --- Game Logic ---
         function renderGame() {
-            document.getElementById('game-target-display').textContent = gameState.currentTarget;
+            const targetDisplay = document.getElementById('game-target-display');
+            targetDisplay.textContent = gameState.currentTarget;
+            
+            // Dynamic resizing for longer target names
+            if(gameState.currentTarget && gameState.currentTarget.length > 3) {
+                targetDisplay.classList.remove('text-6xl');
+                targetDisplay.classList.add('text-3xl');
+            } else {
+                targetDisplay.classList.add('text-6xl');
+                targetDisplay.classList.remove('text-3xl');
+            }
+
             document.getElementById('current-killer-name').textContent = gameState.players[gameState.killerPlayerIndex].name;
             document.getElementById('current-turn-name').textContent = gameState.players[gameState.currentPlayerIndex].name;
 
