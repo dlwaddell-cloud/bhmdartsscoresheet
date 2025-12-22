@@ -55,11 +55,20 @@
         
         <!-- Header Section -->
         <header class="text-center pt-8 sm:pt-4 relative">
+            <!-- Install Button (Top Left) -->
+            <div class="absolute top-0 left-0 sm:top-4 sm:left-0">
+                <button onclick="document.getElementById('installModal').classList.remove('hidden')" class="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-green-400 border border-gray-700 font-semibold py-2 px-4 text-sm rounded-lg transition-all shadow-lg hover:shadow-green-900/20">
+                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Install</span>
+                </button>
+            </div>
+
+            <!-- Donate Button (Top Right) -->
             <div class="absolute top-0 right-0 sm:top-4 sm:right-0">
                 <a href="https://venmo.com/u/dlwaddell" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-sky-400 border border-gray-700 font-semibold py-2 px-4 text-sm rounded-lg transition-all shadow-lg hover:shadow-sky-900/20">
                     <i class="fa-solid fa-heart"></i> Donate
                 </a>
             </div>
+            
             <h1 class="text-4xl sm:text-5xl font-bold mb-3 text-white tracking-tight">Bar Darts Hub</h1>
             <p class="text-lg text-gray-400 max-w-2xl mx-auto">Choose a game to score.</p>
         </header>
@@ -166,6 +175,51 @@
             <p class="text-center pb-6"> Version 3.1, 21.12.2025
             </p>
         </footer>
+    </div>
+
+    <!-- Install Modal -->
+    <div id="installModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4" onclick="if(event.target === this) this.classList.add('hidden')">
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-md w-full relative shadow-2xl">
+            <button onclick="document.getElementById('installModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <i class="fa-solid fa-mobile-screen-button text-sky-500"></i> Install App
+            </h3>
+
+            <div class="space-y-6">
+                <!-- iOS Instructions -->
+                <div class="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
+                    <h4 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-brands fa-apple text-gray-300"></i> iOS (Safari)
+                    </h4>
+                    <ol class="list-decimal list-inside text-gray-300 space-y-2 text-sm">
+                        <li>Tap the <span class="text-sky-400 font-bold"><i class="fa-solid fa-arrow-up-from-bracket"></i> Share</span> button in the toolbar.</li>
+                        <li>Scroll down and tap <span class="font-bold text-white">Add to Home Screen</span>.</li>
+                        <li>Tap <span class="font-bold text-sky-400">Add</span> in the top right.</li>
+                    </ol>
+                </div>
+
+                <!-- Android Instructions -->
+                <div class="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
+                    <h4 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-brands fa-android text-green-400"></i> Android (Chrome)
+                    </h4>
+                    <ol class="list-decimal list-inside text-gray-300 space-y-2 text-sm">
+                        <li>Tap the <span class="text-gray-300 font-bold"><i class="fa-solid fa-ellipsis-vertical"></i> Menu</span> (three dots) icon.</li>
+                        <li>Tap <span class="font-bold text-white">Install App</span> or <span class="font-bold text-white">Add to Home screen</span>.</li>
+                        <li>Follow the on-screen prompts.</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button onclick="document.getElementById('installModal').classList.add('hidden')" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                    Got it
+                </button>
+            </div>
+        </div>
     </div>
 
 </body>
