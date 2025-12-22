@@ -59,10 +59,10 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex flex-col">
+<body class="h-[100dvh] w-screen overflow-hidden flex flex-col">
 
-    <!-- App Container -->
-    <div id="app" class="relative w-full h-full max-w-lg mx-auto flex flex-col bg-gray-900 shadow-2xl">
+    <!-- App Container - Changed max-w-lg to max-w-5xl for better horizontal scaling -->
+    <div id="app" class="relative w-full h-full max-w-5xl mx-auto flex flex-col bg-gray-900 shadow-2xl">
         
         <!-- Header -->
         <header class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10">
@@ -85,30 +85,32 @@
             
             <!-- VIEW: Setup -->
             <div id="setup-view" class="absolute inset-0 z-20 bg-gray-900 flex flex-col p-6 overflow-y-auto">
-                <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa-solid fa-users text-3xl text-orange-500"></i>
+                <div class="w-full max-w-3xl mx-auto flex flex-col min-h-full">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-users text-3xl text-orange-500"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
+                        <p class="text-gray-400 text-sm">Don't miss, or your score gets halved!</p>
                     </div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
-                    <p class="text-gray-400 text-sm">Don't miss, or your score gets halved!</p>
-                </div>
 
-                <div class="space-y-4 flex-1">
-                    <div id="player-inputs" class="space-y-3">
-                        <!-- Player list generated here -->
+                    <div class="space-y-4 flex-1">
+                        <div id="player-inputs" class="space-y-3">
+                            <!-- Player list generated here -->
+                        </div>
+                        
+                        <div class="flex gap-2 mt-4">
+                            <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
+                            <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div class="flex gap-2 mt-4">
-                        <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
-                        <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
 
-                <button id="start-game-btn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    Start Game
-                </button>
+                    <button id="start-game-btn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Start Game
+                    </button>
+                </div>
             </div>
 
             <!-- VIEW: Gameplay -->
@@ -116,100 +118,110 @@
                 
                 <!-- Info Banner -->
                 <div class="bg-gray-800 p-4 shadow-md z-10 border-b border-gray-700">
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="text-left">
-                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Round</span>
-                            <div class="text-xl font-bold text-white">
-                                <span id="current-round-num" class="text-orange-400">1</span>
-                                <span class="text-sm text-gray-500">/ 9</span>
+                    <div class="max-w-5xl mx-auto w-full">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="text-left w-1/4">
+                                <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Round</span>
+                                <div class="text-xl font-bold text-white">
+                                    <span id="current-round-num" class="text-orange-400">1</span>
+                                    <span class="text-sm text-gray-500">/ 9</span>
+                                </div>
+                            </div>
+                            <div class="text-center flex-1">
+                                <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Target</span>
+                                <!-- Increased font size to 6xl -->
+                                <div class="text-6xl font-bold text-orange-400 leading-tight" id="current-target-display">
+                                    20
+                                </div>
+                            </div>
+                            <div class="text-right w-1/4">
+                                 <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Turn</span>
+                                 <div class="text-xl font-bold text-white truncate" id="current-player-name">
+                                    Player
+                                </div>
                             </div>
                         </div>
-                        <div class="text-center">
-                            <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Target</span>
-                            <div class="text-3xl font-bold text-orange-400" id="current-target-display">
-                                20
-                            </div>
+                        
+                        <!-- Throw Tracker -->
+                        <div class="flex justify-center gap-2 mt-1">
+                            <div id="throw-1" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
+                            <div id="throw-2" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
+                            <div id="throw-3" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
                         </div>
-                        <div class="text-right">
-                             <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Turn</span>
-                             <div class="text-xl font-bold text-white truncate max-w-[100px]" id="current-player-name">
-                                Player
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Throw Tracker -->
-                    <div class="flex justify-center gap-2 mt-1">
-                        <div id="throw-1" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
-                        <div id="throw-2" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
-                        <div id="throw-3" class="w-3 h-3 rounded-full bg-gray-700 transition-colors"></div>
                     </div>
                 </div>
 
                 <!-- Player List -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-3" id="players-container">
-                    <!-- Player Cards Injected Here -->
+                <div class="flex-1 overflow-y-auto p-4 w-full">
+                    <div class="max-w-5xl mx-auto w-full space-y-3" id="players-container">
+                        <!-- Player Cards Injected Here -->
+                    </div>
                 </div>
 
                 <!-- Controls -->
                 <div class="bg-gray-800 border-t border-gray-700 p-3 z-20 pb-6 flex flex-col">
-                    
-                    <!-- Dynamic Score Controls -->
-                    <div id="controls-specific" class="hidden flex-1 grid grid-cols-3 gap-2 mb-2">
-                        <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl p-4 flex flex-col items-center justify-center" data-mult="1">
-                            <span class="text-2xl">Single</span>
-                            <span class="text-xs text-gray-400" id="btn-label-s">20</span>
-                        </button>
-                        <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl p-4 flex flex-col items-center justify-center" data-mult="2">
-                            <span class="text-2xl text-green-400">Double</span>
-                            <span class="text-xs text-gray-400" id="btn-label-d">40</span>
-                        </button>
-                        <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl p-4 flex flex-col items-center justify-center" data-mult="3">
-                            <span class="text-2xl text-orange-400">Treble</span>
-                            <span class="text-xs text-gray-400" id="btn-label-t">60</span>
-                        </button>
-                    </div>
-
-                    <div id="controls-any" class="hidden flex-1 overflow-y-auto max-h-[160px] mb-2">
-                        <div class="score-btn-grid" id="any-grid">
-                            <!-- 1-20 buttons injected here -->
+                    <div class="max-w-5xl mx-auto w-full">
+                        
+                        <!-- Dynamic Score Controls -->
+                        <div id="controls-specific" class="hidden grid grid-cols-3 gap-2 mb-2">
+                            <!-- Decreased button sizes to match DartsGolf -->
+                            <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl h-14 flex flex-col items-center justify-center border border-gray-600" data-mult="1">
+                                <span class="text-xl">Single</span>
+                                <span class="text-[10px] text-gray-400 uppercase" id="btn-label-s">20</span>
+                            </button>
+                            <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl h-14 flex flex-col items-center justify-center border border-gray-600" data-mult="2">
+                                <span class="text-xl text-green-400">Double</span>
+                                <span class="text-[10px] text-gray-400 uppercase" id="btn-label-d">40</span>
+                            </button>
+                            <button class="score-btn action-btn bg-gray-700 text-white font-bold rounded-xl h-14 flex flex-col items-center justify-center border border-gray-600" data-mult="3">
+                                <span class="text-xl text-orange-400">Treble</span>
+                                <span class="text-[10px] text-gray-400 uppercase" id="btn-label-t">60</span>
+                            </button>
                         </div>
-                    </div>
-                    
-                    <!-- Bottom Action Bar -->
-                     <div class="grid grid-cols-4 gap-2 h-16">
-                        <button id="undo-btn" class="col-span-1 bg-gray-700 text-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-600 action-btn">
-                            <i class="fa-solid fa-rotate-left text-xl"></i>
-                        </button>
-                        <button id="miss-btn" class="col-span-1 bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl flex flex-col items-center justify-center hover:bg-red-500/20 action-btn">
-                            <span class="text-lg font-bold">MISS</span>
-                        </button>
-                         <button id="next-btn" class="col-span-2 bg-orange-600 text-white rounded-xl flex items-center justify-center hover:bg-orange-500 action-btn font-bold text-lg">
-                            NEXT <i class="fa-solid fa-chevron-right ml-2"></i>
-                        </button>
+
+                        <div id="controls-any" class="hidden overflow-y-auto max-h-[160px] mb-2">
+                            <div class="score-btn-grid" id="any-grid">
+                                <!-- 1-20 buttons injected here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Bottom Action Bar -->
+                         <div class="grid grid-cols-4 gap-2 h-14">
+                            <button id="undo-btn" class="col-span-1 bg-gray-700 text-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-600 action-btn h-full">
+                                <i class="fa-solid fa-rotate-left text-xl"></i>
+                            </button>
+                            <button id="miss-btn" class="col-span-1 bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl flex flex-col items-center justify-center hover:bg-red-500/20 action-btn h-full">
+                                <span class="text-lg font-bold">MISS</span>
+                            </button>
+                             <button id="next-btn" class="col-span-2 bg-orange-600 text-white rounded-xl flex items-center justify-center hover:bg-orange-500 action-btn font-bold text-lg h-full">
+                                NEXT <i class="fa-solid fa-chevron-right ml-2"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- VIEW: Results -->
-            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col p-6 hidden">
-                <div class="text-center mb-8 pt-10">
-                    <i class="fa-solid fa-trophy text-6xl text-yellow-400 mb-6 animate-bounce"></i>
-                    <h2 class="text-4xl font-bold text-white mb-2">Game Over!</h2>
-                    <p class="text-xl text-gray-400" id="winner-name">Player Wins</p>
-                </div>
-                
-                <div id="final-scores-list" class="flex-1 overflow-y-auto space-y-3 mb-4">
-                    <!-- Final scores -->
-                </div>
+            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col p-6 hidden overflow-y-auto">
+                <div class="w-full max-w-3xl mx-auto flex flex-col min-h-full">
+                    <div class="text-center mb-8 pt-10">
+                        <i class="fa-solid fa-trophy text-6xl text-yellow-400 mb-6 animate-bounce"></i>
+                        <h2 class="text-4xl font-bold text-white mb-2">Game Over!</h2>
+                        <p class="text-xl text-gray-400" id="winner-name">Player Wins</p>
+                    </div>
+                    
+                    <div id="final-scores-list" class="flex-1 space-y-3 mb-4">
+                        <!-- Final scores -->
+                    </div>
 
-                <div class="flex flex-col gap-4 pb-10">
-                    <button id="new-game-btn" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all">
-                        Play Again
-                    </button>
-                    <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
-                        Return to Menu
-                    </a>
+                    <div class="flex flex-col gap-4 pb-10">
+                        <button id="new-game-btn" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all">
+                            Play Again
+                        </button>
+                        <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
+                            Return to Menu
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -356,7 +368,6 @@
             gameState.turnThrows = [];
             gameState.history = [];
             // Reset scores
-            gameState.players.forEach(p => p.score = 40); // Start with 40 or 0? Usually 0 or a base. Let's start with 0 as per uploaded file logic
             gameState.players.forEach(p => p.score = 0);
             
             saveState();
@@ -418,8 +429,18 @@
             const container = document.getElementById('players-container');
             container.innerHTML = '';
             
-            gameState.players.forEach((p, i) => {
-                const isTurn = i === gameState.currentPlayerIdx;
+            const playerCount = gameState.players.length;
+            if (playerCount === 0) return;
+
+            // Create an array of indices starting from current player to rotate the list
+            const indices = [];
+            for (let i = 0; i < playerCount; i++) {
+                indices.push((gameState.currentPlayerIdx + i) % playerCount);
+            }
+            
+            indices.forEach((idx) => {
+                const p = gameState.players[idx];
+                const isTurn = idx === gameState.currentPlayerIdx;
                 let bgClass = isTurn ? "bg-gray-700 border border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.2)]" : "bg-gray-800 border border-gray-700 opacity-80";
                 
                 // Calculate potential current turn score to preview
@@ -436,27 +457,25 @@
                 }
 
                 const html = `
-                    <div class="${bgClass} rounded-xl p-4 transition-all flex justify-between items-center relative overflow-hidden" id="card-player-${i}">
-                        <div class="flex items-center gap-3 z-10">
-                            <div class="w-8 h-8 rounded-full ${isTurn ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400'} flex items-center justify-center font-bold text-sm">
-                                ${i+1}
+                    <div class="${bgClass} rounded-xl p-4 transition-all flex justify-between items-center relative overflow-hidden" id="card-player-${idx}">
+                        <div class="flex items-center gap-4 z-10 overflow-hidden">
+                            <div class="w-10 h-10 min-w-[2.5rem] rounded-full ${isTurn ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400'} flex items-center justify-center font-bold text-lg">
+                                ${idx+1}
                             </div>
-                            <div>
-                                <h3 class="font-bold text-white text-lg leading-tight">${p.name}</h3>
-                                ${isTurn ? `<div class="text-xs text-orange-400 font-mono">Current Turn: +${roundScore}</div>` : ''}
+                            <div class="min-w-0">
+                                <!-- Increased font size for name to text-3xl -->
+                                <h3 class="font-bold text-white text-3xl leading-tight truncate">${p.name}</h3>
+                                ${isTurn ? `<div class="text-sm text-orange-400 font-mono">Current Turn: +${roundScore}</div>` : ''}
                             </div>
                         </div>
-                        <div class="z-10 text-right">
-                             <div class="text-3xl font-bold text-white font-mono">${currentScore}</div>
+                        <div class="z-10 text-right pl-4">
+                             <!-- Increased font size for score to text-5xl -->
+                             <div class="text-5xl font-bold text-white font-mono">${currentScore}</div>
                         </div>
                     </div>
                 `;
                 container.innerHTML += html;
             });
-
-            // Scroll to active
-            const activeCard = document.getElementById(`card-player-${gameState.currentPlayerIdx}`);
-            if(activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         function updateSpecificButtons(target) {
@@ -499,14 +518,15 @@
             // 1-20
             for(let i=1; i<=20; i++) {
                 const btn = document.createElement('button');
-                btn.className = "score-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg border border-gray-600";
+                // Made buttons slightly more compact
+                btn.className = "score-btn bg-gray-700 hover:bg-gray-600 text-white font-bold h-10 rounded-lg border border-gray-600 text-sm";
                 btn.textContent = i;
                 btn.onclick = () => handleAnyHit(i);
                 grid.appendChild(btn);
             }
             // Bull
             const bullBtn = document.createElement('button');
-            bullBtn.className = "score-btn bg-red-900/50 hover:bg-red-800/50 text-red-400 font-bold py-3 rounded-lg border border-red-800 col-span-5";
+            bullBtn.className = "score-btn bg-red-900/50 hover:bg-red-800/50 text-red-400 font-bold h-10 rounded-lg border border-red-800 col-span-5 text-sm";
             bullBtn.textContent = "BULL";
             bullBtn.onclick = () => handleAnyHit(25);
             grid.appendChild(bullBtn);
