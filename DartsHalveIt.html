@@ -234,7 +234,7 @@
     <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
         <div class="bg-gray-800 p-6 rounded-2xl max-w-xs w-full shadow-2xl border border-gray-700">
             <h3 class="text-xl font-bold text-white mb-2">Reset Game?</h3>
-            <p class="text-gray-400 mb-6 text-sm">This will clear all current progress.</p>
+            <p class="text-gray-400 mb-6 text-sm">This will clear all current player data.</p>
             <div class="flex gap-3">
                 <button id="cancel-reset" class="flex-1 py-3 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-600">Cancel</button>
                 <button id="confirm-reset" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700">Reset</button>
@@ -649,18 +649,33 @@
         resetBtn.addEventListener('click', () => modals.confirm.classList.remove('hidden'));
         cancelBtn.addEventListener('click', () => modals.confirm.classList.add('hidden'));
         
+        // Confirm Button (Reset Game) -> Wipes Data
         confirmBtn.addEventListener('click', () => {
-            fullReset();
+            resetGame();
             modals.confirm.classList.add('hidden');
         });
         
+        // New Game Button (Play Again) -> Keeps Players
         newGameBtn.addEventListener('click', () => {
-            fullReset();
+            rematchGame();
         });
 
-        function fullReset() {
+        // Completely Wipe Game
+        function resetGame() {
             gameState.phase = 'setup';
             gameState.players = [];
+            gameState.history = [];
+            gameState.currentRoundIdx = 0;
+            gameState.currentPlayerIdx = 0;
+            saveState();
+            render();
+        }
+
+        // Restart with Same Players
+        function rematchGame() {
+            gameState.phase = 'setup';
+            // Do NOT wipe players, just scores
+            gameState.players.forEach(p => p.score = 0);
             gameState.history = [];
             gameState.currentRoundIdx = 0;
             gameState.currentPlayerIdx = 0;
