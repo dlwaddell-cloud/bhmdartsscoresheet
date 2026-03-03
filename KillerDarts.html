@@ -479,11 +479,11 @@
             
             // Dynamic resizing for longer target names
             if(gameState.currentTarget && gameState.currentTarget.length > 3) {
-                targetDisplay.classList.remove('text-6xl');
-                targetDisplay.classList.add('text-3xl');
-            } else {
+                targetDisplay.classList.remove('text-9xl');
                 targetDisplay.classList.add('text-6xl');
-                targetDisplay.classList.remove('text-3xl');
+            } else {
+                targetDisplay.classList.add('text-9xl');
+                targetDisplay.classList.remove('text-6xl');
             }
 
             document.getElementById('current-killer-name').textContent = gameState.players[gameState.killerPlayerIndex].name;
