@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darts Golf</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <meta name="theme-color" content="#1a202c">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            overscroll-behavior: none;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; 
+            border-radius: 4px;
+        }
+
+        .score-btn {
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        .score-btn:active {
+            transform: scale(0.95);
+        }
+
+        .input-focus-ring:focus {
+            outline: 2px solid #facc15; /* Yellow-400 */
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="h-[100dvh] w-screen overflow-hidden flex flex-col">
+
+    <!-- App Container -->
+    <div id="app" class="relative w-full h-full mx-auto flex flex-col bg-gray-900 shadow-2xl">
+        
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 z-10">
+            <div class="max-w-5xl mx-auto w-full p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-golf-ball-tee text-yellow-400 text-xl"></i>
+                    <h1 class="text-xl font-bold text-white tracking-wide">Darts Golf</h1>
+                </div>
+                <div class="flex gap-2">
+     <button id="reset-data-btn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center gap-2">
+        <i class="fa-solid fa-rotate-right"></i>
+        <span>Reset Game</span>
+    </button>
+    <a href="bardarts.html" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center gap-2 no-underline">
+        <i class="fa-solid fa-door-open"></i>
+        <span>Game Hub</span>
+    </a>
+</div>                
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 relative overflow-hidden flex flex-col">
+            
+            <!-- VIEW: Setup -->
+            <div id="setup-view" class="absolute inset-0 z-20 bg-gray-900 flex flex-col overflow-y-auto">
+                <div class="w-full max-w-3xl mx-auto p-6 flex flex-col min-h-full">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-users text-3xl text-yellow-400"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Game Setup</h2>
+                        <p class="text-gray-400 text-sm">Add players to begin the round.</p>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <label class="block text-sm font-medium text-gray-300">Number of Holes</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button class="hole-select-btn bg-yellow-500 text-gray-900 p-3 rounded-lg font-bold border-2 border-yellow-500 transition-all" data-holes="9">9 Holes</button>
+                            <button class="hole-select-btn bg-gray-800 text-gray-400 p-3 rounded-lg font-bold border-2 border-transparent hover:bg-gray-700 transition-all" data-holes="18">18 Holes</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 flex-1">
+                        <label class="block text-sm font-medium text-gray-300">Players</label>
+                        <div id="player-inputs" class="space-y-3">
+                            <!-- Player inputs generated here -->
+                        </div>
+                        
+                        <div class="flex gap-2 mt-4">
+                            <input type="text" id="new-player-name" placeholder="Enter Name" class="input-focus-ring flex-1 bg-gray-800 border border-gray-700 text-white p-3 rounded-lg transition-all" />
+                            <button id="add-player-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg transition-colors">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="start-game-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl shadow-lg mt-6 transform transition hover:-translate-y-1">
+                        Tee Off
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW: Scoreboard / Gameplay -->
+            <div id="game-view" class="absolute inset-0 bg-gray-900 flex flex-col hidden">
+                
+                <!-- Hole Info Banner -->
+                <div class="bg-gray-800 shadow-md z-10 border-b border-gray-700">
+                    <div class="max-w-5xl mx-auto w-full p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Current Hole</span>
+                                <!-- Increased font size for hole number -->
+                                <div class="text-6xl font-bold text-white flex items-baseline">
+                                    <span id="current-hole-num" class="text-9xl text-yellow-400">1</span>
+                                    <span class="text-lg text-gray-500 ml-2">/ <span id="total-holes-display">9</span></span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-gray-400 text-xs uppercase tracking-wider font-bold">Leaderboard</span>
+                                <div id="mini-leaderboard" class="flex flex-col items-end mt-1 space-y-1 min-h-[3rem]">
+                                    <!-- Leaderboard injected here -->
+                                    <span class="text-gray-500 text-xs italic">Tee Off</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-yellow-500 transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Player Card -->
+                <div class="flex-1 overflow-y-auto p-4 w-full">
+                    <div id="players-container" class="max-w-5xl mx-auto space-y-4">
+                        <!-- Player Cards Injected Here -->
+                    </div>
+                </div>
+
+                <!-- Input Controls (Fixed Bottom) -->
+                <div class="bg-gray-800 border-t border-gray-700 z-20">
+                    <div class="max-w-5xl mx-auto w-full p-2 pb-6">
+                        <div class="text-center mb-2">
+                            <p class="text-xs text-gray-400">Select Score for <span id="active-player-name" class="text-white font-bold">Player</span></p>
+                        </div>
+                        <!-- Decreased button height to h-14 and reduced inner text size slightly -->
+                        <div class="grid grid-cols-5 gap-2">
+                            <button class="score-btn bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-3)">
+                                <span class="text-xl font-bold">-3</span>
+                                <span class="text-[9px] uppercase">Double</span>
+                            </button>
+                            <button class="score-btn bg-orange-500/20 border border-orange-500/50 text-orange-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-2)">
+                                <span class="text-xl font-bold">-2</span>
+                                <span class="text-[9px] uppercase">Treble</span>
+                            </button>
+                            <button class="score-btn bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-1)">
+                                <span class="text-xl font-bold">-1</span>
+                                <span class="text-[9px] uppercase">Small</span>
+                            </button>
+                            <button class="score-btn bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(0)">
+                                <span class="text-xl font-bold">0</span>
+                                <span class="text-[9px] uppercase">Large</span>
+                            </button>
+                            <button class="score-btn bg-gray-600/20 border border-gray-600/50 text-gray-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(2)">
+                                <span class="text-xl font-bold">+2</span>
+                                <span class="text-[9px] uppercase">Miss</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Results -->
+            <div id="results-view" class="absolute inset-0 bg-gray-900 z-30 flex flex-col overflow-y-auto hidden">
+                <div class="w-full max-w-3xl mx-auto p-6 flex flex-col min-h-full">
+                    <div class="text-center mb-8 pt-10">
+                        <i class="fa-solid fa-trophy text-5xl text-yellow-400 mb-4 animate-bounce"></i>
+                        <h2 class="text-3xl font-bold text-white">Final Scores</h2>
+                    </div>
+                    
+                    <div id="leaderboard" class="space-y-3 flex-1 overflow-y-auto">
+                        <!-- Leaderboard items -->
+                    </div>
+
+                    <div class="flex flex-col gap-4 pb-10 mt-6">
+                        <button onclick="rematchGame()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl shadow-lg">
+                            Play Again
+                        </button>
+                        <a href="bardarts.html" class="w-full block text-center text-gray-500 hover:text-white py-3 bg-gray-800 rounded-xl">
+                            Return to Menu
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-gray-800 p-6 rounded-2xl max-w-xs w-full shadow-2xl border border-gray-700">
+            <h3 class="text-xl font-bold text-white mb-2">Reset Game?</h3>
+            <p class="text-gray-400 mb-6 text-sm">This will clear all current player data.</p>
+            <div class="flex gap-3">
+                <button id="cancel-reset" class="flex-1 py-3 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-600">Cancel</button>
+                <button id="confirm-reset" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let state = {
+            players: [], // { id, name, scores: [], total: 0 }
+            totalHoles: 9,
+            currentHole: 1,
+            currentPlayerIndex: 0,
+            gameActive: false
+        };
+
+        const STORAGE_KEY = 'darts_golf_state';
+
+        // DOM Elements
+        const views = {
+            setup: document.getElementById('setup-view'),
+            game: document.getElementById('game-view'),
+            results: document.getElementById('results-view')
+        };
+        const modals = {
+            confirm: document.getElementById('confirm-modal')
+        };
+        const playerInputsContainer = document.getElementById('player-inputs');
+        const newPlayerInput = document.getElementById('new-player-name');
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+        });
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    state = JSON.parse(saved);
+                    if (state.gameActive) {
+                        startGame();
+                    } else {
+                        renderPlayerSetup();
+                        updateHoleButtonUI();
+                        switchView('setup');
+                    }
+                } catch (e) {
+                    console.error("Failed to load state", e);
+                    renderPlayerSetup();
+                    switchView('setup');
+                }
+            } else {
+                renderPlayerSetup();
+                switchView('setup');
+            }
+        }
+
+        function updateHoleButtonUI() {
+             document.querySelectorAll('.hole-select-btn').forEach(b => {
+                const btnHoles = parseInt(b.dataset.holes);
+                if (btnHoles === state.totalHoles) {
+                    b.classList.remove('bg-gray-800', 'text-gray-400', 'border-transparent');
+                    b.classList.add('bg-yellow-500', 'text-gray-900', 'border-yellow-500');
+                } else {
+                    b.classList.add('bg-gray-800', 'text-gray-400', 'border-transparent');
+                    b.classList.remove('bg-yellow-500', 'text-gray-900', 'border-yellow-500');
+                }
+            });
+        }
+
+        // --- Setup Logic ---
+
+        document.querySelectorAll('.hole-select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                state.totalHoles = parseInt(e.target.dataset.holes);
+                updateHoleButtonUI();
+                saveState();
+            });
+        });
+
+        document.getElementById('add-player-btn').addEventListener('click', addPlayer);
+        newPlayerInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addPlayer() });
+
+        function addPlayer() {
+            const name = newPlayerInput.value.trim();
+            if (name) {
+                state.players.push({
+                    id: Date.now(),
+                    name: name,
+                    scores: [],
+                    total: 0
+                });
+                newPlayerInput.value = '';
+                saveState();
+                renderPlayerSetup();
+            }
+        }
+
+        window.removePlayer = (index) => {
+            state.players.splice(index, 1);
+            saveState();
+            renderPlayerSetup();
+        };
+
+        function renderPlayerSetup() {
+            playerInputsContainer.innerHTML = '';
+            state.players.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700";
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-400">${i+1}</div>
+                    <span class="flex-1 font-semibold text-white">${p.name}</span>
+                    <button onclick="removePlayer(${i})" class="text-red-400 hover:text-red-300 p-2"><i class="fa-solid fa-trash"></i></button>
+                `;
+                playerInputsContainer.appendChild(div);
+            });
+        }
+
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            if (state.players.length === 0) {
+                alert("Add at least one player!"); // Basic validation
+                return;
+            }
+
+            // Init empty scores
+            state.players.forEach(p => {
+                p.scores = Array(state.totalHoles).fill(null);
+                p.total = 0;
+            });
+
+            state.currentHole = 1;
+            state.currentPlayerIndex = 0;
+            state.gameActive = true;
+            
+            saveState();
+            startGame();
+        });
+
+        // --- Reset / Modals ---
+        const resetBtn = document.getElementById('reset-data-btn');
+        const confirmBtn = document.getElementById('confirm-reset');
+        const cancelBtn = document.getElementById('cancel-reset');
+
+        resetBtn.addEventListener('click', () => modals.confirm.classList.remove('hidden'));
+        cancelBtn.addEventListener('click', () => modals.confirm.classList.add('hidden'));
+        confirmBtn.addEventListener('click', () => {
+            resetGame();
+            modals.confirm.classList.add('hidden');
+        });
+
+        // Function to Completely wipe the game (Header Reset button)
+        window.resetGame = function() {
+            state.players = []; // Wipe players
+            state.gameActive = false;
+            state.currentHole = 1;
+            state.currentPlayerIndex = 0;
+            saveState();
+            renderPlayerSetup();
+            switchView('setup');
+        }
+
+        // Function to Restart with same players (Play Again button)
+        window.rematchGame = function() {
+            state.gameActive = false;
+            state.currentHole = 1;
+            state.currentPlayerIndex = 0;
+            // Scores are reset when "Tee Off" is clicked, so we just return to setup
+            saveState();
+            renderPlayerSetup();
+            switchView('setup');
+        }
+
+        function switchView(viewName) {
+            Object.values(views).forEach(el => el.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+        }
+
+        // --- Game Logic ---
+
+        function startGame() {
+            updateGameUI();
+            switchView('game');
+        }
+
+        function updateGameUI() {
+            document.getElementById('current-hole-num').textContent = state.currentHole;
+            document.getElementById('total-holes-display').textContent = state.totalHoles;
+            
+            // Progress Bar
+            const progress = ((state.currentHole - 1) / state.totalHoles) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            // Active Player Name
+            const currentPlayer = state.players[state.currentPlayerIndex];
+            document.getElementById('active-player-name').textContent = currentPlayer.name;
+
+            updateMiniLeaderboard();
+            renderPlayerCards();
+        }
+
+        function updateMiniLeaderboard() {
+            const container = document.getElementById('mini-leaderboard');
+            if (!container) return;
+            
+            // If hole 1, show Tee Off text
+            if (state.currentHole === 1) {
+                container.innerHTML = '<span class="text-gray-500 text-xs italic">Tee Off</span>';
+                return;
+            }
+
+            // Calculate totals based on COMPLETED holes only (previous hole)
+            // state.currentHole is 1-based. We want scores for indices 0 to (state.currentHole - 2)
+            const limit = state.currentHole - 1; 
+            
+            const rankings = state.players.map(p => {
+                const subTotal = p.scores.slice(0, limit).reduce((acc, curr) => acc + (curr || 0), 0);
+                return { name: p.name, score: subTotal };
+            }).sort((a, b) => a.score - b.score).slice(0, 3); // Top 3
+
+            container.innerHTML = rankings.map((p, i) => {
+                const color = i === 0 ? 'text-yellow-400' : 'text-gray-300';
+                return `
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="${color} font-bold max-w-[80px] truncate">${i+1}. ${p.name}</span>
+                        <span class="font-mono text-white">${p.score}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPlayerCards() {
+            const container = document.getElementById('players-container');
+            container.innerHTML = '';
+            
+            const playerCount = state.players.length;
+            if (playerCount === 0) return;
+
+            // Create an array of indices starting from current player to rotate the list
+            const indices = [];
+            for (let i = 0; i < playerCount; i++) {
+                indices.push((state.currentPlayerIndex + i) % playerCount);
+            }
+
+            indices.forEach((realIndex) => {
+                const player = state.players[realIndex];
+                const isActive = realIndex === state.currentPlayerIndex;
+                const isDone = player.scores[state.currentHole - 1] !== null;
+                
+                let cardClass = isActive 
+                    ? "bg-gray-700 border-2 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]" 
+                    : "bg-gray-800 border border-gray-700 opacity-60";
+
+                if (isDone) {
+                     cardClass = "bg-gray-800 border border-gray-600 opacity-40";
+                }
+
+                const lastScore = state.currentHole > 1 ? player.scores[state.currentHole - 2] : '-';
+                
+                // Increased name font size (text-3xl) and score font size (text-5xl)
+                const html = `
+                    <div class="${cardClass} rounded-xl p-4 transition-all duration-300 relative overflow-hidden">
+                        ${isActive ? '<div class="absolute top-0 right-0 p-2"><span class="flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span></span></div>' : ''}
+                        
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-7xl text-white truncate max-w-[70%]">${player.name}</h3>
+                            <span class="text-7xl font-mono font-bold ${player.total < 0 ? 'text-yellow-400' : 'text-white'}">${player.total}</span>
+                        </div>
+                        
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <div>Last Hole: <span class="text-white font-bold">${lastScore !== null ? lastScore : '-'}</span></div>
+                            <div class="flex gap-1">
+                                ${getScoreHistory(player)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function getScoreHistory(player) {
+            // Show last 5 holes
+            const history = player.scores.slice(0, state.currentHole - 1).slice(-5);
+            return history.map(s => {
+                let color = 'text-gray-500';
+                if(s === -3) color = 'text-red-400';
+                if(s === -2) color = 'text-orange-400';
+                if(s === -1) color = 'text-yellow-400';
+                if(s === 0) color = 'text-blue-400';
+                
+                const displayScore = s > 0 ? '+' + s : s;
+                
+                return `<span class="${color}">${displayScore}</span>`;
+            }).join(' ');
+        }
+
+        window.recordScore = function(score) {
+            const player = state.players[state.currentPlayerIndex];
+            player.scores[state.currentHole - 1] = score;
+            player.total += score;
+
+            // Move to next player
+            state.currentPlayerIndex++;
+
+            // If all players have played this hole
+            if (state.currentPlayerIndex >= state.players.length) {
+                state.currentPlayerIndex = 0;
+                state.currentHole++;
+
+                // Game Over Check
+                if (state.currentHole > state.totalHoles) {
+                    endGame();
+                    // We also save state at end game to ensure if they refresh they see results
+                    // Although logic below doesn't handle refreshing on 'results' view explicitly
+                    // It will stay on game view but with hole > total holes, which triggers endGame immediately
+                    saveState(); 
+                    return;
+                }
+            }
+            
+            saveState();
+            updateGameUI();
+        };
+
+        function endGame() {
+            switchView('results');
+            const leaderboard = document.getElementById('leaderboard');
+            
+            // Sort players by score (ascending)
+            const sortedPlayers = [...state.players].sort((a, b) => a.total - b.total);
+            
+            leaderboard.innerHTML = sortedPlayers.map((p, i) => {
+                let rankColor = "text-gray-400";
+                let rankIcon = `<span class="font-mono text-gray-500">#${i+1}</span>`;
+                let bgClass = "bg-gray-800";
+                
+                if (i === 0) {
+                    rankColor = "text-yellow-400";
+                    rankIcon = '<i class="fa-solid fa-crown text-yellow-400"></i>';
+                    bgClass = "bg-gradient-to-r from-yellow-900/20 to-gray-800 border-yellow-500/30 border";
+                } else if (i === 1) {
+                    rankColor = "text-gray-300";
+                    bgClass = "bg-gray-800 border-gray-600 border";
+                } else if (i === 2) {
+                    rankColor = "text-orange-400";
+                    bgClass = "bg-gray-800 border-orange-900/30 border";
+                }
+
+                return `
+                    <div class="${bgClass} p-4 rounded-xl flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-8 text-center text-xl">${rankIcon}</div>
+                            <div>
+                                <div class="font-bold text-white text-lg">${p.name}</div>
+                                <div class="text-xs text-gray-500">Avg: ${(p.total / state.totalHoles).toFixed(1)}</div>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-mono font-bold ${rankColor}">${p.total}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+    </script>
+</body>
+</html>
