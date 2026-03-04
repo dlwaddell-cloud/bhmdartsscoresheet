@@ -62,15 +62,16 @@
                     <h1 class="text-xl font-bold text-white tracking-wide">Darts Golf</h1>
                 </div>
                 <div class="flex gap-2">
-     <button id="reset-data-btn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center gap-2">
-        <i class="fa-solid fa-rotate-right"></i>
-        <span>Reset Game</span>
-    </button>
-    <a href="bardarts.html" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center gap-2 no-underline">
-        <i class="fa-solid fa-door-open"></i>
-        <span>Game Hub</span>
-    </a>
-</div>                
+                    <button id="reset-data-btn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Reset Game</span>
+                    </button>
+                    <a href="bardarts.html" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center gap-2 no-underline">
+                        <i class="fa-solid fa-door-open"></i>
+                        <span>Game Hub</span>
+                    </a>
+                </div>                
+            </div>
         </header>
 
         <!-- Main Content Area -->
@@ -154,11 +155,16 @@
                 <!-- Input Controls (Fixed Bottom) -->
                 <div class="bg-gray-800 border-t border-gray-700 z-20">
                     <div class="max-w-5xl mx-auto w-full p-2 pb-6">
-                        <div class="text-center mb-2">
-                            <p class="text-xs text-gray-400">Select Score for <span id="active-player-name" class="text-white font-bold">Player</span></p>
+                        
+                        <div class="text-center mb-2 px-1">
+                            <p class="text-xs text-gray-400">Score for <span id="active-player-name" class="text-white font-bold text-sm">Player</span></p>
                         </div>
-                        <!-- Decreased button height to h-14 and reduced inner text size slightly -->
-                        <div class="grid grid-cols-5 gap-2">
+                        
+                        <!-- 6-column grid to accommodate Undo button + 5 scoring buttons -->
+                        <div class="grid grid-cols-6 gap-2">
+                            <button id="undo-btn" class="score-btn bg-gray-700 hover:bg-gray-600 text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg p-2 flex flex-col items-center justify-center h-14 border border-gray-600 transition-all" onclick="handleUndo()">
+                                <i class="fa-solid fa-rotate-left text-xl"></i>
+                            </button>
                             <button class="score-btn bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg p-2 flex flex-col items-center justify-center h-14" onclick="recordScore(-3)">
                                 <span class="text-xl font-bold">-3</span>
                                 <span class="text-[9px] uppercase">Double</span>
@@ -229,7 +235,8 @@
             totalHoles: 9,
             currentHole: 1,
             currentPlayerIndex: 0,
-            gameActive: false
+            gameActive: false,
+            history: [] // For undo
         };
 
         const STORAGE_KEY = 'darts_golf_state';
@@ -260,6 +267,8 @@
             if (saved) {
                 try {
                     state = JSON.parse(saved);
+                    if (!state.history) state.history = []; // Migration for older saves
+                    
                     if (state.gameActive) {
                         startGame();
                     } else {
@@ -276,6 +285,13 @@
                 renderPlayerSetup();
                 switchView('setup');
             }
+        }
+        
+        function pushHistory() {
+            const stateCopy = JSON.parse(JSON.stringify(state));
+            stateCopy.history = []; // Keep history clear in copies to prevent nesting loops
+            state.history.push(stateCopy);
+            if (state.history.length > 5) state.history.shift(); // keep last 5
         }
 
         function updateHoleButtonUI() {
@@ -354,6 +370,7 @@
             state.currentHole = 1;
             state.currentPlayerIndex = 0;
             state.gameActive = true;
+            state.history = []; // Reset history for new game
             
             saveState();
             startGame();
@@ -377,6 +394,7 @@
             state.gameActive = false;
             state.currentHole = 1;
             state.currentPlayerIndex = 0;
+            state.history = [];
             saveState();
             renderPlayerSetup();
             switchView('setup');
@@ -387,6 +405,7 @@
             state.gameActive = false;
             state.currentHole = 1;
             state.currentPlayerIndex = 0;
+            state.history = [];
             // Scores are reset when "Tee Off" is clicked, so we just return to setup
             saveState();
             renderPlayerSetup();
@@ -416,6 +435,13 @@
             // Active Player Name
             const currentPlayer = state.players[state.currentPlayerIndex];
             document.getElementById('active-player-name').textContent = currentPlayer.name;
+
+            // Update Undo Button state
+            const undoBtn = document.getElementById('undo-btn');
+            if (undoBtn) {
+                const canUndo = state.history && state.history.length > 0;
+                undoBtn.disabled = !canUndo;
+            }
 
             updateMiniLeaderboard();
             renderPlayerCards();
@@ -517,7 +543,17 @@
             }).join(' ');
         }
 
+        window.handleUndo = function() {
+            if (state.history && state.history.length > 0) {
+                state = state.history.pop();
+                saveState();
+                updateGameUI();
+            }
+        };
+
         window.recordScore = function(score) {
+            pushHistory();
+            
             const player = state.players[state.currentPlayerIndex];
             player.scores[state.currentHole - 1] = score;
             player.total += score;
@@ -534,8 +570,6 @@
                 if (state.currentHole > state.totalHoles) {
                     endGame();
                     // We also save state at end game to ensure if they refresh they see results
-                    // Although logic below doesn't handle refreshing on 'results' view explicitly
-                    // It will stay on game view but with hole > total holes, which triggers endGame immediately
                     saveState(); 
                     return;
                 }
